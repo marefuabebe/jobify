@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+    xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Rate Freelancer - Jobify</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
+    <link rel="stylesheet" th:href="@{/webjars/font-awesome/css/all.min.css}" />
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <style>
+        :root {
+            --primary: #4B6CB7;
+            --primary-light: #182848;
+            --accent: #00b4d8;
+            --success: #2ecc71;
+            --warning: #f1c40f;
+            --danger: #e74c3c;
+            --bg-body: #f5f7fa;
+            --glass-bg: rgba(255, 255, 255, 0.88);
+            --glass-border: rgba(255, 255, 255, 0.5);
+            --card-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+            --radius-xl: 24px;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f8faff 0%, #eef2f7 100%);
+            color: #2D3436;
+            font-family: 'Inter', -apple-system, sans-serif;
+            min-height: 100vh;
+        }
+
+        .navbar-custom {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-brand-custom {
+            font-weight: 800;
+            font-size: 24px;
+            color: var(--primary) !important;
+            letter-spacing: -0.5px;
+        }
+
+        .rating-hero {
+            padding: 50px 0 30px 0;
+            text-align: center;
+        }
+
+        .hero-title {
+            font-weight: 900;
+            font-size: 42px;
+            color: var(--primary-light);
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+        }
+
+        .hero-subtitle {
+            color: #636E72;
+            font-size: 18px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .content-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--card-shadow);
+            padding: 40px;
+            margin-bottom: 40px;
+        }
+
+        .project-summary {
+            background: rgba(75, 108, 183, 0.05);
+            border-radius: 18px;
+            padding: 25px;
+            margin-bottom: 40px;
+            border: 1px solid rgba(75, 108, 183, 0.1);
+        }
+
+        .project-summary h4 {
+            font-weight: 800;
+            color: var(--primary-light);
+            margin-bottom: 5px;
+        }
+
+        .project-summary p {
+            margin-bottom: 0;
+            color: #636e72;
+            font-weight: 600;
+        }
+
+        .star-rating {
+            font-size: 3.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .star-rating .fa-star {
+            color: #dfe6e9;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.05));
+        }
+
+        .star-rating .fa-star:hover,
+        .star-rating .fa-star.active {
+            color: var(--warning);
+            transform: scale(1.15);
+            filter: drop-shadow(0 8px 15px rgba(241, 196, 15, 0.3));
+        }
+
+        .form-label {
+            font-weight: 800;
+            color: var(--primary-light);
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+
+        .form-control {
+            border-radius: 18px;
+            padding: 15px 20px;
+            border: 2px solid #eef2f7;
+            background: white;
+            transition: all 0.3s;
+            font-size: 15px;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(75, 108, 183, 0.1);
+            background: white;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            border: none;
+            padding: 16px 40px;
+            border-radius: 18px;
+            color: white;
+            font-weight: 800;
+            font-size: 16px;
+            box-shadow: 0 10px 25px rgba(75, 108, 183, 0.25);
+            transition: all 0.3s;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(75, 108, 183, 0.35);
+            color: white;
+        }
+
+        .btn-back {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            padding: 10px 20px;
+            border-radius: 15px;
+            font-weight: 700;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+        }
+
+        .btn-back:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-up {
+            animation: fadeInUp 0.6s ease-out both;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-3">
+                <a th:href="@{/client-dashboard/projects}"
+                    class="btn btn-back py-2 px-3 d-flex align-items-center justify-content-center"
+                    title="Back to Projects">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+                <a class="navbar-brand navbar-brand-custom m-0" th:href="@{/dashboard/}">
+                    <i class="fas fa-rocket me-2"></i>Jobify
+                </a>
+            </div>
+            <div class="ms-auto">
+                <a th:href="@{/logout}" class="btn btn-link text-decoration-none text-muted fw-bold">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container" style="max-width: 800px;">
+        <header class="rating-hero animate-up">
+            <h1 class="hero-title">Rate Freelancer</h1>
+            <p class="hero-subtitle">Share your experience and help the community grow.</p>
+        </header>
+
+        <div class="content-card animate-up" style="animation-delay: 0.1s;">
+            <div class="project-summary">
+                <p>WORKING ON PROJECT</p>
+                <h4 th:text="${project.job.jobTitle}">UI/UX Designer Needed for E-commerce App</h4>
+                <p class="mt-2">
+                    <i class="fas fa-user-circle me-2"></i>
+                    Freelancer: <span class="text-dark"
+                        th:text="${freelancer.firstName + ' ' + freelancer.lastName}">Freelancer Name</span>
+                </p>
+            </div>
+
+            <form th:action="@{/ratings/submit/{id}(id=${project.id})}" method="post" id="ratingForm">
+                <div class="text-center mb-5">
+                    <label class="form-label d-block">Overall Satisfaction</label>
+                    <div class="star-rating" id="starRating">
+                        <i class="fas fa-star" data-rating="1"></i>
+                        <i class="fas fa-star" data-rating="2"></i>
+                        <i class="fas fa-star" data-rating="3"></i>
+                        <i class="fas fa-star" data-rating="4"></i>
+                        <i class="fas fa-star" data-rating="5"></i>
+                    </div>
+                    <input type="hidden" name="ratingValue" id="ratingValue" required />
+                    <p class="text-muted small fw-bold mt-2" id="ratingText">Select stars to rate</p>
+                </div>
+
+                <div class="mb-5">
+                    <label for="review" class="form-label">Written Feedback (Optional)</label>
+                    <textarea class="form-control" id="review" name="review" rows="5"
+                        placeholder="What was it like working with them? Quality, communication, and speed..."></textarea>
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-submit btn-lg px-5">
+                        <i class="fas fa-paper-plane me-2"></i> Submit Review
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
+    <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const stars = document.querySelectorAll('.star-rating .fa-star');
+            const ratingInput = document.getElementById('ratingValue');
+            const ratingText = document.getElementById('ratingText');
+
+            const ratingMessages = {
+                1: "Very Dissatisfied",
+                2: "Dissatisfied",
+                3: "Neutral",
+                4: "Satisfied",
+                5: "Excellent! Highly Recommended"
+            };
+
+            stars.forEach((star, index) => {
+                star.addEventListener('click', () => {
+                    const rating = index + 1;
+                    ratingInput.value = rating;
+                    ratingText.innerText = ratingMessages[rating];
+                    ratingText.style.color = 'var(--primary)';
+
+                    stars.forEach((s, i) => {
+                        if (i < rating) {
+                            s.classList.add('active');
+                        } else {
+                            s.classList.remove('active');
+                        }
+                    });
+                });
+
+                star.addEventListener('mouseenter', () => {
+                    const ratingSelected = parseInt(ratingInput.value) || 0;
+                    const hoverRating = index + 1;
+
+                    stars.forEach((s, i) => {
+                        if (i < hoverRating) {
+                            s.style.color = 'var(--warning)';
+                        } else {
+                            s.style.color = '#dfe6e9';
+                        }
+                    });
+                });
+            });
+
+            document.getElementById('starRating').addEventListener('mouseleave', () => {
+                const currentRating = parseInt(ratingInput.value) || 0;
+                stars.forEach((s, i) => {
+                    if (i < currentRating) {
+                        s.style.color = 'var(--warning)';
+                    } else {
+                        s.style.color = '#dfe6e9';
+                    }
+                });
+            });
+
+            // Basic form validation
+            document.getElementById('ratingForm').addEventListener('submit', (e) => {
+                if (!ratingInput.value) {
+                    e.preventDefault();
+                    ratingText.innerText = "Please select a star rating first!";
+                    ratingText.style.color = 'var(--danger)';
+
+                    // Simple vibration effect for stars
+                    const sr = document.getElementById('starRating');
+                    sr.style.animation = 'none';
+                    sr.offsetHeight; /* trigger reflow */
+                    sr.style.animation = 'shake 0.5s ease-in-out';
+                }
+            });
+        });
+    </script>
+
+    <style>
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-10px);
+            }
+
+            75% {
+                transform: translateX(10px);
+            }
+        }
+    </style>
+</body>
+
+</html>

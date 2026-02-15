@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>User Details - Admin</title>
+    <link th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/webjars/font-awesome/css/all.min.css}" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #059862;
+            --primary-light: #07be7b;
+            --primary-dark: #047a4e;
+            --secondary: #192734;
+            --bg-body: #15202B;
+            --bg-card: #192734;
+            --bg-light: #22303c;
+            --border: #38444d;
+            --text: #ffffff;
+            --text-light: #8899a6;
+            --radius: 12px;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar {
+            background-color: var(--bg-card) !important;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .navbar-brand {
+            color: var(--text) !important;
+            font-weight: 700;
+        }
+
+        .nav-link {
+            color: var(--text-light) !important;
+        }
+
+        .nav-link:hover {
+            color: var(--primary) !important;
+        }
+
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+        }
+
+        .card-header {
+            background-color: rgba(5, 152, 98, 0.1);
+            border-bottom: 1px solid var(--border);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .card-header h5 {
+            margin: 0;
+            color: var(--text);
+        }
+
+        .text-muted {
+            color: var(--text-light) !important;
+        }
+
+        .alert-warning {
+            background-color: rgba(255, 180, 0, 0.1);
+            color: #ffb400;
+            border: 1px solid rgba(255, 180, 0, 0.2);
+        }
+
+        .alert-info {
+            background-color: rgba(29, 155, 240, 0.1);
+            color: #1d9bf0;
+            border: 1px solid rgba(29, 155, 240, 0.2);
+        }
+
+        .btn-outline-primary {
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .btn-outline-primary:hover {
+            background-color: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+        }
+
+        /* Light Theme Overrides */
+        .light-theme {
+            --primary: #059862;
+            --primary-light: #07be7b;
+            --primary-dark: #047a4e;
+            --secondary: #ffffff;
+            --bg-body: #f5f7fa;
+            --bg-card: #ffffff;
+            --border: #e3e8f0;
+            --text: #1a202c;
+            --text-light: #64748b;
+        }
+
+        .light-theme .navbar {
+            background-color: #ffffff !important;
+            border-bottom: 1px solid #e3e8f0;
+        }
+
+        .light-theme .navbar-brand,
+        .light-theme .nav-link {
+            color: #1a202c !important;
+        }
+
+        .light-theme .nav-link:hover {
+            color: var(--primary) !important;
+        }
+    </style>
+</head>
+
+<body th:classappend="${session.theme == 'light' ? 'light-theme' : ''}">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/admin/dashboard">
+                <i class="fas fa-briefcase me-2"></i> Jobify Admin
+            </a>
+            <div class="d-flex align-items-center gap-3">
+                <!-- Theme Toggle Removed -->
+                <a class="nav-link" href="/admin/users/pending">
+                    <i class="fas fa-arrow-left me-1"></i> Back to Pending Users
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h2 class="mb-4 text-white"><i class="fas fa-shield-alt text-primary me-2"></i> User Identity Verification</h2>
+
+        <div class="alert alert-info mb-4">
+            <h6><i class="fas fa-exclamation-triangle"></i> Verification Requirements</h6>
+            <ul class="mb-0">
+                <li>Government-issued ID (passport, national ID, or driver's license)</li>
+                <li>Name and photo must match the provided identification</li>
+                <li>For clients: Business license or registration document required</li>
+                <li>Verify document authenticity before approval</li>
+            </ul>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header">
+                <h5>User Information</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Email:</strong> <span th:text="${user.email}"></span></p>
+                <p><strong>User Type:</strong> <span
+                        th:text="${user.userTypeId != null ? user.userTypeId.userTypeName : ''}"></span></p>
+                <p><strong>Registration Date:</strong> <span
+                        th:text="${#dates.format(user.registrationDate, 'dd-MM-yyyy')}"></span></p>
+                <p><strong>Status:</strong>
+                    <span class="badge bg-warning" th:if="${!user.approved}">Pending Approval</span>
+                    <span class="badge bg-success" th:if="${user.approved}">Approved</span>
+                </p>
+            </div>
+        </div>
+
+        <!-- Client Profile -->
+        <div class="card mb-3" th:if="${user.userTypeId != null && user.userTypeId.userTypeId == 1}">
+            <div class="card-header">
+                <h5>Client Profile</h5>
+            </div>
+            <div class="card-body" th:if="${profile != null}">
+                <p><strong>Name:</strong> <span
+                        th:text="${profile.firstName != null ? profile.firstName : '' + ' ' + (profile.lastName != null ? profile.lastName : '')}"></span>
+                </p>
+                <p><strong>Company:</strong> <span th:text="${profile.company != null ? profile.company : ''}"></span>
+                </p>
+                <p><strong>Location:</strong> <span
+                        th:text="${(profile.city != null ? profile.city : '') + ', ' + (profile.state != null ? profile.state : '') + ', ' + (profile.country != null ? profile.country : '')}"></span>
+                </p>
+                <p><strong>Status:</strong>
+                    <span class="badge bg-warning" th:if="${profile.documentStatus != null}"
+                        th:text="${profile.documentStatus}"></span>
+                    <span class="badge bg-warning" th:if="${profile.businessLicenseStatus != null}"
+                        th:text="${profile.businessLicenseStatus}"></span>
+                    <span class="badge bg-success" th:if="${profile.isVerified}">Verified</span>
+                </p>
+
+                <div th:if="${profile.verificationDocument == null && profile.verificationFront == null}"
+                    class="alert alert-warning mt-3">
+                    <i class="fas fa-exclamation-triangle"></i> <strong>Missing Verification Document</strong><br>
+                    This client has not uploaded a government-issued ID. They must upload this document before
+                    verification.
+                </div>
+
+                <div th:if="${profile.businessLicense == null}" class="alert alert-warning mt-3">
+                    <i class="fas fa-exclamation-triangle"></i> <strong>Missing Business License</strong><br>
+                    This client has not uploaded a business license. They must upload this document before verification.
+                </div>
+
+                <div th:if="${profile.verificationFront != null}" class="mt-3">
+                    <h6><i class="fas fa-id-card"></i> Government ID (Front):</h6>
+                    <a th:href="@{/admin/users/{id}/download-verification(id=${user.userId}, type='verificationFront')}"
+                        class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-download"></i> Download Front Side
+                    </a>
+                </div>
+
+                <div th:if="${profile.verificationBack != null}" class="mt-3">
+                    <h6><i class="fas fa-id-card"></i> Government ID (Back):</h6>
+                    <a th:href="@{/admin/users/{id}/download-verification(id=${user.userId}, type='verificationBack')}"
+                        class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-download"></i> Download Back Side
+                    </a>
+                </div>
+
+                <div th:if="${profile.verificationDocument != null}" class="mt-3">
+                    <h6><i class="fas fa-id-card"></i> Government ID Document:</h6>
+                    <a th:href="@{/admin/users/{id}/download-verification(id=${user.userId}, type='verification')}"
+                        class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-download"></i> Download Verification Document
+                    </a>
+                    <small class="text-muted d-block mt-1">Verify name and photo match the user profile</small>
+                </div>
+
+                <div th:if="${profile.businessLicense != null}" class="mt-3">
+                    <h6><i class="fas fa-certificate"></i> Business License:</h6>
+                    <a th:href="@{/admin/users/{id}/download-verification(id=${user.userId}, type='license')}"
+                        class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-download"></i> Download Business License
+                    </a>
+                    <small class="text-muted d-block mt-1">Verify business registration and legitimacy</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Freelancer Profile -->
+        <div class="card mb-3" th:if="${user.userTypeId != null && user.userTypeId.userTypeId == 2}">
+            <div class="card-header">
+                <h5>Freelancer Profile</h5>
+            </div>
+            <div class="card-body" th:if="${profile != null}">
+                <p><strong>Name:</strong> <span
+                        th:text="${(profile.firstName != null ? profile.firstName : '') + ' ' + (profile.lastName != null ? profile.lastName : '')}"></span>
+                </p>
+                <p><strong>Location:</strong> <span
+                        th:text="${(profile.city != null ? profile.city : '') + ', ' + (profile.state != null ? profile.state : '') + ', ' + (profile.country != null ? profile.country : '')}"></span>
+                </p>
+                <p><strong>Work Authorization:</strong> <span
+                        th:text="${profile.workAuthorization != null ? profile.workAuthorization : ''}"></span></p>
+                <p><strong>Verification Status:</strong>
+                    <span class="badge bg-warning" th:if="${profile.documentStatus != null}"
+                        th:text="${profile.documentStatus}"></span>
+                    <span class="badge bg-success" th:if="${profile.isVerified}">Verified</span>
+                </p>
+
+                <div th:if="${profile.verificationDocument != null}" class="mt-3">
+                    <h6>Verification Document:</h6>
+                    <a th:href="@{/admin/users/{id}/download-verification(id=${user.userId}, type='verification')}"
+                        class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-download"></i> Download Verification Document
+                    </a>
+                </div>
+
+                <div th:if="${profile.resume != null}" class="mt-3">
+                    <h6>Resume:</h6>
+                    <a th:href="@{/job-seeker-profile/downloadResume(fileName=${profile.resume}, userID=${profile.userAccountId})}"
+                        class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-download"></i> Download Resume
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <form th:action="@{/admin/users/{id}/verify(id=${user.userId})}" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-success me-2">
+                        <i class="fas fa-check"></i> Verify & Approve User
+                    </button>
+                </form>
+                <form th:action="@{/admin/users/{id}/reject(id=${user.userId})}" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-danger"
+                        onclick="return confirm('Are you sure you want to reject this user?')">
+                        <i class="fas fa-times"></i> Reject
+                    </button>
+                </form>
+                <form th:action="@{/admin/users/{id}/ban(id=${user.userId})}" method="post" class="d-inline ms-2">
+                    <button type="submit" class="btn btn-dark"
+                        onclick="return confirm('Are you sure you want to BAN this user? This will deactivate their account.')">
+                        <i class="fas fa-ban"></i> Ban User
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
+    <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
+</body>
+
+</html>

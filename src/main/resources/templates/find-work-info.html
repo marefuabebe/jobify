@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Work - Jobify Platform Guide</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            /* Global Blue Theme (User Requested) */
+            --primary: #4B6CB7;
+            --primary-light: #7390D8;
+            --primary-dark: #324C8C;
+            --secondary: #1a1d1f;
+            --accent: #FFD460;
+            --text-dark: #333;
+            /* Slightly softer than #1a1d1a to match Segoe */
+            --text-gray: #5e6d55;
+            --bg-white: #ffffff;
+            --bg-light: #f4f7fc;
+            --bg-gradient: linear-gradient(135deg, #4B6CB7 0%, #182848 100%);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+            /* Card Design Variables */
+            --primary-color: #4B6CB7;
+            --secondary-color: #182848;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --gray-color: #6c757d;
+            --light-gray: #e9ecef;
+            --border-radius: 12px;
+            --box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            --box-shadow-hover: 0 10px 25px rgba(0, 0, 0, 0.12);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-white);
+            color: var(--text-dark);
+        }
+
+        /* CTA Section - Premium Light */
+        .cta-section {
+            background: radial-gradient(circle at 50% 50%, #f0f7ff 0%, #ffffff 100%);
+            padding: 60px 0;
+            text-align: center;
+            color: var(--text-dark);
+            position: relative;
+            overflow: hidden;
+            margin-top: 60px;
+        }
+
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(circle at 10% 20%, rgba(75, 108, 183, 0.03) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(75, 108, 183, 0.03) 0%, transparent 40%);
+            z-index: 0;
+        }
+
+        .cta-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-cta-primary {
+            background: var(--primary);
+            color: white;
+            padding: 16px 40px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 10px 25px rgba(75, 108, 183, 0.25);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+        }
+
+        .btn-cta-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(75, 108, 183, 0.35);
+            color: white;
+            background: var(--primary-dark);
+        }
+
+        .btn-cta-outline {
+            background: transparent;
+            color: var(--primary);
+            padding: 16px 40px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            border: 2px solid var(--primary-light);
+            transition: all 0.3s ease;
+        }
+
+        .btn-cta-outline:hover {
+            border-color: var(--primary);
+            background: rgba(75, 108, 183, 0.05);
+            color: var(--primary-dark);
+            transform: translateY(-3px);
+        }
+
+        /* Feature Cards */
+        .feature-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 40px;
+            box-shadow: var(--shadow-md);
+            height: 100%;
+            transition: var(--transition);
+            border: 1px solid rgba(5, 152, 98, 0.1);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--primary);
+        }
+
+        .feature-icon {
+            width: 70px;
+            height: 70px;
+            background: rgba(5, 152, 98, 0.1);
+            color: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+            font-size: 28px;
+        }
+
+        /* Steps - Premium Flow */
+        .step-card {
+            background: white;
+            border-radius: 16px;
+            padding: 32px 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+            border: 1px solid #eef2f6;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            z-index: 2;
+            height: 100%;
+            text-align: center;
+        }
+
+        .step-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(75, 108, 183, 0.15);
+            border-color: var(--primary-light);
+        }
+
+        .step-number {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary) 0%, #182848 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 800;
+            font-size: 1.5rem;
+            margin: 0 auto 24px;
+            box-shadow: 0 8px 16px rgba(75, 108, 183, 0.25);
+            position: relative;
+            z-index: 1;
+        }
+
+        .step-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+        }
+
+        .step-description {
+            color: var(--text-gray);
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        /* Connector Line for Desktop */
+        .steps-connector {
+            position: absolute;
+            top: 60px;
+            /* Adjust based on padding + half circle height */
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-image: linear-gradient(to right, #ddd 50%, transparent 50%);
+            background-size: 20px 100%;
+            z-index: 0;
+            display: none;
+        }
+
+        @media (min-width: 992px) {
+            .steps-connector {
+                display: block;
+            }
+        }
+
+        /* Job Cards - Premium Style */
+        .job-card {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid #edf2f7;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .job-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08);
+            border-color: var(--primary-light);
+        }
+
+        .job-card:hover::before {
+            opacity: 1;
+        }
+
+        .job-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .job-card-header {
+            padding: 24px;
+            display: flex;
+            gap: 16px;
+            border-bottom: 1px solid #f8f9fa;
+        }
+
+        .job-icon-wrapper {
+            width: 56px;
+            height: 56px;
+            background: #f0f7ff;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 1.35rem;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+        }
+
+        .job-card:hover .job-icon-wrapper {
+            background: var(--primary);
+            color: white;
+            transform: rotate(-5deg);
+        }
+
+        .job-card-body {
+            padding: 24px;
+            flex-grow: 1;
+        }
+
+        .job-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+            line-height: 1.4;
+        }
+
+        .company-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-gray);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .job-meta {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-top: 16px;
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+
+        .job-meta i {
+            color: var(--primary-light);
+            margin-right: 6px;
+        }
+
+        .job-tags-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 20px;
+        }
+
+        .job-tag {
+            padding: 6px 12px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: #f1f5f9;
+            color: #475569;
+            transition: all 0.2s;
+        }
+
+        .job-tag.tag-primary {
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+
+        .job-card-footer {
+            padding: 20px 24px;
+            background: #fafbfc;
+            border-top: 1px solid #edf2f7;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .salary-text {
+            font-weight: 700;
+            color: var(--text-dark);
+            font-size: 1.1rem;
+        }
+
+        .btn-card-apply {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+            box-shadow: 0 4px 12px rgba(75, 108, 183, 0.25);
+            text-decoration: none;
+        }
+
+        .btn-card-apply:hover {
+            background: var(--primary-dark);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(75, 108, 183, 0.35);
+        }
+
+        .btn-card-apply i {
+            font-size: 0.9em;
+            transition: transform 0.3s ease;
+        }
+
+        .btn-card-apply:hover i {
+            transform: translateX(3px);
+        }
+
+        /* Features Section - Premium */
+        .feature-card {
+            background: white;
+            padding: 40px 32px;
+            border-radius: 20px;
+            text-align: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid #edf2f7;
+            height: 100%;
+            position: relative;
+            z-index: 1;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+            border-color: rgba(75, 108, 183, 0.3);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 24px;
+            background: linear-gradient(135deg, #f0f7ff 0%, #e0e7ff 100%);
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: var(--primary);
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(75, 108, 183, 0.1);
+            transform: rotate(-5deg);
+        }
+
+        .feature-card:hover .feature-icon {
+            background: var(--primary);
+            color: white;
+            transform: rotate(0deg) scale(1.1);
+            box-shadow: 0 10px 25px rgba(75, 108, 183, 0.3);
+        }
+
+
+
+        /* Hero Section - Premium Redesign */
+        .hero-section {
+            background: linear-gradient(135deg, #f8faff 0%, #eef4ff 100%);
+            padding: 100px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Abstract Background Blob */
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(75, 108, 183, 0.05) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: 0;
+        }
+
+        .hero-title {
+            font-size: 4rem;
+            font-weight: 800;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.1;
+            letter-spacing: -1px;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: #64748b;
+            margin-bottom: 40px;
+            max-width: 600px;
+            line-height: 1.6;
+        }
+
+        .hero-image-wrapper {
+            position: relative;
+            z-index: 1;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-up {
+            opacity: 0;
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+
+        .delay-100 {
+            animation-delay: 0.1s;
+        }
+
+        .delay-200 {
+            animation-delay: 0.2s;
+        }
+
+        .delay-300 {
+            animation-delay: 0.3s;
+        }
+
+
+        .hero-image {
+            max-height: 500px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .hero-image:hover {
+            transform: scale(1.02);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Buttons */
+        .btn-primary-custom {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 16px 36px;
+            border-radius: 50px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 20px rgba(75, 108, 183, 0.2);
+        }
+
+        .btn-primary-custom:hover {
+            background: var(--primary-dark);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(75, 108, 183, 0.3);
+        }
+
+        .btn-outline-custom {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid #dae1e7;
+            padding: 16px 36px;
+            border-radius: 50px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-outline-custom:hover {
+            border-color: var(--primary);
+            background: white;
+            color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .feature-list-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+            color: #64748b;
+        }
+
+        .feature-list-item i {
+            color: var(--primary);
+            font-size: 1.1rem;
+        }
+
+        .newsletter-section {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary-color) 100%);
+        }
+
+        /* Scroll Reveal Animation */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal.delay-100 {
+            transition-delay: 0.1s;
+        }
+
+        .reveal.delay-200 {
+            transition-delay: 0.2s;
+        }
+
+        .reveal.delay-300 {
+            transition-delay: 0.3s;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <!-- Navigation -->
+    <th:block th:replace="fragments/public-header :: header('find-work')"></th:block>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container position-relative z-1">
+            <div class="row align-items-center">
+                <div class="col-lg-6 text-center text-lg-start mb-5 mb-lg-0">
+                    <span
+                        class="d-inline-block py-1 px-3 rounded-pill bg-light text-primary fw-bold small mb-3 border border-primary-subtle animate-up">
+                        <i class="fas fa-star me-1"></i> #1 Platform for Freelancers
+                    </span>
+                    <h1 class="hero-title animate-up delay-100">Find Work as a<br>Freelancer</h1>
+                    <p class="hero-subtitle animate-up delay-200">
+                        Discover exciting opportunities from verified clients worldwide. Join thousands of freelancers
+                        who are building their careers on Jobify.
+                    </p>
+                    <div
+                        class="d-flex gap-3 flex-wrap justify-content-center justify-content-lg-start animate-up delay-300">
+                        <a href="/signup" class="btn-primary-custom">
+                            <i class="fas fa-rocket"></i>
+                            Start Freelancing
+                        </a>
+                        <a href="/find-talent-info" class="btn-outline-custom">
+                            <i class="fas fa-users"></i>
+                            Looking for Talent?
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-6 text-center">
+                    <div class="hero-image-wrapper">
+                        <img th:src="@{/assets/find-work-hero-flat.png}" alt="Freelancer working flat illustration"
+                            class="img-fluid hero-image">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Recent Jobs Section -->
+    <section class="py-5 bg-light" th:if="${recentJobs != null and !recentJobs.empty}">
+        <div class="container">
+            <div class="text-center mb-5 reveal">
+                <span class="text-primary fw-bold text-uppercase ls-1 small">Discover</span>
+                <h2 class="fw-bold display-6 mb-3">Latest Opportunities</h2>
+                <p class="text-muted fs-5">Browse the most recent jobs posted by top companies</p>
+            </div>
+
+            <div class="row g-4">
+                <!-- Job Card Loop -->
+                <div class="col-md-6 col-lg-4 reveal" th:each="job, iterStat : ${recentJobs}"
+                    th:if="${iterStat.index < 3}" th:classappend="${'delay-' + (iterStat.index + 1) * 100}">
+                    <div class="job-card">
+                        <div class="job-card-header">
+                            <div class="job-icon-wrapper">
+                                <i class="fas fa-briefcase"></i>
+                            </div>
+                            <div>
+                                <h5 class="job-title" th:text="${job.jobTitle}">Job Title</h5>
+                                <div class="company-name" th:text="${job.jobCompanyId.name}">Company Name</div>
+                            </div>
+                        </div>
+
+                        <div class="job-card-body">
+                            <div class="job-meta">
+                                <span><i class="fas fa-map-marker-alt"></i> <span
+                                        th:text="${job.jobLocationId.city}">City</span></span>
+                                <span><i class="far fa-clock"></i> <span
+                                        th:text="${#strings.substring(job.postedDate,0,10)}">Date</span></span>
+                            </div>
+
+                            <div class="job-tags-wrapper">
+                                <span class="job-tag tag-primary" th:text="${job.jobType}">Full Time</span>
+                                <span class="job-tag" th:text="${job.jobCategory}">Category</span>
+                            </div>
+                        </div>
+
+                        <div class="job-card-footer">
+                            <div class="salary-text" th:text="${job.salary}">$50k</div>
+                            <a th:href="@{/job-details-apply/{id}(id=${job.jobPostId})}" class="btn-card-apply">
+                                Apply Now <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-5">
+                <a href="/login" class="btn btn-primary-custom px-5">
+                    <i class="fas fa-lock me-2"></i> Login to View All Jobs
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-5 bg-white">
+        <div class="container">
+            <div class="text-center mb-5 reveal">
+                <span class="text-primary fw-bold text-uppercase ls-1 small">Why Choose Us</span>
+                <h2 class="display-6 fw-bold mb-3">Why Choose Jobify?</h2>
+                <p class="text-muted fs-5" style="max-width: 600px; margin: 0 auto;">We provide the tools and security
+                    you need to focus on what you do best.</p>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-4 reveal delay-100">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h3 class="fw-bold mb-3 h4">Verified Clients</h3>
+                        <p class="text-muted mb-4">
+                            All clients are verified to ensure safe and reliable work opportunities without the hassle
+                            of fake projects.
+                        </p>
+                        <div class="d-flex flex-column gap-2">
+                            <div class="feature-list-item">
+                                <i class="fas fa-check-circle"></i> Identity verification
+                            </div>
+                            <div class="feature-list-item">
+                                <i class="fas fa-check-circle"></i> Payment protection
+                            </div>
+                            <div class="feature-list-item">
+                                <i class="fas fa-check-circle"></i> Dispute resolution
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 reveal delay-200">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <h3 class="fw-bold mb-3 h4">Smart Matching</h3>
+                        <p class="text-muted mb-4">
+                            Our intelligent matching system connects you with projects that perfectly match your skills
+                            and experience.
+                        </p>
+                        <div class="d-flex flex-column gap-2">
+                            <div class="feature-list-item">
+                                <i class="fas fa-check-circle"></i> AI recommendations
+                            </div>
+                            <div class="feature-list-item">
+                                <i class="fas fa-check-circle"></i> Skill-based filtering
+                            </div>
+                            <div class="feature-list-item">
+                                <i class="fas fa-check-circle"></i> Budget matching
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 reveal delay-300">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h3 class="fw-bold mb-3 h4">Career Growth</h3>
+                        <p class="text-muted mb-4">
+                            Build your portfolio, earn reviews, and grow your freelance career with long-term client
+                            relationships.
+                        </p>
+                        <div class="d-flex flex-column gap-2">
+                            <div class="feature-list-item">
+                                <i class="fas fa-check-circle"></i> Portfolio tools
+                            </div>
+                            <div class="feature-list-item">
+                                <i class="fas fa-check-circle"></i> Rating system
+                            </div>
+                            <div class="feature-list-item">
+                                <i class="fas fa-check-circle"></i> Analytics dashboard
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="py-5 bg-light position-relative overflow-hidden">
+        <div class="container position-relative z-1">
+            <div class="text-center mb-5 reveal">
+                <span class="text-primary fw-bold text-uppercase ls-1 small">The Process</span>
+                <h2 class="display-6 fw-bold mb-3">How It Works</h2>
+                <p class="text-muted fs-5">Start your freelance journey in 4 simple steps</p>
+            </div>
+
+            <div class="position-relative">
+                <!-- Connector Line (Visual Only) -->
+                <div class="steps-connector d-none d-lg-block reveal delay-100"
+                    style="top: 62px; height: 1px; border-top: 2px dashed #dbe2ef;"></div>
+
+                <div class="row g-4">
+                    <div class="col-lg-3 col-md-6 reveal delay-100">
+                        <div class="step-card">
+                            <div class="step-number">1</div>
+                            <h3 class="step-title">Create Profile</h3>
+                            <p class="step-description">
+                                Sign up and build a comprehensive profile showcasing your skills, experience, and
+                                portfolio.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 reveal delay-200">
+                        <div class="step-card">
+                            <div class="step-number">2</div>
+                            <h3 class="step-title">Find Work</h3>
+                            <p class="step-description">
+                                Browse thousands of job postings. Use advanced filters to find projects that match your
+                                expertise.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 reveal delay-300">
+                        <div class="step-card">
+                            <div class="step-number">3</div>
+                            <h3 class="step-title">Submit Proposal</h3>
+                            <p class="step-description">
+                                Craft compelling proposals. Communicate directly with clients through our secure system.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 reveal delay-300">
+                        <div class="step-card">
+                            <div class="step-number">4</div>
+                            <h3 class="step-title">Get Paid</h3>
+                            <p class="step-description">
+                                Work with confidence. Receive payments safely through our protected escrow system.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container cta-content reveal">
+            <h2 class="display-5 fw-bold mb-4">Ready to Start Earning?</h2>
+            <p class="fs-5 mb-5 text-muted" style="max-width: 700px; margin: 0 auto;">
+                Join thousands of successful freelancers on Jobify. Access premium projects, secure payments, and take
+                control of your career today.
+            </p>
+            <div class="d-flex justify-content-center flex-wrap gap-3">
+                <a href="/signup" class="btn-cta-primary">
+                    <i class="fas fa-rocket"></i>
+                    Get Started Now
+                </a>
+                <a href="/" class="btn-cta-outline">
+                    <i class="fas fa-home"></i>
+                    Back to Home
+                </a>
+            </div>
+        </div>
+    </section>
+
+    </form>
+    </div>
+    </div>
+    </div>
+    </section>
+
+    <!-- Footer -->
+    <!-- Footer -->
+    <th:block th:replace="fragments/footer :: footer"></th:block>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.1
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            const revealElements = document.querySelectorAll('.reveal');
+            revealElements.forEach(el => observer.observe(el));
+
+            // Safety fallback: Ensure content is visible even if observer fails or loads late
+            setTimeout(() => {
+                document.querySelectorAll('.reveal:not(.active)').forEach(el => {
+                    el.classList.add('active');
+                });
+            }, 1000);
+        });
+    </script>
+</body>
+
+</html>

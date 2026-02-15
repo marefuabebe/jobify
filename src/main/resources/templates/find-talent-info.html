@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Talent - Jobify Platform Guide</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            /* Global Blue Theme (User Requested) */
+            --primary: #4B6CB7;
+            --primary-light: #7390D8;
+            --primary-dark: #324C8C;
+            --secondary: #1a1d1f;
+            --accent: #FFD460;
+            --text-dark: #333;
+            /* Slightly softer than #1a1a1a to match Segoe */
+            --text-gray: #5e6d55;
+            --bg-white: #ffffff;
+            --bg-light: #f4f7fc;
+            --bg-gradient: linear-gradient(135deg, #4B6CB7 0%, #182848 100%);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+            /* Card Design Variables Override */
+            --primary-color: #4B6CB7;
+            --secondary-color: #182848;
+            --accent-color: #f72585;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --gray-color: #6c757d;
+            --light-gray: #e9ecef;
+            --success-color: #4cc9f0;
+            --border-radius: 12px;
+            --box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            --box-shadow-hover: 0 10px 25px rgba(0, 0, 0, 0.12);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-white);
+            color: var(--text-dark);
+        }
+
+        /* Navbar & Hero overrides */
+
+        .hero-section {
+            background: linear-gradient(135deg, #f0f4fd 0%, #e1e9f8 100%);
+            /* Light blue tint */
+            padding: 80px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 24px;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-gray);
+            margin-bottom: 40px;
+            max-width: 700px;
+        }
+
+        /* New Freelancer Card Styles */
+        .section-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            color: var(--secondary-color);
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .section-header p {
+            font-size: 1.1rem;
+            color: var(--gray-color);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* New Premium Talent Card Styles (Matches Authenticated View) */
+        .talent-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        @media (max-width: 1200px) {
+            .talent-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .talent-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .talent-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+            border: 1px solid #eef2f6;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .talent-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(75, 108, 183, 0.12);
+            border-color: var(--primary-light);
+        }
+
+        .freelancer-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .freelancer-name {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            text-decoration: none;
+            display: block;
+            margin-bottom: 2px;
+            transition: color 0.2s;
+        }
+
+        .freelancer-name:hover {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .freelancer-location {
+            font-size: 0.85rem;
+            color: var(--text-gray);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .badge-verified {
+            color: #0ca678;
+            background: #e6fcf5;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .skill-badge {
+            background: #f8f9fa;
+            color: #495057;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            display: inline-block;
+            margin: 0 6px 8px 0;
+            border: 1px solid #e9ecef;
+            transition: all 0.2s;
+        }
+
+        .skill-badge:hover {
+            background: #e9ecef;
+            color: var(--primary-dark);
+        }
+
+        .actions-row {
+            margin-top: auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            width: 100%;
+            padding-top: 20px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .btn-action {
+            padding: 10px 5px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 13px;
+            text-align: center;
+            text-decoration: none;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-view {
+            background: white;
+            border: 1.5px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-view:hover {
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-message {
+            background: var(--primary);
+            color: white;
+            border: 1.5px solid var(--primary);
+        }
+
+        .btn-message:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+            color: white;
+            text-decoration: none;
+        }
+
+        .empty-avatar {
+            background: var(--primary-light);
+            color: white;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .opacity-10 {
+            opacity: 0.1 !important;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            color: var(--gray-color);
+        }
+
+        /* Other existing helpers */
+        .btn-primary-custom {
+            background: white;
+            color: var(--primary);
+            border: none;
+            padding: 16px 32px;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 16px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: var(--transition);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            color: var(--primary-dark);
+        }
+
+        .btn-outline-custom {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+            padding: 16px 32px;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 16px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: var(--transition);
+            margin-left: 16px;
+        }
+
+        .btn-outline-custom:hover {
+            background: white;
+            color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .cta-section {
+            background: var(--bg-white);
+            padding: 60px 0;
+            text-align: center;
+            color: var(--text-dark);
+        }
+
+        .cta-title {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--text-dark);
+        }
+
+        .cta-description {
+            font-size: 18px;
+            margin-bottom: 40px;
+            opacity: 1;
+            color: var(--text-gray);
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+            height: 100%;
+            transition: all 0.25s;
+        }
+
+        .talent-stats {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 20px;
+            background: white;
+            padding: 40px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Custom "How It Works" Styling */
+        /* Steps - Premium Flow */
+        .step-card {
+            background: white;
+            border-radius: 16px;
+            padding: 32px 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+            border: 1px solid #eef2f6;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            z-index: 2;
+            height: 100%;
+            text-align: center;
+        }
+
+        .step-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(75, 108, 183, 0.15);
+            border-color: var(--primary-light);
+            border-left: 1px solid var(--primary-light);
+            /* Reset left border override */
+        }
+
+        .step-number {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary) 0%, #182848 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 800;
+            font-size: 1.5rem;
+            margin: 0 auto 24px;
+            box-shadow: 0 8px 16px rgba(75, 108, 183, 0.25);
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-up {
+            opacity: 0;
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+
+        .delay-100 {
+            animation-delay: 0.1s;
+        }
+
+        .delay-200 {
+            animation-delay: 0.2s;
+        }
+
+        .delay-300 {
+            animation-delay: 0.3s;
+        }
+
+        .hero-image {
+            max-height: 500px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .step-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+        }
+
+        .step-description {
+            color: var(--text-gray);
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        /* Connector Line for Desktop */
+        .steps-connector {
+            position: absolute;
+            top: 60px;
+            /* Adjust based on padding + half circle height */
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-image: linear-gradient(to right, #ddd 50%, transparent 50%);
+            background-size: 20px 100%;
+            z-index: 0;
+            display: none;
+        }
+
+        @media (min-width: 992px) {
+            .steps-connector {
+                display: block;
+            }
+        }
+
+        .cta-section .btn-primary-custom {
+            background: var(--primary);
+            color: white;
+        }
+
+        .cta-section .btn-primary-custom:hover {
+            background: var(--primary-dark);
+            color: white;
+        }
+
+        .cta-section .btn-outline-custom {
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .cta-section .btn-outline-custom:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .newsletter-section {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        }
+
+        /* Scroll Reveal Animation */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal.delay-100 {
+            transition-delay: 0.1s;
+        }
+
+        .reveal.delay-200 {
+            transition-delay: 0.2s;
+        }
+
+        .reveal.delay-300 {
+            transition-delay: 0.3s;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <!-- Navigation -->
+    <th:block th:replace="fragments/public-header :: header('find-talent')"></th:block>
+
+    <!-- Hero Section -->
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container position-relative z-1">
+            <div class="row align-items-center">
+                <div class="col-lg-6 text-center text-lg-start mb-5 mb-lg-0">
+                    <span
+                        class="d-inline-block py-1 px-3 rounded-pill bg-light text-primary fw-bold small mb-3 border border-primary-subtle animate-up">
+                        <i class="fas fa-check-circle me-1"></i> Trusted by 10k+ Companies
+                    </span>
+                    <h1 class="hero-title animate-up delay-100">Find Top Talent for<br>Your Projects</h1>
+                    <p class="hero-subtitle animate-up delay-200">
+                        Connect with skilled, verified freelancers worldwide. Get your projects done by professionals
+                        who are passionate about delivering quality work.
+                    </p>
+                    <div
+                        class="d-flex gap-3 flex-wrap justify-content-center justify-content-lg-start animate-up delay-300">
+                        <a href="/signup" class="btn-primary-custom">
+                            <i class="fas fa-search-plus"></i>
+                            Start Hiring
+                        </a>
+                        <a href="/find-work-info" class="btn-outline-custom">
+                            <i class="fas fa-briefcase"></i>
+                            Looking for Work?
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-6 text-center">
+                    <div class="hero-image-wrapper">
+                        <img th:src="@{/assets/find-talent-hero.png}" alt="Hiring Talent" class="img-fluid hero-image">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Freelancers Section -->
+    <section class="py-5 bg-light" th:if="${recentFreelancers != null and !recentFreelancers.empty}">
+        <div class="container">
+            <div class="section-title reveal">
+                <h2>Featured Freelancers</h2>
+                <p>Connect with top-rated professionals ready to work</p>
+            </div>
+
+            <div class="talent-grid">
+                <!-- Freelancer Card Loop -->
+                <div class="reveal" th:each="freelancer, iterStat : ${recentFreelancers}" th:if="${iterStat.index < 3}"
+                    th:classappend="${'delay-' + (iterStat.index + 1) * 100}">
+                    <div class="talent-card">
+                        <!-- Header with Avatar and Name -->
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <!-- Profile Photo -->
+                            <img th:if="${freelancer.profile.profilePhoto != null}"
+                                th:src="@{${freelancer.profile.photosImagePath}}" class="freelancer-avatar"
+                                alt="Profile">
+                            <div th:unless="${freelancer.profile.profilePhoto != null}" class="freelancer-avatar">
+                                <span
+                                    th:text="${(freelancer.profile.firstName != null and !#strings.isEmpty(freelancer.profile.firstName)) ? #strings.substring(freelancer.profile.firstName,0,1) : 'U'}">U</span>
+                            </div>
+
+                            <div class="flex-grow-1 overflow-hidden">
+                                <h3 class="freelancer-name text-truncate mb-1"
+                                    th:text="${(freelancer.profile.firstName != null ? freelancer.profile.firstName : '') + ' ' + (freelancer.profile.lastName != null ? freelancer.profile.lastName : '')}">
+                                    Name</h3>
+
+                                <div class="freelancer-location">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span class="text-truncate"
+                                        th:text="${freelancer.profile.city != null ? freelancer.profile.city : 'Remote'}">Location</span>
+                                </div>
+
+                                <div class="badge-verified">
+                                    <i class="fas fa-check-circle"></i> Verified Pro
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Info Block (Title & Skills) -->
+                        <div class="mb-3">
+                            <div class="text-primary fw-bold small mb-2"
+                                th:text="${freelancer.profile.title ?: 'Freelancer'}">Title</div>
+                            <div class="d-flex flex-wrap gap-1">
+                                <span th:each="skill, iter : ${freelancer.profile.skills}" th:if="${iter.index < 3}"
+                                    class="skill-badge" th:text="${skill.name}">Skill</span>
+                                <span th:if="${freelancer.profile.skills.size() > 3}" class="skill-badge">
+                                    +<span th:text="${freelancer.profile.skills.size() - 3}"></span>
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Actions Row -->
+                        <div class="actions-row">
+                            <a href="/login" class="btn-action btn-message">
+                                <i class="fas fa-comment-dots"></i> Message
+                            </a>
+                            <a href="/login" class="btn-action btn-view">
+                                View Profile
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-5">
+                <a href="/login" class="btn btn-primary px-4 py-2 fw-semibold">
+                    <i class="fas fa-search me-2"></i> Login to Find More Talent
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Talent Stats -->
+    <section class="py-5">
+        <div class="container">
+            <div class="talent-stats">
+                <div class="stat-item reveal">
+                    <div class="stat-number" th:text="${verifiedFreelancersCount} + '+'">50,000+</div>
+                    <div class="stat-label">Verified Freelancers</div>
+                </div>
+                <div class="stat-item reveal delay-100">
+                    <div class="stat-number" th:text="${skillsCount} + '+'">150+</div>
+                    <div class="stat-label">Skills Categories</div>
+                </div>
+                <div class="stat-item reveal delay-200">
+                    <div class="stat-number" th:text="${successRate} + '%'">98%</div>
+                    <div class="stat-label">Success Rate</div>
+                </div>
+                <div class="stat-item reveal delay-300">
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">Support Available</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-4 reveal delay-100">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                        <h3 class="feature-title">Verified Professionals</h3>
+                        <p class="feature-description">
+                            Every freelancer on our platform undergoes a thorough verification process to ensure they
+                            have the skills and experience they claim.
+                        </p>
+                        <div class="benefit-item">
+                            <i class="fas fa-check-circle benefit-icon"></i>
+                            <span class="benefit-text">Identity and skill verification</span>
+                        </div>
+                        <div class="benefit-item">
+                            <i class="fas fa-check-circle benefit-icon"></i>
+                            <span class="benefit-text">Portfolio review process</span>
+                        </div>
+                        <div class="benefit-item">
+                            <i class="fas fa-check-circle benefit-icon"></i>
+                            <span class="benefit-text">Background checks available</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 reveal delay-200">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-filter"></i>
+                        </div>
+                        <h3 class="feature-title">Advanced Filtering</h3>
+                        <p class="feature-description">
+                            Find the perfect match with our advanced filtering system. Search by skills, experience,
+                            location, budget, and more.
+                        </p>
+                        <div class="benefit-item">
+                            <i class="fas fa-check-circle benefit-icon"></i>
+                            <span class="benefit-text">Skill-based search</span>
+                        </div>
+                        <div class="benefit-item">
+                            <i class="fas fa-check-circle benefit-icon"></i>
+                            <span class="benefit-text">Experience level filtering</span>
+                        </div>
+                        <div class="benefit-item">
+                            <i class="fas fa-check-circle benefit-icon"></i>
+                            <span class="benefit-text">Rating and review system</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 reveal delay-300">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <h3 class="feature-title">Direct Communication</h3>
+                        <p class="feature-description">
+                            Communicate directly with freelancers through our secure messaging system. Discuss project
+                            details, timelines, and expectations.
+                        </p>
+                        <div class="benefit-item">
+                            <i class="fas fa-check-circle benefit-icon"></i>
+                            <span class="benefit-text">Real-time messaging</span>
+                        </div>
+                        <div class="benefit-item">
+                            <i class="fas fa-check-circle benefit-icon"></i>
+                            <span class="benefit-text">File sharing capabilities</span>
+                        </div>
+                        <div class="benefit-item">
+                            <i class="fas fa-check-circle benefit-icon"></i>
+                            <span class="benefit-text">Video call integration</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="py-5 bg-light position-relative overflow-hidden">
+        <div class="container position-relative z-1">
+            <div class="text-center mb-5 reveal">
+                <span class="text-primary fw-bold text-uppercase ls-1 small">The Process</span>
+                <h2 class="display-5 fw-bold mb-3">How It Works</h2>
+                <p class="text-muted fs-5">Find the right talent for your project in 4 simple steps</p>
+            </div>
+
+            <div class="position-relative">
+                <!-- Connector Line (Visual Only) -->
+                <div class="steps-connector d-none d-lg-block reveal delay-100"
+                    style="top: 62px; height: 1px; border-top: 2px dashed #dbe2ef;"></div>
+
+                <div class="row g-4">
+                    <div class="col-lg-3 col-md-6 reveal delay-100">
+                        <div class="step-card">
+                            <div class="step-number">1</div>
+                            <h3 class="step-title">Post Project</h3>
+                            <p class="step-description">
+                                Create a detailed project description outlining your requirements, budget, timeline, and
+                                desired skills.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 reveal delay-200">
+                        <div class="step-card">
+                            <div class="step-number">2</div>
+                            <h3 class="step-title">Review Proposals</h3>
+                            <p class="step-description">
+                                Receive proposals from qualified freelancers. Review their profiles, ratings, and
+                                previous work.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 reveal delay-300">
+                        <div class="step-card">
+                            <div class="step-number">3</div>
+                            <h3 class="step-title">Collaborate</h3>
+                            <p class="step-description">
+                                Work closely with your chosen freelancer via our platform. Track progress and share
+                                files easily.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 reveal delay-300">
+                        <div class="step-card">
+                            <div class="step-number">4</div>
+                            <h3 class="step-title">Pay Safely</h3>
+                            <p class="step-description">
+                                Use our secure escrow system. Funds are released only when you're satisfied with the
+                                work.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container cta-content reveal">
+            <h2 class="cta-title">Ready to Hire Top Talent?</h2>
+            <p class="cta-description">
+                Join thousands of businesses that trust Jobify to connect them with skilled professionals for their
+                projects.
+            </p>
+            <div class="d-flex justify-content-center flex-wrap">
+                <a href="/signup" class="btn-primary-custom">
+                    <i class="fas fa-rocket"></i>
+                    Post Your First Project
+                </a>
+                <a href="/" class="btn-outline-custom">
+                    <i class="fas fa-home"></i>
+                    Back to Home
+                </a>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+    <th:block th:replace="fragments/footer :: footer"></th:block>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.1
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            const revealElements = document.querySelectorAll('.reveal');
+            revealElements.forEach(el => observer.observe(el));
+
+            // Safety fallback: Ensure content is visible even if observer fails or loads late
+            setTimeout(() => {
+                document.querySelectorAll('.reveal:not(.active)').forEach(el => {
+                    el.classList.add('active');
+                });
+            }, 1000);
+        });
+    </script>
+</body>
+
+</html>

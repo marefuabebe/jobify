@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - Jobify</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0B5ED7;
+            --primary-light: #5FA4F9;
+            --primary-dark: #094BB3;
+            --secondary: #1a1d1f;
+            --text-dark: #1a1d1a;
+            --text-gray: #5e6d55;
+            --bg-white: #ffffff;
+            --bg-light: #f8faf8;
+            --border-color: #e0e0e0;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+            --radius-md: 12px;
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--text-dark);
+            background-color: var(--bg-light);
+            line-height: 1.6;
+        }
+
+
+
+        .privacy-container {
+            max-width: 800px;
+            margin: 60px auto;
+            background: white;
+            padding: 50px;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+        }
+
+        h1 {
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--text-dark);
+        }
+
+        .last-updated {
+            color: var(--text-gray);
+            margin-bottom: 40px;
+            font-size: 0.95rem;
+            display: block;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            color: var(--text-dark);
+        }
+
+        p {
+            margin-bottom: 15px;
+            color: var(--text-gray);
+        }
+
+        /* Footer */
+        .footer-upwork {
+            background: var(--secondary);
+            color: white;
+            padding: 2.5rem 0 1.5rem;
+            margin-top: auto;
+        }
+
+        .footer-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .footer-upwork p {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 1.25rem;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .footer-upwork h5 {
+            color: white;
+            margin-bottom: 1.25rem;
+            font-size: 1.1rem;
+        }
+
+        .footer-upwork ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-upwork ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-upwork a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-upwork a:hover {
+            color: var(--primary);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1.25rem;
+        }
+
+        .social-links a {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            color: white;
+            text-decoration: none;
+        }
+
+        .social-links a:hover {
+            background: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .footer-bottom {
+            margin-top: 2.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <th:block th:replace="fragments/public-header :: header('privacy')"></th:block>
+
+    <div class="privacy-container">
+        <h1>Privacy Policy</h1>
+        <span class="last-updated">Last updated: January 2026</span>
+
+        <h2>1. Information Collection</h2>
+        <p>We collect information you provide directly to us, such as when you create an account, update your profile,
+            post a job, or communicate with other users. This may include your name, email address, payment information,
+            and professional history.</p>
+
+        <h2>2. Use of Information</h2>
+        <p>We use the information we collect to provide, maintain, and improve our services, to match freelancers with
+            clients, to process payments, and to communicate with you about products, services, offers, and events.</p>
+
+        <h2>3. Data Protection</h2>
+        <p>We implement appropriate technical and organizational measures to protect specific personal data that we
+            process from unauthorized disclosure, use, alteration, or destruction. We regularly review our security
+            practices.</p>
+
+        <h2>4. Contact Us</h2>
+        <p>If you have any questions about this Privacy Policy or our data practices, please contact us at
+            support@jobify.com or visit our Contact page.</p>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer-upwork">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mb-3">
+                    <a href="/" class="footer-logo">Jobify</a>
+                    <p>Transforming how businesses and freelancers connect. Join our professional community.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-3">
+                    <h5>Quick Links</h5>
+                    <ul>
+                        <li><a href="/info/find-work">Browse Jobs</a></li>
+                        <li><a href="/register">Sign Up</a></li>
+                        <li><a href="/login">Log In</a></li>
+                        <li><a href="/info/terms">Terms of Service</a></li>
+                        <li><a href="/info/privacy">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <h5>Resources</h5>
+                    <ul>
+                        <li><a href="/info/about">About Us</a></li>
+                        <li><a href="/info/blog">Blog</a></li>
+                        <li><a href="#">Help Center</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <h5>Contact</h5>
+                    <ul>
+                        <li><a href="mailto:support@jobify.com">support@jobify.com</a></li>
+                        <li><a href="tel:+15551234567">+1 (555) 123-4567</a></li>
+                        <li>San Francisco, CA</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Jobify. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+
+</body>
+
+</html>

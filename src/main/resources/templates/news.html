@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Company News - Jobify</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <style>
+        .news-hero {
+            background: linear-gradient(135deg, #4B6CB7 0%, #182848 100%);
+            padding: 100px 0 60px;
+            color: white;
+            text-align: center;
+        }
+
+        .news-card {
+            border: none;
+            border-radius: 12px;
+            overflow: hidden;
+            background: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            height: 100%;
+        }
+
+        .news-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .news-date {
+            font-size: 0.85rem;
+            color: #4B6CB7;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .news-title {
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            line-height: 1.4;
+        }
+
+        .news-title a {
+            color: #333;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .news-title a:hover {
+            color: #4B6CB7;
+        }
+
+        .news-excerpt {
+            color: #6c757d;
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .read-more-link {
+            color: #4B6CB7;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        .read-more-link:hover {
+            color: #182848;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <th:block th:replace="fragments/public-header :: header('news')"></th:block>
+
+    <!-- Hero -->
+    <header class="news-hero">
+        <div class="container animate-up">
+            <span class="badge bg-white text-primary mb-3 px-3 py-2 rounded-pill fw-bold text-uppercase ls-1">Company
+                Updates</span>
+            <h1 class="display-4 fw-bold mb-3">Newsroom</h1>
+            <p class="lead opacity-75 mb-0 mx-auto" style="max-width: 600px;">Latest announcements, production updates,
+                and press releases from Jobify.</p>
+        </div>
+    </header>
+
+    <!-- News List -->
+    <div class="container py-5">
+        <div class="row g-4">
+            <!-- Article 1 -->
+            <div class="col-md-4 animate-up delay-100">
+                <article class="news-card p-4">
+                    <span class="news-date">February 05, 2026</span>
+                    <h3 class="news-title"><a th:href="@{/info/news/article}">Jobify Launches New AI-Powered Matching
+                            Algorithm</a></h3>
+                    <p class="news-excerpt">We are thrilled to announce a major upgrade to our core matching engine,
+                        helping freelancers find relevant projects 2x faster.</p>
+                    <a th:href="@{/info/news/article}" class="read-more-link">Read full story <i
+                            class="fas fa-arrow-right ms-2"></i></a>
+                </article>
+            </div>
+
+            <!-- Article 2 -->
+            <div class="col-md-4 animate-up delay-200">
+                <article class="news-card p-4">
+                    <span class="news-date">January 28, 2026</span>
+                    <h3 class="news-title"><a th:href="@{/info/news/article}">Expansion into European Markets</a></h3>
+                    <p class="news-excerpt">Jobify is opening new offices in London and Berlin to better serve our
+                        growing European user base and enterprise partners.</p>
+                    <a th:href="@{/info/news/article}" class="read-more-link">Read full story <i
+                            class="fas fa-arrow-right ms-2"></i></a>
+                </article>
+            </div>
+
+            <!-- Article 3 -->
+            <div class="col-md-4 animate-up delay-300">
+                <article class="news-card p-4">
+                    <span class="news-date">January 15, 2026</span>
+                    <h3 class="news-title"><a th:href="@{/info/news/article}">Q4 2025 Financial Results Record
+                            Growth</a></h3>
+                    <p class="news-excerpt">Our fourth quarter results show a 45% increase in platform activity and
+                        strong revenue growth across all sectors.</p>
+                    <a th:href="@{/info/news/article}" class="read-more-link">Read full story <i
+                            class="fas fa-arrow-right ms-2"></i></a>
+                </article>
+            </div>
+
+            <!-- Article 4 -->
+            <div class="col-md-4 animate-up">
+                <article class="news-card p-4">
+                    <span class="news-date">December 10, 2025</span>
+                    <h3 class="news-title"><a th:href="@{/info/news/article}">Introducing Premium Enterprise
+                            Solutions</a></h3>
+                    <p class="news-excerpt">New tools designed specifically for large organizations to manage contingent
+                        workforces at scale.</p>
+                    <a th:href="@{/info/news/article}" class="read-more-link">Read full story <i
+                            class="fas fa-arrow-right ms-2"></i></a>
+                </article>
+            </div>
+
+            <!-- Article 5 -->
+            <div class="col-md-4 animate-up">
+                <article class="news-card p-4">
+                    <span class="news-date">November 22, 2025</span>
+                    <h3 class="news-title"><a th:href="@{/info/news/article}">Community Spotlight: Top Freelancers of
+                            2025</a></h3>
+                    <p class="news-excerpt">Celebrating the exceptional talent on our platform. Meet the freelancers who
+                        are redefining the future of work.</p>
+                    <a th:href="@{/info/news/article}" class="read-more-link">Read full story <i
+                            class="fas fa-arrow-right ms-2"></i></a>
+                </article>
+            </div>
+
+            <!-- Article 6 -->
+            <div class="col-md-4 animate-up">
+                <article class="news-card p-4">
+                    <span class="news-date">October 15, 2025</span>
+                    <h3 class="news-title"><a th:href="@{/info/news/article}">Security Updates and New Compliance
+                            Tools</a></h3>
+                    <p class="news-excerpt">We've implemented new security protocols and compliance features to keep
+                        your data safer than ever.</p>
+                    <a th:href="@{/info/news/article}" class="read-more-link">Read full story <i
+                            class="fas fa-arrow-right ms-2"></i></a>
+                </article>
+            </div>
+        </div>
+    </div>
+
+    <!-- Newsletter -->
+    <section class="py-5 bg-light border-top">
+        <div class="container text-center">
+            <div class="row justify-content-center">
+                <div class="col-lg-6">
+                    <h3 class="fw-bold mb-3">Stay in the loop</h3>
+                    <p class="text-muted mb-4">Subscribe to our press list to receive the latest news immediately.</p>
+                    <form class="d-flex gap-2">
+                        <input type="email" class="form-control" placeholder="Email address">
+                        <button class="btn btn-primary px-4">Subscribe</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <!-- Footer -->
+    <th:block th:replace="fragments/footer :: footer"></th:block>
+
+    <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.animation = `fadeInUp 0.8s ease-out forwards ${entry.target.classList.contains('delay-100') ? '0.1s' : entry.target.classList.contains('delay-200') ? '0.2s' : entry.target.classList.contains('delay-300') ? '0.3s' : '0s'}`;
+                        entry.target.style.opacity = '1';
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.animate-up').forEach(el => {
+                el.style.opacity = '0'; // Initial state
+                observer.observe(el);
+            });
+        });
+    </script>
+</body>
+
+</html>

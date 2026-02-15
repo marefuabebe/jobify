@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+    xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Edit Proposal - Jobify</title>
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
+    <link rel="stylesheet" th:href="@{/webjars/font-awesome/css/all.css}" />
+    <style>
+        .box {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .primary-title {
+            color: #2c3e50;
+            font-weight: bold;
+        }
+
+        .section {
+            padding: 40px 0;
+            background-color: #f8f9fa;
+            min-height: calc(100vh - 80px);
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <label class="mt-2 ms-5 fw-bold h5">
+            <a th:href="@{/freelancer-dashboard/}" class="text-white text-decoration-none">Jobify</a>
+        </label>
+
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggler"
+            aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarToggler">
+            <ul class="navbar-nav m-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/freelancer-dashboard/}">
+                        <i class="fas fa-home"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" th:href="@{/freelancer-dashboard/proposals}">
+                        <i class="fas fa-file-alt"></i> My Proposals
+                    </a>
+                </li>
+            </ul>
+
+            <img class="rounded-circle me-3" height="50" width="50" th:if="${user.photosImagePath != null}"
+                th:src="@{${user.photosImagePath}}" />
+
+            <label class="nav-link me-3 text-white" th:if="${user.firstName != null and user.lastName != null}"
+                th:text="${user.firstName + ' ' + user.lastName}">
+            </label>
+
+            <a class="btn btn-outline-light me-4" th:href="@{/logout}">Logout</a>
+        </div>
+    </header>
+
+    <section class="section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="box">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h2 class="primary-title mb-0">Edit Proposal</h2>
+                            <a th:href="@{/freelancer-dashboard/proposals}" class="btn btn-outline-secondary btn-sm">
+                                <i class="fas fa-arrow-left me-1"></i> Back to Proposals
+                            </a>
+                        </div>
+
+                        <div class="alert alert-info mb-4">
+                            <h6><i class="fas fa-info-circle me-2"></i>Edit Proposal for: <span
+                                    th:text="${applyJob.job.jobTitle}" class="fw-bold">Job Title</span></h6>
+                            <small>You can edit your proposal while it is still pending. Once reviewed by the client,
+                                editing will be disabled.</small>
+                        </div>
+
+                        <form th:action="@{/dashboard/edit-proposal/{id}(id=${applyJob.id})}" th:object="${applyJob}"
+                            method="post">
+
+                            <div class="mb-3">
+                                <label for="coverLetter" class="form-label fw-bold">Cover Letter</label>
+                                <textarea class="form-control" id="coverLetter" rows="5" th:field="*{coverLetter}"
+                                    required></textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="understanding" class="form-label fw-bold">Understanding of
+                                    Requirements</label>
+                                <textarea class="form-control" id="understanding" rows="3"
+                                    th:field="*{understanding}"></textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="relevantSkills" class="form-label fw-bold">Relevant Skills &
+                                    Experience</label>
+                                <textarea class="form-control" id="relevantSkills" rows="3"
+                                    th:field="*{relevantSkills}"></textarea>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="proposedRate" class="form-label fw-bold">Proposed Rate ($)</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" class="form-control" id="proposedRate"
+                                            th:field="*{proposedRate}" min="0" step="0.01" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="expectedCompletionTime" class="form-label fw-bold">Expected Completion
+                                        Time</label>
+                                    <input type="text" class="form-control" id="expectedCompletionTime"
+                                        th:field="*{expectedCompletionTime}" required>
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                                <a th:href="@{/freelancer-dashboard/proposals}" class="btn btn-light me-md-2">Cancel</a>
+                                <button type="submit" class="btn btn-primary px-4"><i class="fas fa-save me-2"></i>Save
+                                    Changes</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
+    <script th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+
+
+    <!-- Footer -->
+    <th:block th:replace="fragments/footer :: footer"></th:block>
+
+</body>
+
+</html>

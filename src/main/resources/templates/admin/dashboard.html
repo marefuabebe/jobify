@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Jobify Admin</title>
+    <link th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/webjars/font-awesome/css/all.min.css}" rel="stylesheet">
+    <link th:href="@{/css/admin-styles.css}" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+</head>
+
+<body class="light-theme">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar" id="sidebar"
+        th:replace="~{admin/fragments/sidebar :: sidebar(activeLink='dashboard')}">
+        <!-- Content replaced by fragment -->
+    </aside>
+
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <button class="btn btn-primary d-lg-none me-3" id="sidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="page-title">
+                <div>
+                    <h1 class="h3 fw-bold mb-1">Dashboard</h1>
+                    <p class="text-muted mb-0">Overview of platform performance</p>
+                </div>
+            </div>
+
+            <div class="user-menu d-flex align-items-center gap-3">
+                <div class="input-group d-none d-md-flex" style="width: 250px;">
+                    <span class="input-group-text bg-transparent border-end-0 text-muted ps-3">
+                        <i class="fas fa-search"></i>
+                    </span>
+                    <input type="text" class="form-control bg-transparent border-start-0 ps-0" placeholder="Search..."
+                        style="box-shadow: none;">
+                </div>
+
+                <!-- Theme Toggle Removed -->
+
+
+
+                <div class="dropdown">
+                    <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle"
+                        id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img th:if="${user.photos != null}" th:src="@{${user.photosImagePath}}"
+                            class="rounded-circle border" width="36" height="36" style="object-fit: cover;">
+                        <div th:if="${user.photos == null}"
+                            class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center"
+                            style="width: 36px; height: 36px;">
+                            <i class="fas fa-user"></i>
+                        </div>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0" aria-labelledby="profileDropdown">
+                        <li><a class="dropdown-item" href="/admin/profile"><i class="fas fa-user-circle me-2"></i>
+                                Profile</a></li>
+                        <li><a class="dropdown-item" href="/admin/settings"><i class="fas fa-cog me-2"></i> Settings</a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item text-danger" href="/logout"><i class="fas fa-sign-out-alt me-2"></i>
+                                Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Cards Row -->
+        <div class="row g-4 mb-4">
+            <!-- Total Users -->
+            <div class="col-xl-3 col-md-6">
+                <div
+                    class="card border-0 shadow-sm h-100 card-scale-up bg-gradient-purple position-relative overflow-hidden">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-start z-1 position-relative">
+                            <div>
+                                <h2 class="fw-bold mb-1 text-white stat-counter" th:text="${stats.totalUsers}"
+                                    th:attr="data-target=${stats.totalUsers}" data-counter="true">0</h2>
+                                <p class="mb-0 text-white-50 fw-medium">Total Users</p>
+                            </div>
+                            <div class="icon-circle-white">
+                                <i class="fas fa-users"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Jobs -->
+            <div class="col-xl-3 col-md-6">
+                <div
+                    class="card border-0 shadow-sm h-100 card-scale-up bg-gradient-success position-relative overflow-hidden">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-start z-1 position-relative">
+                            <div>
+                                <h2 class="fw-bold mb-1 text-white stat-counter" th:text="${stats.totalJobs}"
+                                    th:attr="data-target=${stats.totalJobs}" data-counter="true">0</h2>
+                                <p class="mb-0 text-white-50 fw-medium">Total Jobs</p>
+                            </div>
+                            <div class="icon-circle-white">
+                                <i class="fas fa-briefcase"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Applications -->
+            <div class="col-xl-3 col-md-6">
+                <div
+                    class="card border-0 shadow-sm h-100 card-scale-up bg-gradient-info position-relative overflow-hidden">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-start z-1 position-relative">
+                            <div>
+                                <h2 class="fw-bold mb-1 text-white stat-counter" th:text="${stats.totalApplications}"
+                                    th:attr="data-target=${stats.totalApplications}" data-counter="true">0</h2>
+                                <p class="mb-0 text-white-50 fw-medium">Total Applications</p>
+                            </div>
+                            <div class="icon-circle-white">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Projects -->
+            <div class="col-xl-3 col-md-6">
+                <div
+                    class="card border-0 shadow-sm h-100 card-scale-up bg-gradient-warning position-relative overflow-hidden">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-start z-1 position-relative">
+                            <div>
+                                <h2 class="fw-bold mb-1 text-white stat-counter" th:text="${stats.activeProjects}"
+                                    th:attr="data-target=${stats.activeProjects}" data-counter="true">0</h2>
+                                <p class="mb-0 text-white-50 fw-medium">Active Projects</p>
+                            </div>
+                            <div class="icon-circle-white">
+                                <i class="fas fa-tasks"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="row g-4 mb-4">
+            <!-- Sales / Activity Chart -->
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm h-100">
+                    <div
+                        class="card-header bg-transparent border-bottom px-4 py-3 d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 fw-bold">Platform Activity</h5>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-light text-muted dropdown-toggle border-0"
+                                type="button" data-bs-toggle="dropdown">
+                                Weekly
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                                <li><a class="dropdown-item" href="#">Daily</a></li>
+                                <li><a class="dropdown-item" href="#">Weekly</a></li>
+                                <li><a class="dropdown-item" href="#">Monthly</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-end mb-4">
+                            <h3 class="fw-bold mb-0 me-3">$4,230</h3>
+                            <span class="text-success small fw-bold"><i class="fas fa-arrow-up"></i> 5.2%</span>
+                            <span class="text-muted small ms-2">vs last week</span>
+                        </div>
+                        <div class="chart-container" style="height: 300px;">
+                            <canvas id="activityChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Revenue / Distribution Chart -->
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-transparent border-bottom px-4 py-3">
+                        <h5 class="mb-0 fw-bold">User Distribution</h5>
+                    </div>
+                    <div class="card-body p-4 d-flex flex-column align-items-center justify-content-center">
+                        <div class="chart-container position-relative" style="height: 250px; width: 250px;">
+                            <canvas id="distributionChart"></canvas>
+                            <!-- Center Text Overlay -->
+                            <div class="position-absolute top-50 start-50 translate-middle text-center">
+                                <h4 class="mb-0 fw-bold stat-counter" th:text="${stats.totalUsers}"
+                                    th:attr="data-target=${stats.totalUsers}" data-counter="true">100</h4>
+                                <small class="text-muted">Total</small>
+                            </div>
+                        </div>
+                        <div class="mt-4 w-100">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-muted small"><i class="fas fa-circle text-primary me-1"></i>
+                                    Clients</span>
+                                <span class="fw-bold stat-counter" th:text="${stats.totalClients}"
+                                    th:attr="data-target=${stats.totalClients}" data-counter="true">0</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-muted small"><i class="fas fa-circle text-info me-1"></i>
+                                    Freelancers</span>
+                                <span class="fw-bold stat-counter" th:text="${stats.totalFreelancers}"
+                                    th:attr="data-target=${stats.totalFreelancers}" data-counter="true">0</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-muted small"><i class="fas fa-circle text-warning me-1"></i>
+                                    Pending</span>
+                                <span class="fw-bold stat-counter" th:text="${stats.pendingUsers}"
+                                    th:attr="data-target=${stats.pendingUsers}" data-counter="true">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Traffic / Quick Actions -->
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-transparent border-bottom px-4 py-3">
+                        <h5 class="mb-0 fw-bold">Traffic Sources</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="fw-medium">Direct</span>
+                                <span class="text-muted traffic-label" data-traffic-label="direct">80%</span>
+                            </div>
+                            <div class="progress" style="height: 6px;">
+                                <div class="progress-bar bg-primary traffic-bar" role="progressbar" style="width: 0%"
+                                    data-traffic-bar="direct" data-target-percent="80" aria-valuenow="0"
+                                    aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="fw-medium">Social</span>
+                                <span class="text-muted traffic-label" data-traffic-label="social">50%</span>
+                            </div>
+                            <div class="progress" style="height: 6px;">
+                                <div class="progress-bar bg-info traffic-bar" role="progressbar" style="width: 0%"
+                                    data-traffic-bar="social" data-target-percent="50" aria-valuenow="0"
+                                    aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+                        <div class="mb-0">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="fw-medium">Referral</span>
+                                <span class="text-muted traffic-label" data-traffic-label="referral">20%</span>
+                            </div>
+                            <div class="progress" style="height: 6px;">
+                                <div class="progress-bar bg-warning traffic-bar" role="progressbar" style="width: 0%"
+                                    data-traffic-bar="referral" data-target-percent="20" aria-valuenow="0"
+                                    aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions Grid (Revised) -->
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-transparent border-bottom px-4 py-3">
+                        <h5 class="mb-0 fw-bold">Quick Management</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row g-3">
+                            <div class="col-md-4 col-6">
+                                <a href="/admin/users/pending"
+                                    class="d-block text-center text-decoration-none p-3 rounded-3 bg-light bg-opacity-50 hover-bg-light transition-all border">
+                                    <div class="d-inline-flex align-items-center justify-content-center bg-white rounded-circle shadow-sm mb-3"
+                                        style="width: 50px; height: 50px;">
+                                        <i class="fas fa-user-clock text-warning fa-lg"></i>
+                                    </div>
+                                    <h6 class="text-dark mb-0 fw-bold">Pending Users</h6>
+                                </a>
+                            </div>
+
+                            <div class="col-md-4 col-6">
+                                <a href="/admin/disputes"
+                                    class="d-block text-center text-decoration-none p-3 rounded-3 bg-light bg-opacity-50 hover-bg-light transition-all border">
+                                    <div class="d-inline-flex align-items-center justify-content-center bg-white rounded-circle shadow-sm mb-3"
+                                        style="width: 50px; height: 50px;">
+                                        <i class="fas fa-exclamation-triangle text-danger fa-lg"></i>
+                                    </div>
+                                    <h6 class="text-dark mb-0 fw-bold">Disputes</h6>
+                                </a>
+                            </div>
+                            <div class="col-md-4 col-6">
+                                <a href="/admin/profile"
+                                    class="d-block text-center text-decoration-none p-3 rounded-3 bg-light bg-opacity-50 hover-bg-light transition-all border">
+                                    <div class="d-inline-flex align-items-center justify-content-center bg-white rounded-circle shadow-sm mb-3"
+                                        style="width: 50px; height: 50px;">
+                                        <i class="fas fa-user-circle text-primary fa-lg"></i>
+                                    </div>
+                                    <h6 class="text-dark mb-0 fw-bold">Profile</h6>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Short Admin Footer -->
+    <div th:replace="~{admin/fragments/footer :: adminFooter}"></div>
+
+    <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
+    <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script th:src="@{/js/admin-scripts.js}"></script>
+
+    <!-- Dashboard Specific Scripts -->
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        document.addEventListener('DOMContentLoaded', function () {
+            // Force light mode colors
+            const gridColor = '#e3e8f0';
+            const textColor = '#64748b';
+
+            // ---------- Activity Chart (Area/Line) with live animation ----------
+            const activityCtx = document.getElementById('activityChart').getContext('2d');
+            const activityGradient = activityCtx.createLinearGradient(0, 0, 0, 300);
+            activityGradient.addColorStop(0, 'rgba(29, 155, 240, 0.5)');
+            activityGradient.addColorStop(1, 'rgba(29, 155, 240, 0.0)');
+
+            const activityChart = new Chart(activityCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Activity',
+                        data: [65, 59, 80, 81, 56, 55, 40],
+                        fill: true,
+                        backgroundColor: activityGradient,
+                        borderColor: '#1d9bf0',
+                        tension: 0.4,
+                        pointBackgroundColor: '#1d9bf0',
+                        pointBorderColor: '#fff',
+                        pointRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: gridColor, borderDash: [5, 5] },
+                            ticks: { color: textColor }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: textColor }
+                        }
+                    }
+                }
+            });
+
+            // Helper to slightly jitter a value but keep it positive
+            function jitter(value, maxDelta) {
+                const delta = (Math.random() * 2 - 1) * maxDelta;
+                return Math.max(0, Math.round(value + delta));
+            }
+
+            // Simulate "real-time" activity by updating the last point every 5s
+            setInterval(function () {
+                const data = activityChart.data.datasets[0].data;
+                const last = data[data.length - 1] || 0;
+                data.push(jitter(last, 10));
+                if (data.length > 14) {
+                    data.shift();
+                }
+                activityChart.update('easeOutQuad');
+            }, 5000);
+
+            // ---------- Distribution Chart (Doughnut) with smooth updates ----------
+            // Get data from Thymeleaf if available, else standard mocks
+            const clientsCount = /*[[${stats.totalClients != null ? stats.totalClients : 30}]]*/ 30;
+            const freelancersCount = /*[[${stats.totalFreelancers != null ? stats.totalFreelancers : 50}]]*/ 50;
+            const pendingCount = /*[[${stats.pendingUsers != null ? stats.pendingUsers : 20}]]*/ 20;
+
+            const distributionCtx = document.getElementById('distributionChart').getContext('2d');
+            const distributionChart = new Chart(distributionCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Clients', 'Freelancers', 'Pending'],
+                    datasets: [{
+                        data: [clientsCount, freelancersCount, pendingCount],
+                        backgroundColor: ['#059862', '#1d9bf0', '#ffb400'],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '75%',
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+
+            // Light "real-time" effect: gently adjust pending users share every 7s
+            setInterval(function () {
+                const ds = distributionChart.data.datasets[0];
+                const baseClients = clientsCount;
+                const baseFreelancers = freelancersCount;
+                const basePending = pendingCount;
+                const variation = Math.round((Math.random() * 2 - 1) * 3); // -3..+3
+                ds.data = [baseClients, baseFreelancers, Math.max(0, basePending + variation)];
+                distributionChart.update('easeOutQuad');
+            }, 7000);
+
+            // ---------- Animated counters for key stats ----------
+            function animateCounter(el, target, duration) {
+                const start = 0;
+                const startTime = performance.now();
+                const formatter = new Intl.NumberFormat();
+
+                function frame(now) {
+                    const progress = Math.min((now - startTime) / duration, 1);
+                    const current = Math.round(start + (target - start) * progress);
+                    el.textContent = formatter.format(current);
+                    if (progress < 1) {
+                        requestAnimationFrame(frame);
+                    }
+                }
+
+                requestAnimationFrame(frame);
+            }
+
+            document.querySelectorAll('[data-counter="true"]').forEach(function (el) {
+                const targetAttr = el.getAttribute('data-target');
+                const target = parseInt(targetAttr || el.textContent || '0', 10) || 0;
+                el.textContent = '0';
+                animateCounter(el, target, 900);
+            });
+
+            // ---------- Traffic sources progress bar animation ----------
+            function animateTrafficBar(barEl, targetPercent, duration) {
+                const startTime = performance.now();
+
+                function frame(now) {
+                    const progress = Math.min((now - startTime) / duration, 1);
+                    const current = targetPercent * progress;
+                    barEl.style.width = current + '%';
+                    barEl.setAttribute('aria-valuenow', Math.round(current));
+                    if (progress < 1) {
+                        requestAnimationFrame(frame);
+                    }
+                }
+
+                requestAnimationFrame(frame);
+            }
+
+            document.querySelectorAll('.traffic-bar').forEach(function (bar) {
+                const target = parseInt(bar.getAttribute('data-target-percent') || '0', 10);
+                bar.style.width = '0%';
+                bar.setAttribute('aria-valuenow', '0');
+                animateTrafficBar(bar, target, 1000);
+            });
+
+            // Optional subtle "live" effect: nudge labels by ±1% without changing bars
+            setInterval(function () {
+                document.querySelectorAll('.traffic-label').forEach(function (label) {
+                    const text = label.textContent.replace('%', '').trim();
+                    const base = parseInt(text || '0', 10);
+                    const delta = Math.round((Math.random() * 2 - 1)); // -1..+1
+                    const next = Math.max(0, Math.min(100, base + delta));
+                    label.textContent = next + '%';
+                });
+            }, 6000);
+        });
+        /*]]>*/
+    </script>
+</body>
+
+</html>

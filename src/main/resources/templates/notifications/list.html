@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Notifications - Jobify</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
+    <link rel="stylesheet" th:href="@{/webjars/font-awesome/css/all.min.css}" />
+    <link rel="stylesheet" th:href="@{/css/global.css}" />
+
+    <style>
+        :root {
+            --primary: #00b074;
+            --primary-light: #e6f7f1;
+            --secondary: #2c3e50;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --border: #e0e0e0;
+            --radius: 8px;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            --transition: all 0.3s ease;
+        }
+
+        /* Header Styles from Dashboard */
+        .navbar {
+            background: var(--dark);
+            padding: 12px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-brand {
+            color: white !important;
+            font-weight: 700;
+            font-size: 24px;
+            text-decoration: none;
+        }
+
+        .navbar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.9);
+            padding: 8px 12px;
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: var(--radius);
+            transition: var(--transition);
+        }
+
+        .navbar-nav .nav-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .navbar-nav .nav-link.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+        }
+
+        .badge {
+            font-size: 11px;
+            padding: 3px 6px;
+            font-weight: 600;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            object-fit: cover;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .user-name {
+            color: white;
+            font-weight: 500;
+            font-size: 13px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--light);
+            color: var(--dark);
+        }
+
+        .notification-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .notification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .notification-card {
+            background: white;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            margin-bottom: 1rem;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .notification-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .notification-card.unread {
+            border-left: 4px solid var(--primary);
+            background: #fff;
+        }
+
+        .notification-card.unread::after {
+            content: '';
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 8px;
+            height: 8px;
+            background: var(--primary);
+            border-radius: 50%;
+        }
+
+        .icon-box {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+
+        .icon-info {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .icon-success {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .icon-warning {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .icon-error {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .icon-message {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .time-badge {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header Fragment Inclusion -->
+    <th:block th:if="${userType == 'Recruiter'}">
+        <nav th:replace="fragments/client-header :: clientHeader('dashboard')"></nav>
+    </th:block>
+    <th:block th:if="${userType == 'JobSeeker'}">
+        <nav th:replace="fragments/freelancer-header :: freelancerHeader('dashboard')"></nav>
+    </th:block>
+    <th:block th:if="${userType != 'Recruiter' and userType != 'JobSeeker'}">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="/">Jobify</a>
+            </div>
+        </nav>
+    </th:block>
+
+    <!-- Main Content -->
+    <div class="notification-container">
+
+        <div class="notification-header">
+            <div class="d-flex align-items-center">
+                <div class="icon-box" style="background: var(--primary-light); color: var(--primary);">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <div>
+                    <h4 class="mb-0 fw-bold">Notifications</h4>
+                    <p class="text-muted mb-0 small">Stay updated with your latest activities</p>
+                </div>
+            </div>
+
+            <a th:if="${notifications != null and !notifications.isEmpty()}" th:href="@{/notifications/mark-all-read}"
+                class="btn btn-outline-success btn-sm rounded-pill px-3">
+                <i class="fas fa-check-double me-1"></i> Mark All as Read
+            </a>
+        </div>
+
+        <!-- No Notifications -->
+        <div th:if="${notifications == null or notifications.isEmpty()}" class="empty-state">
+            <img src="https://cdni.iconscout.com/illustration/premium/thumb/empty-notification-2972412-2483562.png"
+                alt="Empty" style="width: 200px; opacity: 0.7; mix-blend-mode: multiply;" />
+            <h5 class="mt-3 fw-bold">No new notifications</h5>
+            <p class="text-muted">You're all caught up! Check back later for updates.</p>
+        </div>
+
+        <!-- Notification List -->
+        <div class="list-group" th:if="${notifications != null}">
+            <a th:each="notification : ${notifications}" th:href="@{/notifications/read/{id}(id=${notification.id})}"
+                class="list-group-item list-group-item-action p-3 notification-card d-flex align-items-start"
+                th:classappend="${!notification.isRead ? 'unread' : ''}">
+
+                <!-- Icon -->
+                <div class="icon-box" th:classappend="${
+                    notification.type == 'INFO' ? 'icon-info' :
+                    notification.type == 'SUCCESS' ? 'icon-success' :
+                    notification.type == 'WARNING' ? 'icon-warning' :
+                    notification.type == 'ERROR' ? 'icon-error' :
+                    notification.type == 'MESSAGE' ? 'icon-message' : 'icon-info'}">
+
+                    <i class="fas" th:classappend="${
+                        notification.type == 'INFO' ? 'fa-info' :
+                        notification.type == 'SUCCESS' ? 'fa-check' :
+                        notification.type == 'WARNING' ? 'fa-exclamation' :
+                        notification.type == 'ERROR' ? 'fa-times' :
+                        notification.type == 'MESSAGE' ? 'fa-envelope' : 'fa-bell'}"></i>
+                </div>
+
+                <!-- Content -->
+                <div class="flex-grow-1">
+                    <div class="d-flex w-100 justify-content-between align-items-center mb-1">
+                        <h6 class="mb-0 fw-bold text-dark" th:text="${notification.title}">Title</h6>
+                        <span class="time-badge">
+                            <i class="far fa-clock me-1"></i>
+                            <span th:text="${#dates.format(notification.createdAt, 'dd MMM HH:mm')}">Time</span>
+                        </span>
+                    </div>
+                    <p class="mb-0 text-muted small" th:text="${notification.message}">Message content goes here.</p>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
+</body>
+
+</html>

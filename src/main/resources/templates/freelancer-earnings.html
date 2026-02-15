@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+    xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Earnings & Financials | Jobify</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
+    <link rel="stylesheet" th:href="@{/webjars/font-awesome/css/all.css}" />
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <style>
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Sidebar Styles */
+        .dashboard-sidebar {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+
+        .user-profile-card {
+            text-align: center;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 1.5rem;
+        }
+
+        .profile-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1rem;
+        }
+
+        .sidebar-nav .nav-link {
+            color: #64748b;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-nav .nav-link:hover,
+        .sidebar-nav .nav-link.active {
+            background-color: #F8FAFC;
+            color: #0F172A !important;
+        }
+
+        .sidebar-nav .nav-link i {
+            width: 24px;
+            margin-right: 0.5rem;
+            color: #94A3B8;
+        }
+
+        .sidebar-nav .nav-link:hover i,
+        .sidebar-nav .nav-link.active i {
+            color: #3B82F6 !important;
+        }
+
+        /* Stats Cards */
+        .stats-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.02);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+        }
+
+        .stats-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .bg-blue-light {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: #3B82F6;
+        }
+
+        .bg-green-light {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: #10B981;
+        }
+
+        .bg-purple-light {
+            background-color: rgba(139, 92, 246, 0.1);
+            color: #8B5CF6;
+        }
+
+        /* Table Styles */
+        .earnings-table {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+            overflow: hidden;
+        }
+
+        .table thead th {
+            background-color: #F8FAFC;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            color: #64748b;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #E2E8F0;
+        }
+
+        .table tbody td {
+            vertical-align: middle;
+            padding: 1rem 1.5rem;
+            color: #334155;
+            border-bottom: 1px solid #F1F5F9;
+        }
+
+        .table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .status-badge {
+            padding: 0.35rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+
+        .status-paid {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: #3B82F6;
+        }
+
+        .status-approved {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: #10B981;
+        }
+
+        .status-funded {
+            background-color: rgba(6, 182, 212, 0.1);
+            color: #0891B2;
+        }
+
+        .status-pending {
+            background-color: rgba(100, 116, 139, 0.1);
+            color: #64748B;
+        }
+
+        /* Payment Method Select */
+        .payment-method-card {
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .payment-method-card:hover,
+        .payment-method-card.selected {
+            border-color: #3B82F6;
+            background-color: #EFF6FF;
+        }
+    </style>
+</head>
+
+<body class="bg-light">
+
+    <th:block th:replace="fragments/freelancer-header :: freelancerHeader('earnings')"></th:block>
+
+    <div class="dashboard-container">
+        <div class="row g-4">
+            <!-- Sidebar -->
+            <div class="col-lg-3">
+                <div class="dashboard-sidebar">
+                    <div class="user-profile-card">
+                        <img th:src="@{${user.photosImagePath != null ? user.photosImagePath : 'https://ui-avatars.com/api/?name=' + user.firstName + '+' + user.lastName}}"
+                            alt="Profile" class="profile-image">
+                        <h6 class="fw-bold mb-1" th:text="${user.firstName + ' ' + user.lastName}">User Name</h6>
+                        <p class="text-muted small mb-0" th:text="${user.userId.email}">user@example.com</p>
+                        <div class="mt-2">
+                            <span class="badge bg-success-subtle text-success rounded-pill"
+                                th:if="${isVerified}">Verified</span>
+                            <span class="badge bg-warning-subtle text-warning rounded-pill"
+                                th:unless="${isVerified}">Unverified</span>
+                        </div>
+                    </div>
+
+                    <nav class="nav flex-column sidebar-nav">
+                        <a class="nav-link" th:href="@{/freelancer-dashboard/}">
+                            <i class="fas fa-home"></i> Dashboard
+                        </a>
+                        <a class="nav-link" th:href="@{/find-work/}">
+                            <i class="fas fa-search"></i> Find Work
+                        </a>
+                        <a class="nav-link" th:href="@{/freelancer-dashboard/proposals}">
+                            <i class="fas fa-file-alt"></i> My Proposals
+                        </a>
+                        <a class="nav-link" th:href="@{/freelancer-dashboard/projects}">
+                            <i class="fas fa-briefcase"></i> My Projects
+                        </a>
+                        <a class="nav-link active" th:href="@{/freelancer-dashboard/earnings}">
+                            <i class="fas fa-wallet"></i> Earnings
+                        </a>
+                        <a class="nav-link" th:href="@{/job-seeker-profile/}">
+                            <i class="fas fa-user-cog"></i> Profile Settings
+                        </a>
+                    </nav>
+
+                    <!-- Verification Promo relocated inside sidebar -->
+                    <div class="mt-4 card border-0 shadow-sm bg-primary text-white p-4 rounded-4 text-center"
+                        th:if="${!isVerified}">
+                        <i class="fas fa-shield-alt fa-3x mb-3 text-white-50"></i>
+                        <h6 class="fw-bold">Get Verified</h6>
+                        <p class="small text-white-50 mb-3">Verify your identity to unlock withdrawals and gain trust.
+                        </p>
+                        <a th:href="@{/job-seeker-profile/}" class="btn btn-light btn-sm fw-bold w-100">Verify Now</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-lg-9">
+                <!-- Page Header -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h3 class="fw-bold text-dark mb-1">Financial Overview</h3>
+                        <p class="text-muted mb-0">Track your earnings, pending clearances, and withdrawals.</p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-primary rounded-pill px-4 btn-sm" data-bs-toggle="modal"
+                            data-bs-target="#paymentSettingsModal">
+                            <i class="fas fa-cog me-2"></i> Payout Settings
+                        </button>
+                        <a th:href="@{/freelancer-dashboard/}" class="btn btn-primary rounded-pill px-4 btn-sm">
+                            <i class="fas fa-arrow-left me-2"></i> Dashboard
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="row g-4 mb-5">
+                    <!-- Total Project Value -->
+                    <div class="col-md-4">
+                        <div class="stats-card">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <p class="text-muted small fw-bold text-uppercase mb-1">Total Contract Value</p>
+                                    <h2 class="fw-bold text-dark mb-0"
+                                        th:text="${'$' + #numbers.formatDecimal(totalProjectValue, 0, 'COMMA', 2, 'POINT')}">
+                                        $0.00</h2>
+                                </div>
+                                <div class="stats-icon bg-blue-light">
+                                    <i class="fas fa-file-invoice-dollar"></i>
+                                </div>
+                            </div>
+                            <small class="text-success fw-medium">
+                                <i class="fas fa-arrow-up me-1"></i> From <span
+                                    th:text="${ongoingProjects.size()}">0</span> Active Contracts
+                            </small>
+                        </div>
+                    </div>
+
+                    <!-- Available Balance -->
+                    <div class="col-md-4">
+                        <div class="stats-card">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <p class="text-muted small fw-bold text-uppercase mb-1">Available for Withdrawal</p>
+                                    <h2 class="fw-bold text-dark mb-0"
+                                        th:text="${'$' + #numbers.formatDecimal(availableBalance, 0, 'COMMA', 2, 'POINT')}">
+                                        $0.00</h2>
+                                </div>
+                                <div class="stats-icon bg-green-light">
+                                    <i class="fas fa-wallet"></i>
+                                </div>
+                            </div>
+                            <small class="text-muted">
+                                Cleared and ready to payout
+                            </small>
+                        </div>
+                    </div>
+
+                    <!-- Platform Fees (Placeholder for now) -->
+                    <div class="col-md-4">
+                        <div class="stats-card">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <p class="text-muted small fw-bold text-uppercase mb-1">Pending Clearance</p>
+                                    <h2 class="fw-bold text-dark mb-0"
+                                        th:text="${'$' + #numbers.formatDecimal(pendingClearance, 0, 'COMMA', 2, 'POINT')}">
+                                        $0.00</h2>
+                                </div>
+                                <div class="stats-icon bg-purple-light">
+                                    <i class="fas fa-hourglass-half"></i>
+                                </div>
+                            </div>
+                            <small class="text-muted">
+                                Funds in escrow
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Earnings Table -->
+                <h5 class="fw-bold text-dark mb-3">Active Contracts & Earnings</h5>
+                <div class="earnings-table">
+                    <div class="table-responsive">
+                        <table class="table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Project / Client</th>
+                                    <th>Contract Date</th>
+                                    <th>Agreed Rate</th>
+                                    <th>Payment Status</th>
+                                    <th>Remaining Balance</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:if="${ongoingProjects.isEmpty()}">
+                                    <td colspan="6" class="text-center py-5">
+                                        <div class="empty-state">
+                                            <i class="fas fa-coins fa-3x text-muted mb-3 opacity-50"></i>
+                                            <h6>No active contracts found</h6>
+                                            <p class="text-muted small">Once you are hired, your earnings will appear
+                                                here.</p>
+                                            <a th:href="@{/find-work/}" class="btn btn-sm btn-outline-primary mt-2">Find
+                                                Work</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr th:each="project : ${ongoingProjects}">
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar bg-light text-primary rounded-circle me-3 d-flex align-items-center justify-content-center"
+                                                style="width: 40px; height: 40px;">
+                                                <i class="fas fa-briefcase"></i>
+                                            </div>
+                                            <div>
+                                                <a th:href="@{/job-details-apply/{id}(id=${project.job.jobPostId})}"
+                                                    class="fw-bold text-dark text-decoration-none d-block mb-0"
+                                                    th:text="${project.job.jobTitle}">Job Title</a>
+                                                <small class="text-muted"
+                                                    th:text="${project.job.postedById.email}">Client Name</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="text-muted small">
+                                            <span th:text="${#dates.format(project.applyDate, 'MMM dd, yyyy')}">Jan 01,
+                                                2026</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="fw-bold text-dark"
+                                            th:text="${project.proposedRate != null ? '$' + #numbers.formatDecimal(project.proposedRate, 0, 'COMMA', 2, 'POINT') : 'N/A'}">$500.00</span>
+                                        <span class="badge bg-light text-dark ms-1 small rounded-pill">Fixed</span>
+                                    </td>
+                                    <td>
+                                        <span th:if="${projectRemainingBalance.get(project.job.jobPostId) <= 0}"
+                                            class="status-badge status-paid"><i class="fas fa-check-double me-1"></i>
+                                            Paid</span>
+                                        <span
+                                            th:if="${withdrawableBalance.get(project.job.jobPostId) > 0 and projectRemainingBalance.get(project.job.jobPostId) > 0}"
+                                            class="status-badge status-approved"><i
+                                                class="fas fa-check-circle me-1"></i>
+                                            Approved</span>
+                                        <span
+                                            th:if="${projectPaymentStatus.get(project.job.jobPostId) and withdrawableBalance.get(project.job.jobPostId) <= 0 and projectRemainingBalance.get(project.job.jobPostId) > 0}"
+                                            class="status-badge status-funded"><i class="fas fa-lock me-1"></i>
+                                            Funded</span>
+                                        <span th:unless="${projectPaymentStatus.get(project.job.jobPostId)}"
+                                            class="status-badge status-pending"><i class="fas fa-clock me-1"></i>
+                                            Pending</span>
+                                    </td>
+                                    <td>
+                                        <span class="fw-bold text-dark"
+                                            th:text="${projectRemainingBalance.get(project.job.jobPostId) > 0 ? '$' + #numbers.formatDecimal(projectRemainingBalance.get(project.job.jobPostId), 0, 'COMMA', 2, 'POINT') : '$0.00'}">$0.00</span>
+                                    </td>
+                                    <td class="text-end">
+                                        <button class="btn btn-sm btn-primary rounded-pill px-3" data-bs-toggle="modal"
+                                            data-bs-target="#withdrawModal" th:attr="data-project-id=${project.job.jobPostId}, 
+                                                     data-client-name=${project.job.postedById.email}, 
+                                                     data-rate=${withdrawableBalance.get(project.job.jobPostId)},
+                                                     data-verified=${isVerified},
+                                                     data-paid=${projectPaymentStatus.get(project.job.jobPostId)}"
+                                            th:disabled="${withdrawableBalance.get(project.job.jobPostId) <= 0}">
+                                            Withdraw
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Recent Withdrawals Section (Placeholder) -->
+                <div class="mt-5" th:if="${withdrawals != null and !withdrawals.isEmpty()}">
+                    <h5 class="fw-bold text-dark mb-3">Withdrawal History</h5>
+                    <div class="earnings-table">
+                        <div class="table-responsive">
+                            <table class="table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Method</th>
+                                        <th>Amount</th>
+                                        <th>Reference Job</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="withdrawal : ${withdrawals}">
+                                        <td th:text="${#dates.format(withdrawal.withdrawalDate, 'MMM dd, yyyy HH:mm')}">
+                                            Date</td>
+                                        <td>
+                                            <i class="fab fa-stripe text-primary me-2"></i>
+                                            <span th:text="${withdrawal.method}">Stripe</span>
+                                        </td>
+                                        <td class="fw-bold text-dark"
+                                            th:text="${'-$' + #numbers.formatDecimal(withdrawal.amount, 0, 'COMMA', 2, 'POINT')}">
+                                            -$100.00</td>
+                                        <td class="small text-muted" th:text="${withdrawal.job.jobTitle}">Project Name
+                                        </td>
+                                        <td><span class="badge bg-success-subtle text-success">Completed</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Withdrawal Modal -->
+    <div class="modal fade" id="withdrawModal" tabindex="-1" aria-labelledby="withdrawModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold" id="withdrawModalLabel">Withdraw Funds</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form th:action="@{/freelancer-dashboard/process-withdrawal}" method="post">
+                    <div class="modal-body pt-2">
+                        <input type="hidden" id="projectId" name="projectId" />
+                        <input type="hidden" id="amount" name="amount" />
+
+                        <div class="text-center py-4">
+                            <h1 class="display-4 fw-bold text-success mb-0" id="modalAmountDisplay">$0.00</h1>
+                            <p class="text-muted">Available to withdraw</p>
+                        </div>
+
+                        <div class="card bg-light border-0 rounded-3 mb-4">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted small">Source Project</span>
+                                    <span class="fw-medium small text-truncate" style="max-width: 200px;"
+                                        id="modalProjectName">Project A</span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span class="text-muted small">Client</span>
+                                    <span class="fw-medium small" id="modalClientName">Client Name</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="unverifiedAlert"
+                            class="alert alert-warning border-warning-subtle text-warning-emphasis"
+                            style="display: none;">
+                            <div class="d-flex">
+                                <i class="fas fa-lock me-3 mt-1"></i>
+                                <div>
+                                    <strong>Account Verification Required</strong>
+                                    <div class="small mt-1">For security reasons, you must verify your identity before
+                                        withdrawing funds.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="withdrawalOptions">
+                            <label class="form-label fw-semibold small text-uppercase text-muted">Select Payout
+                                Method</label>
+
+                            <div class="d-flex flex-column gap-2">
+                                <label class="payment-method-card d-flex align-items-center mb-0">
+                                    <input type="radio" name="method" value="Stripe Bank Transfer"
+                                        class="form-check-input me-3" checked>
+                                    <div class="flex-grow-1">
+                                        <div class="fw-medium">Bank Transfer</div>
+                                        <div class="small text-muted">2-3 business days</div>
+                                    </div>
+                                    <i class="fas fa-university text-muted"></i>
+                                </label>
+
+                                <label class="payment-method-card d-flex align-items-center mb-0">
+                                    <input type="radio" name="method" value="Stripe Instant Payout"
+                                        class="form-check-input me-3">
+                                    <div class="flex-grow-1">
+                                        <div class="fw-medium">Instant Payout</div>
+                                        <div class="small text-muted">Debit Card • Fee 1%</div>
+                                    </div>
+                                    <i class="fas fa-bolt text-warning"></i>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 pt-0">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" id="submitBtn" class="btn btn-success px-4 fw-bold">Confirm
+                            Withdrawal</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Settings Modal (Placeholder) -->
+    <div class="modal fade" id="paymentSettingsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content rounded-4 border-0">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title fw-bold">Payout Settings</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center py-5">
+                    <i class="fab fa-stripe fa-4x text-primary mb-3"></i>
+                    <h5>Connect with Stripe</h5>
+                    <div th:if="${currentUser.stripeAccountId == null || currentUser.stripeAccountId.isEmpty()}">
+                        <p class="text-muted">Securely link your bank account or debit card using Stripe Connect to
+                            receive
+                            payouts.</p>
+                        <form th:action="@{/freelancer-dashboard/create-stripe-account}" method="post">
+                            <button type="submit" class="btn btn-primary rounded-pill px-4">Connect Stripe
+                                Account</button>
+                        </form>
+                    </div>
+                    <div th:if="${currentUser.stripeAccountId != null && !currentUser.stripeAccountId.isEmpty()}">
+                        <p class="text-success"><i class="fas fa-check-circle me-2"></i>Stripe Account Connected</p>
+                        <p class="text-muted">You can manage your payout settings and view transfers on Stripe.</p>
+                        <form th:action="@{/freelancer-dashboard/create-stripe-account}" method="post">
+                            <button type="submit" class="btn btn-outline-primary rounded-pill px-4">Update Payout
+                                Settings</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script th:if="${success}">
+        Swal.fire({
+            title: 'Success!',
+            text: '[[${success}]]',
+            icon: 'success',
+            confirmButtonColor: '#10B981'
+        });
+    </script>
+    <script th:if="${error}">
+        Swal.fire({
+            title: 'Error',
+            text: '[[${error}]]',
+            icon: 'error',
+            confirmButtonColor: '#EF4444'
+        });
+    </script>
+
+    <script>
+        // Withdrawal Modal Logic
+        var withdrawModal = document.getElementById('withdrawModal');
+        if (withdrawModal) {
+            withdrawModal.addEventListener('show.bs.modal', function (event) {
+                var button = event.relatedTarget;
+                var projectId = button.getAttribute('data-project-id');
+                var clientName = button.getAttribute('data-client-name');
+                var rate = button.getAttribute('data-rate');
+                var isVerified = button.getAttribute('data-verified') === 'true';
+
+                // Update Modal Content
+                document.getElementById('modalProjectName').textContent = 'Project #' + projectId; //Ideally fetch title
+                document.getElementById('modalClientName').textContent = clientName;
+                document.getElementById('projectId').value = projectId;
+                document.getElementById('amount').value = rate;
+
+                // Format Currency
+                var formattedAmount = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(rate);
+                document.getElementById('modalAmountDisplay').textContent = formattedAmount;
+
+                // Toggle Verification UI
+                var unverifiedAlert = document.getElementById('unverifiedAlert');
+                var submitBtn = document.getElementById('submitBtn');
+                var withdrawalOptions = document.getElementById('withdrawalOptions');
+
+                if (isVerified) {
+                    unverifiedAlert.style.display = 'none';
+                    withdrawalOptions.style.display = 'block';
+                    submitBtn.disabled = false;
+                } else {
+                    unverifiedAlert.style.display = 'block';
+                    withdrawalOptions.style.display = 'none';
+                    submitBtn.disabled = true;
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

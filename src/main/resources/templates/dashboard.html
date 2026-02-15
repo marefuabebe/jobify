@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Dashboard</title>
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
+    <link rel="stylesheet" th:href="@{/webjars/font-awesome/css/all.css}" />
+</head>
+
+<body>
+
+    <header class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <label class="mt-2 fw-bold h5">
+                <a th:href="@{/dashboard/}" class="text-white text-decoration-none">
+                    Jobify
+                </a>
+            </label>
+
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggler"
+                aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarToggler">
+                <ul class="navbar-nav mx-auto">
+
+                    <!-- FREELANCER -->
+                    <li class="nav-item" sec:authorize="hasAuthority('Freelancer')">
+                        <a class="nav-link" th:href="@{/dashboard/}">
+                            <i class="fas fa-search"></i> Search for Jobs
+                        </a>
+                    </li>
+                    <li class="nav-item" sec:authorize="hasAuthority('Freelancer')">
+                        <a class="nav-link" th:href="@{/saved-jobs/}">
+                            <i class="fas fa-eye"></i> View Saved Jobs
+                        </a>
+                    </li>
+                    <li class="nav-item" sec:authorize="hasAuthority('Freelancer')">
+                        <a class="nav-link" th:href="@{/chat/}">
+                            <i class="fas fa-comments"></i> Messages
+                            <span id="headerMessageBadge" class="badge bg-danger rounded-pill"
+                                style="font-size: 0.6em; vertical-align: top; display: none;">0</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" sec:authorize="hasAuthority('Freelancer')">
+                        <a class="nav-link" th:href="@{/job-seeker-profile/}">
+                            <i class="fas fa-pencil-alt"></i> Edit Profile
+                        </a>
+                    </li>
+
+                    <!-- CLIENT -->
+                    <li class="nav-item" sec:authorize="hasAuthority('Client')">
+                        <a class="nav-link" th:href="@{/dashboard/add}">
+                            <i class="fas fa-file-circle-plus"></i> Post New Job
+                        </a>
+                    </li>
+                    <li class="nav-item" sec:authorize="hasAuthority('Client')">
+                        <a class="nav-link" th:href="@{/dashboard/}">
+                            <i class="fas fa-eye"></i> View Your Jobs
+                        </a>
+                    </li>
+                    <li class="nav-item" sec:authorize="hasAuthority('Client')">
+                        <a class="nav-link" th:href="@{/recruiter-profile/}">
+                            <i class="fas fa-pencil-alt"></i> Edit Account
+                        </a>
+                    </li>
+                </ul>
+
+                <!-- USER INFO -->
+                <div class="d-flex align-items-center">
+                    <img class="rounded-circle me-2" height="50" width="50" th:if="${user.photosImagePath != null}"
+                        th:src="${user.photosImagePath}" />
+
+                    <div class="d-flex flex-column">
+                        <label class="nav-link p-0 text-white"
+                            th:if="${user.firstName != null and user.lastName != null}"
+                            th:text="${user.firstName + ' ' + user.lastName}">
+                        </label>
+                        <label class="nav-link p-0 text-white"
+                            th:unless="${user.firstName != null and user.lastName != null}" th:text="${username}">
+                        </label>
+
+                        <div class="d-flex mt-1">
+                            <span th:if="${user != null and user.isVerified}" class="verified-badge">
+                                <i class="fas fa-check-circle me-1"></i>Verified
+                            </span>
+                            <span th:if="${user != null and !user.isVerified}" class="unverified-badge">
+                                <i class="fas fa-clock me-1"></i>Pending
+                            </span>
+                        </div>
+                    </div>
+
+                    <a class="btn btn-outline-light ms-3" th:href="@{/logout}">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="section d-flex">
+
+        <!-- SIDEBAR -->
+        <div class="sidenav px-5" sec:authorize="hasAuthority('Freelancer')">
+            <label class="text-uppercase fw-bold text-muted">Filter Results</label>
+            <hr />
+
+            <form id="myForm" th:action="@{/dashboard/}" method="get">
+
+                <label>Job Category</label>
+                <div class="mb-3">
+                    <select class="form-select form-select-sm" name="category"
+                        onchange="document.getElementById('myForm').submit()">
+                        <option value="" th:selected="${category == null || category == ''}">All Categories</option>
+                        <option value="AI & Machine Learning" th:selected="${category == 'AI & Machine Learning'}">AI &
+                            Machine Learning</option>
+                        <option value="Data Science & Analytics"
+                            th:selected="${category == 'Data Science & Analytics'}">Data Science & Analytics</option>
+                        <option value="Web, Mobile & Software Development"
+                            th:selected="${category == 'Web, Mobile & Software Development'}">Software Development
+                        </option>
+                        <option value="Sales & Marketing" th:selected="${category == 'Sales & Marketing'}">Sales &
+                            Marketing</option>
+                        <option value="Design & Creative" th:selected="${category == 'Design & Creative'}">Design &
+                            Creative</option>
+                        <option value="Writing" th:selected="${category == 'Writing'}">Writing</option>
+                        <option value="Engineering & Architecture"
+                            th:selected="${category == 'Engineering & Architecture'}">Engineering</option>
+                        <option value="IT & Networking" th:selected="${category == 'IT & Networking'}">IT & Networking
+                        </option>
+                        <option value="Customer Service" th:selected="${category == 'Customer Service'}">Customer
+                            Service</option>
+                        <option value="Legal" th:selected="${category == 'Legal'}">Legal</option>
+                    </select>
+                </div>
+
+                <label>Employment Type</label>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="partTime" th:checked="${partTime}"
+                        value="Part-Time">
+                    <label class="form-check-label">Part-Time</label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="fullTime" th:checked="${fullTime}"
+                        value="Full-Time">
+                    <label class="form-check-label">Full-Time</label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="freelance" th:checked="${freelance}"
+                        value="Freelance">
+                    <label class="form-check-label">Freelance</label>
+                </div>
+
+                <label class="mt-3">Remote</label>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="remoteOnly" th:checked="${remoteOnly}"
+                        value="Remote-Only">
+                    <label class="form-check-label">Remote Only</label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="officeOnly" th:checked="${officeOnly}"
+                        value="Office-Only">
+                    <label class="form-check-label">Office Only</label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="partialRemote" th:checked="${partialRemote}"
+                        value="Partial-Remote">
+                    <label class="form-check-label">Partial Remote</label>
+                </div>
+
+                <label class="mt-3">Date Posted</label>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="today" th:checked="${today}">
+                    <label class="form-check-label">Today</label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="days7" th:checked="${days7}">
+                    <label class="form-check-label">Last 7 Days</label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="days30" th:checked="${days30}">
+                    <label class="form-check-label">Last 30 Days</label>
+                </div>
+
+                <input type="hidden" id="hidJob" name="job" th:value="${job}">
+                <input type="hidden" id="hidLoc" name="location" th:value="${location}">
+            </form>
+        </div>
+
+        <!-- MAIN -->
+        <article class="flex-fill">
+
+            <div class="box" sec:authorize="hasAuthority('Freelancer')">
+                <h1 class="primary-title">Freelancer Dashboard</h1>
+                <div class="inner">
+                    <input id="job" type="text" placeholder="Search for a job" th:value="${job}">
+                    <input id="loc" type="text" placeholder="Job Location" th:value="${location}">
+                    <button type="submit" form="myForm">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="box" sec:authorize="hasAuthority('Client')">
+                <h1 class="primary-title">Client Dashboard</h1>
+                <div class="alert alert-info" sec:authorize="hasAuthority('Client')" th:if="${!user.isVerified}">
+                    <i class="fas fa-info-circle"></i> Your account is pending verification. Please complete your
+                    profile and upload verification documents. Once verified, you'll be able to post jobs.
+                </div>
+            </div>
+
+            <div class="box mt-3">
+                <label class="large-label px-3 mb-3" sec:authorize="hasAuthority('Freelancer')">
+                    Search Results
+                </label>
+
+                <th:block th:each="jobPost : ${jobPost}">
+                    <a th:href="@{/job-details-apply/{id}(id=${jobPost.jobPostId})}"
+                        class="text-decoration-none text-dark">
+
+                        <div class="job-row">
+                            <div class="row">
+
+                                <div class="col-md-4">
+                                    <label class="job-title">
+                                        [[${jobPost.jobTitle}]]
+
+                                        <span class="title-span" sec:authorize="hasAuthority('Client')"
+                                            th:text="'(' + ${jobPost.totalCandidates} + ' Candidates Applied)'">
+                                        </span>
+
+                                        <span class="title-span" sec:authorize="hasAuthority('Freelancer')"
+                                            th:if="${jobPost.isActive}">
+                                            (Applied)
+                                        </span>
+
+                                        <span class="title-span" sec:authorize="hasAuthority('Freelancer')"
+                                            th:if="${jobPost.isSaved}">
+                                            (Saved)
+                                        </span>
+                                    </label>
+                                </div>
+
+                                <div class="col-md-4 text-center">
+                                    <label th:text="${jobPost.jobLocationId.city + ', ' + jobPost.jobLocationId.state}">
+                                        City, State
+                                    </label>
+                                </div>
+
+                                <div class="col-md-4 text-end">
+                                    <label th:text="${jobPost.jobCompanyId.name}">
+                                        Company Name
+                                    </label>
+                                </div>
+
+                            </div>
+                        </div>
+                    </a>
+                </th:block>
+            </div>
+
+        </article>
+    </section>
+
+
+    <!-- Verification Success Modal -->
+    <div class="modal fade" id="verificationSuccessModal" tabindex="-1" aria-labelledby="verificationModalLabel"
+        aria-hidden="true" th:if="${verificationSuccess}">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content text-center p-4">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <i class="fas fa-check-circle text-success" style="font-size: 3rem;"></i>
+                    </div>
+                    <h4 class="mb-3">Documents Sent Successfully!</h4>
+                    <p class="text-muted">Your verification documents have been submitted to the admin for approval. You
+                        will be notified once the process is complete.</p>
+                    <button type="button" class="btn btn-primary px-4 mt-3" data-bs-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
+    <script th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+    <script th:src="@{/webjars/sockjs-client/sockjs.min.js}"></script>
+    <script th:src="@{/webjars/stomp-websocket/stomp.min.js}"></script>
+
+    <script>
+        $('#job').on('input', function () {
+            $('#hidJob').val(this.value);
+        });
+        $('#loc').on('input', function () {
+            $('#hidLoc').val(this.value);
+        });
+
+        // WebSocket for Global Notifications
+        /*<![CDATA[*/
+        // Note: Using a unique variable name to avoid conflicts if included elsewhere
+        let globalStompClient = null;
+        const globalCurrentUserId = /*[[${user.userId}]]*/ null;
+
+        function connectGlobalNotifications() {
+            // Only connect if user is logged in
+            if (!globalCurrentUserId) return;
+
+            const socket = new SockJS('/ws');
+            globalStompClient = Stomp.over(socket);
+            globalStompClient.debug = null; // Disable debug logs to keep console clean
+
+            globalStompClient.connect({}, function () {
+                // Subscribe to user-specific message queue
+                globalStompClient.subscribe('/user/queue/messages', function (message) {
+                    const msg = JSON.parse(message.body);
+                    handleNewMessage(msg);
+                });
+            });
+        }
+
+        function handleNewMessage(message) {
+            // Update badge info
+            const badge = document.getElementById('headerMessageBadge');
+            if (badge) {
+                let currentCount = parseInt(badge.innerText) || 0;
+                badge.innerText = currentCount + 1;
+                badge.style.display = 'inline-block';
+
+                // Optional: visual popup/toast could go here
+                console.log("New message received!", message);
+            }
+        }
+
+        // Initialize connection
+        connectGlobalNotifications();
+        /*]]>*/
+    </script>
+
+</body>
+
+</html>

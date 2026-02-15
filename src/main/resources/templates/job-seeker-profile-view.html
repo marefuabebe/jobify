@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Freelancer Profile | Jobify</title>
+
+    <!-- CSRF Token -->
+    <meta th:name="_csrf" th:content="${_csrf.token}" />
+    <meta th:name="_csrf_header" th:content="${_csrf.headerName}" />
+
+    <link th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" rel="stylesheet" />
+    <link th:href="@{/webjars/font-awesome/css/all.min.css}" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #4b6cb7;
+            --primary-light: #6b8dd6;
+            --primary-dark: #182848;
+            --secondary: #1A1A2E;
+            --accent: #00d4ff;
+            --success: #28a745;
+            --light: #F8F9FA;
+            --dark: #212529;
+            --text-muted: #6C757D;
+            --border-color: #E9ECEF;
+            --card-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            --card-shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.12);
+            --border-radius: 20px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+            font-family: 'Inter', sans-serif;
+            color: var(--dark);
+            min-height: 100vh;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: linear-gradient(135deg, var(--secondary) 0%, #2a2a4a 100%);
+            padding: 14px 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(10px);
+        }
+
+        .navbar-brand {
+            font-weight: 800;
+            font-size: 24px;
+            color: white !important;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            font-weight: 500;
+            transition: var(--transition);
+            padding: 8px 16px !important;
+            border-radius: 8px;
+        }
+
+        .nav-link:hover {
+            color: white !important;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Profile Layout */
+        .profile-container {
+            max-width: 1280px;
+            margin: 40px auto;
+            padding: 0 24px;
+        }
+
+        .profile-sidebar {
+            position: sticky;
+            top: 100px;
+        }
+
+        .card-custom {
+            background: white;
+            border-radius: var(--border-radius);
+            border: none;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 28px;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .card-custom:hover {
+            box-shadow: var(--card-shadow-hover);
+            transform: translateY(-2px);
+        }
+
+        .card-padding {
+            padding: 32px;
+        }
+
+        /* Enhanced Profile Card */
+        .profile-header-img {
+            width: 100%;
+            height: 160px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .profile-header-img::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .profile-avatar-container {
+            width: 160px;
+            height: 160px;
+            margin: -80px auto 20px;
+            position: relative;
+        }
+
+        .profile-avatar {
+            width: 160px;
+            height: 160px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 6px solid white;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            background: white;
+            transition: var(--transition);
+        }
+
+        .profile-avatar:hover {
+            transform: scale(1.05);
+        }
+
+        .verified-badge-icon {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            background: white;
+            color: var(--success);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+            border: 3px solid white;
+        }
+
+        .profile-name {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            color: var(--secondary);
+            letter-spacing: -0.5px;
+        }
+
+        .profile-title {
+            color: var(--text-muted);
+            font-size: 17px;
+            font-weight: 500;
+            margin-bottom: 18px;
+        }
+
+        .profile-meta {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .meta-item i {
+            color: var(--primary);
+            font-size: 16px;
+        }
+
+        .hourly-rate-badge {
+            background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
+            color: white;
+            padding: 14px 28px;
+            border-radius: 50px;
+            font-weight: 800;
+            font-size: 20px;
+            display: inline-block;
+            margin-bottom: 24px;
+            box-shadow: 0 6px 20px rgba(75, 108, 183, 0.3);
+            transition: var(--transition);
+        }
+
+        .hourly-rate-badge:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(75, 108, 183, 0.4);
+        }
+
+        /* Action Buttons */
+        .btn-action {
+            padding: 14px 24px;
+            font-weight: 600;
+            border-radius: 12px;
+            transition: var(--transition);
+            font-size: 15px;
+        }
+
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            box-shadow: 0 4px 15px rgba(75, 108, 183, 0.3);
+        }
+
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(75, 108, 183, 0.4);
+            color: white;
+        }
+
+        .btn-outline-custom {
+            border: 2px solid var(--border-color);
+            color: var(--dark);
+            background: white;
+        }
+
+        .btn-outline-custom:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: rgba(75, 108, 183, 0.05);
+        }
+
+        /* Content Sections */
+        .section-title {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 24px;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            letter-spacing: -0.5px;
+        }
+
+        .section-title::before {
+            content: '';
+            display: inline-block;
+            width: 5px;
+            height: 28px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            margin-right: 14px;
+            border-radius: 4px;
+        }
+
+        .bio-text {
+            color: #4a4a4a;
+            line-height: 1.9;
+            font-size: 16px;
+            white-space: pre-line;
+        }
+
+        /* Enhanced Skills */
+        .skill-tag {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border: 2px solid var(--border-color);
+            color: var(--dark);
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            margin: 0 10px 12px 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .skill-tag::before {
+            content: '●';
+            color: var(--primary);
+            font-size: 10px;
+        }
+
+        .skill-tag:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: linear-gradient(135deg, rgba(75, 108, 183, 0.05) 0%, rgba(75, 108, 183, 0.1) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(75, 108, 183, 0.15);
+        }
+
+        /* Info Grid */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .info-item {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            padding: 20px;
+            border-radius: 14px;
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+
+        .info-item:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(75, 108, 183, 0.1);
+        }
+
+        .info-item h6 {
+            color: var(--text-muted);
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .info-item h6 i {
+            color: var(--primary);
+            font-size: 14px;
+        }
+
+        .info-item p {
+            font-weight: 600;
+            color: var(--secondary);
+            margin: 0;
+            font-size: 16px;
+        }
+
+        /* Enhanced Reviews */
+        .review-stat-box {
+            text-align: center;
+            padding: 28px;
+            background: linear-gradient(135deg, rgba(75, 108, 183, 0.05) 0%, rgba(75, 108, 183, 0.1) 100%);
+            border-radius: 16px;
+            border: 2px solid rgba(75, 108, 183, 0.2);
+            transition: var(--transition);
+        }
+
+        .review-stat-box:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(75, 108, 183, 0.2);
+        }
+
+        .rating-number {
+            font-size: 52px;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1;
+            margin-bottom: 12px;
+        }
+
+        .rating-stars {
+            color: #FFC107;
+            font-size: 20px;
+            margin: 12px 0;
+            filter: drop-shadow(0 2px 4px rgba(255, 193, 7, 0.3));
+        }
+
+        .rating-count {
+            color: var(--text-muted);
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .profile-sidebar {
+            animation: slideInLeft 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .card-custom {
+            animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+        }
+
+        .col-lg-8 .card-custom:nth-child(1) {
+            animation-delay: 0.15s;
+        }
+
+        .col-lg-8 .card-custom:nth-child(2) {
+            animation-delay: 0.25s;
+        }
+
+        .col-lg-8 .card-custom:nth-child(3) {
+            animation-delay: 0.35s;
+        }
+
+        /* Responsive */
+        @media (max-width: 991px) {
+            .profile-sidebar {
+                position: static;
+                margin-bottom: 30px;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-container {
+                padding: 0 16px;
+            }
+
+            .card-padding {
+                padding: 24px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .profile-name {
+                font-size: 24px;
+            }
+
+            .section-title {
+                font-size: 20px;
+            }
+
+            .hourly-rate-badge {
+                font-size: 18px;
+                padding: 12px 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header -->
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container-fluid container d-flex align-items-center">
+            <!-- Mobile Back Button -->
+            <a href="javascript:void(0)" onclick="history.back()"
+                class="btn btn-link text-white d-lg-none me-3 p-0 hover-scale" title="Go Back"
+                style="transition: transform 0.2s;">
+                <i class="fas fa-arrow-left fa-lg"></i>
+            </a>
+
+            <a class="navbar-brand me-auto" th:href="@{/dashboard/}" sec:authorize="hasAuthority('Recruiter')">Job<span
+                    style="color: var(--primary-light);">ify</span></a>
+            <a class="navbar-brand me-auto" th:href="@{/freelancer-dashboard/}"
+                sec:authorize="hasAuthority('Job Seeker')">Job<span style="color: var(--primary-light);">ify</span></a>
+            <a class="navbar-brand me-auto" th:href="@{/}" sec:authorize="!isAuthenticated()">Job<span
+                    style="color: var(--primary-light);">ify</span></a>
+
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/dashboard/}" sec:authorize="hasAuthority('Recruiter')">
+                            <i class="fas fa-columns me-1"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/find-talent/}">
+                            <i class="fas fa-search me-1"></i> Find Talent
+                        </a>
+                    </li>
+                </ul>
+
+                <!-- Authenticated User -->
+                <div class="d-flex align-items-center" th:if="${user != null}">
+                    <ul class="navbar-nav me-3">
+                        <th:block th:replace="fragments/notification-dropdown :: notificationDropdown"></th:block>
+                    </ul>
+                    <div class="dropdown">
+                        <a class="d-flex align-items-center text-decoration-none dropdown-toggle text-white" href="#"
+                            id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img class="rounded-circle me-2" th:if="${user.photosImagePath != null}"
+                                th:src="${user.photosImagePath}" alt=""
+                                style="width: 38px; height: 38px; object-fit: cover; border: 2px solid rgba(255,255,255,0.3);">
+                            <span class="fw-semibold" th:text="${user.firstName}">User</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0" aria-labelledby="userDropdown"
+                            style="border-radius: 12px; overflow: hidden;">
+                            <li><a class="dropdown-item" th:href="@{/logout}"><i
+                                        class="fas fa-sign-out-alt me-2 text-danger"></i>Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Guest -->
+                <div class="d-flex align-items-center gap-2" th:if="${user == null}">
+                    <a class="btn btn-outline-light btn-sm" th:href="@{/login}" style="border-radius: 8px;">Log In</a>
+                    <a class="btn btn-sm"
+                        style="background: white; color: var(--primary); border-radius: 8px; font-weight: 600;"
+                        th:href="@{/register}">Sign Up</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container profile-container">
+        <div class="row">
+            <!-- LEFT COLUMN: Profile Card -->
+            <div class="col-lg-4">
+                <aside class="profile-sidebar">
+                    <div class="card-custom text-center pb-4">
+                        <div class="profile-header-img"></div>
+                        <div class="profile-avatar-container">
+                            <img class="profile-avatar" th:src="${profile.profilePhoto != null
+                                 ? '/photos/candidate/' + profile.userAccountId + '/' + profile.profilePhoto
+                                 : '/images/avatar.png'}" alt="Profile Photo" />
+                            <div th:if="${profile.isVerified}" class="verified-badge-icon"
+                                title="Verified Professional">
+                                <i class="fas fa-check"></i>
+                            </div>
+                        </div>
+
+                        <h1 class="profile-name"
+                            th:text="${(profile.firstName != null ? profile.firstName : '') + ' ' + (profile.lastName != null ? profile.lastName : '')}">
+                            Name</h1>
+                        <p class="profile-title" th:text="${profile.title != null ? profile.title : 'Freelancer'}">
+                            Title</p>
+
+                        <div class="profile-meta">
+                            <div class="meta-item" th:if="${profile.city}">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span th:text="${profile.city}">City</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-star"></i>
+                                <span th:text="${#numbers.formatDecimal(averageRating,1,1)}">5.0</span>
+                            </div>
+                        </div>
+
+                        <div class="hourly-rate-badge">
+                            <i class="fas fa-tag me-2" style="font-size: 0.8em;"></i>
+                            <span
+                                th:text="${'$' + (profile.hourlyRate != null ? profile.hourlyRate : '0') + '/hr'}">$0/hr</span>
+                        </div>
+
+                        <div class="px-4 d-grid gap-2">
+                            <!-- Auth Actions -->
+                            <div sec:authorize="isAuthenticated()">
+                                <div
+                                    th:if="${profile.userId != null and #authentication.principal.username != profile.userId.email}">
+
+                                    <button class="btn btn-primary-custom btn-action w-100 mb-2"
+                                        th:if="${user != null and user.isVerified}" onclick="openInviteModal()">
+                                        <i class="fas fa-paper-plane me-2"></i> Invite to Job
+                                    </button>
+
+                                    <button class="btn btn-secondary w-100 mb-2" disabled
+                                        th:if="${user == null or !user.isVerified}">
+                                        <i class="fas fa-lock me-2"></i> Invite (Verified Only)
+                                    </button>
+
+                                    <a th:href="@{/chat/{id}(id=${profile.userId.userId})}"
+                                        class="btn btn-outline-custom btn-action w-100"
+                                        th:if="${user != null and user.isVerified}">
+                                        <i class="fas fa-comment-dots me-2"></i> Message
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- Guest Actions -->
+                            <div sec:authorize="!isAuthenticated()">
+                                <a th:href="@{/login}" class="btn btn-primary-custom btn-action w-100">
+                                    <i class="fas fa-sign-in-alt me-2"></i> Login to Contact
+                                </a>
+                            </div>
+
+                            <!-- Resume -->
+                            <a th:if="${profile.resume != null}"
+                                th:href="@{/job-seeker-profile/downloadResume(fileName=${profile.resume}, userID=${profile.userAccountId})}"
+                                class="btn btn-light btn-action w-100 text-muted mt-2 border">
+                                <i class="fas fa-file-download me-2"></i> Download Resume
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Reviews Summary (Sidebar Widget) -->
+                    <div class="card-custom card-padding">
+                        <div class="review-stat-box">
+                            <div class="rating-number" th:text="${#numbers.formatDecimal(averageRating,1,1)}">0.0</div>
+                            <div class="rating-stars">
+                                <i class="fas fa-star" th:each="i : ${#numbers.sequence(1, 5)}"
+                                    th:classappend="${i <= averageRating ? '' : 'text-muted'}"
+                                    style="opacity: 0.8;"></i>
+                            </div>
+                            <div class="rating-count" th:text="${ratingCount + ' Reviews'}">0 Reviews</div>
+                            <a th:href="@{/ratings/view/{id}(id=${profile.userAccountId})}"
+                                class="btn btn-link btn-sm mt-2 text-decoration-none">Read All Reviews</a>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+
+            <!-- RIGHT COLUMN: Details -->
+            <div class="col-lg-8">
+
+                <!-- About Section -->
+                <div class="card-custom card-padding bounce-in">
+                    <h3 class="section-title">About Me</h3>
+                    <div class="bio-text" th:utext="${profile.bio ?: 'This user has not added a bio yet.'}">
+                        Bio text goes here...
+                    </div>
+                </div>
+
+                <!-- Skills Section -->
+                <div class="card-custom card-padding">
+                    <h3 class="section-title">Skills & Expertise</h3>
+                    <div th:if="${skills != null and !skills.isEmpty()}" class="d-flex flex-wrap">
+                        <span th:each="skill : ${skills}" th:text="${skill.name}" class="skill-tag">Skill</span>
+                    </div>
+                    <p th:if="${skills == null or skills.isEmpty()}" class="text-muted fst-italic">
+                        No skills listed yet.
+                    </p>
+                </div>
+
+                <!-- Education & Certifications Section -->
+                <div class="card-custom card-padding"
+                    th:if="${profile.education != null or profile.educationDoc != null or profile.certifications != null or profile.certificationDoc != null}">
+                    <h3 class="section-title">Education & Certifications</h3>
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <h6 class="fw-bold text-muted small text-uppercase mb-3" style="letter-spacing: 0.5px;">
+                                <i class="fas fa-graduation-cap text-primary me-2"></i> Education
+                            </h6>
+                            <p class="bio-text mb-3" style="font-size: 15px;"
+                                th:text="${profile.education ?: 'No description provided.'}">Education
+                                details...</p>
+                            <a th:if="${profile.educationDoc != null and !profile.educationDoc.isEmpty()}"
+                                th:href="@{/job-seeker-profile/downloadResume(fileName=${profile.educationDoc}, userID=${profile.userAccountId})}"
+                                class="btn btn-sm btn-outline-custom rounded-pill px-3">
+                                <i class="fas fa-file-download me-2"></i> Download Evidence
+                            </a>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <h6 class="fw-bold text-muted small text-uppercase mb-3" style="letter-spacing: 0.5px;">
+                                <i class="fas fa-certificate text-primary me-2"></i> Certifications
+                            </h6>
+                            <p class="bio-text mb-3" style="font-size: 15px;"
+                                th:text="${profile.certifications ?: 'No description provided.'}">
+                                Certification details...</p>
+                            <a th:if="${profile.certificationDoc != null and !profile.certificationDoc.isEmpty()}"
+                                th:href="@{/job-seeker-profile/downloadResume(fileName=${profile.certificationDoc}, userID=${profile.userAccountId})}"
+                                class="btn btn-sm btn-outline-custom rounded-pill px-3">
+                                <i class="fas fa-file-download me-2"></i> Download Evidence
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Languages & Availability Section -->
+                <div class="card-custom card-padding">
+                    <h3 class="section-title">Languages & Availability</h3>
+                    <div class="info-grid">
+                        <div class="col-12" th:if="${profile.languages != null and !profile.languages.isEmpty()}">
+                            <h6 class="mb-3 text-muted small text-uppercase fw-bold" style="letter-spacing: 1px;">
+                                <i class="fas fa-language me-2 text-primary"></i> Language Mastery
+                            </h6>
+                            <div class="row g-3">
+                                <div th:each="langPair : ${#strings.arraySplit(profile.languages, ', ')}"
+                                    class="col-md-6">
+                                    <div class="p-3 border rounded-3 bg-white shadow-sm h-100"
+                                        th:with="parts=${#strings.arraySplit(langPair, ': ')}">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="fw-bold text-dark"
+                                                th:text="${parts.length > 0 ? parts[0] : langPair}">English</span>
+                                            <span
+                                                class="badge bg-primary-subtle text-primary border border-primary-subtle"
+                                                th:text="${parts.length > 1 ? parts[1] : 'Scale'}">Native</span>
+                                        </div>
+                                        <div class="progress" style="height: 6px;">
+                                            <div class="progress-bar rounded-pill" role="progressbar"
+                                                th:style="'width: ' + (${parts.length > 1 and parts[1] == 'Native' ? '100%' : 
+                                                                         (parts.length > 1 and parts[1] == 'Fluent' ? '75%' : 
+                                                                         (parts.length > 1 and parts[1] == 'Conversational' ? '50%' : '25%'))})" aria-valuenow="100"
+                                                aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <h6><i class="fas fa-clock me-1"></i> Working Hours</h6>
+                            <p th:text="${profile.hoursPerWeek ?: 'Flexible'}">40+ hours/week</p>
+                        </div>
+                        <div class="info-item">
+                            <h6><i class="fas fa-calendar-check me-1"></i> Availability Status</h6>
+                            <p th:classappend="${profile.availabilityStatus == 'Available' ? 'text-success' : (profile.availabilityStatus == 'Busy' ? 'text-warning' : '')}"
+                                th:text="${profile.availabilityStatus ?: 'Available'}">Available Now</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Details Grid (Original) -->
+                <div class="card-custom card-padding">
+                    <h3 class="section-title">Professional Details</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <h6><i class="fas fa-globe me-1"></i> Location</h6>
+                            <p
+                                th:text="${(profile.city != null ? profile.city : '-') + ', ' + (profile.country != null ? profile.country : '-')}">
+                                Location</p>
+                        </div>
+                        <div class="info-item">
+                            <h6><i class="fas fa-briefcase me-1"></i> Experience Level</h6>
+                            <p th:text="${profile.experienceLevel ?: 'Not specified'}">Level</p>
+                        </div>
+                        <div class="info-item">
+                            <h6><i class="fas fa-file-contract me-1"></i> Employment Type</h6>
+                            <p th:text="${profile.employmentType ?: 'Not specified'}">Type</p>
+                        </div>
+                        <div class="info-item">
+                            <h6><i class="fas fa-passport me-1"></i> Work Authorization</h6>
+                            <p th:text="${profile.workAuthorization ?: 'Not specified'}">Auth</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Invite Modal -->
+    <div class="modal fade" id="inviteModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+                <div class="modal-header border-0 pb-2"
+                    style="background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%); color: white;">
+                    <h5 class="modal-title fw-bold"><i class="fas fa-paper-plane me-2"></i>Invite to Job</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body pt-4 pb-4" style="padding: 28px;">
+                    <form id="inviteForm">
+                        <div class="mb-4">
+                            <label for="jobSelect" class="form-label fw-bold text-muted small text-uppercase"
+                                style="letter-spacing: 0.5px;">Select
+                                Job</label>
+                            <select class="form-select form-select-lg" id="jobSelect" required
+                                style="border-radius: 12px; border: 2px solid var(--border-color);">
+                                <option value="" selected disabled>Choose a job...</option>
+                                <option th:each="job : ${recruiterJobs}" th:value="${job.jobPostId}"
+                                    th:text="${job.jobTitle}">Job Title</option>
+                            </select>
+                            <div class="form-text text-danger" id="noJobsMsg"
+                                th:if="${recruiterJobs == null or recruiterJobs.isEmpty()}">
+                                You have no active jobs to invite to.
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="inviteMessage" class="form-label fw-bold text-muted small text-uppercase"
+                                style="letter-spacing: 0.5px;">Message</label>
+                            <textarea class="form-control" id="inviteMessage" rows="4"
+                                style="border-radius: 12px; resize: none; border: 2px solid var(--border-color);"
+                                required>Hi, I was impressed by your profile and I'd like to invite you to apply for this position.</textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-0 pt-0 pb-4 px-4" style="background: #f8f9fa;">
+                    <button type="button" class="btn btn-light rounded-pill px-4 fw-semibold" data-bs-dismiss="modal"
+                        style="border: 2px solid var(--border-color);">Cancel</button>
+                    <button type="button" class="btn btn-primary-custom rounded-pill px-4 fw-semibold"
+                        onclick="sendInvite()" th:disabled="${recruiterJobs == null or recruiterJobs.isEmpty()}">
+                        <i class="fas fa-paper-plane me-2"></i> Send Invitation
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Receiver ID hidden field -->
+    <input type="hidden" id="receiverId" th:value="${profile.userId.userId}" />
+
+    <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Setup CSRF token for all AJAX requests
+            var token = $("meta[name='_csrf']").attr("content");
+            var header = $("meta[name='_csrf_header']").attr("content");
+
+            if (token && header) {
+                $(document).ajaxSend(function (e, xhr, options) {
+                    xhr.setRequestHeader(header, token);
+                });
+            }
+        });
+
+        var inviteModal = new bootstrap.Modal(document.getElementById('inviteModal'));
+
+        function openInviteModal() {
+            inviteModal.show();
+        }
+
+        function sendInvite() {
+            const jobId = document.getElementById('jobSelect').value;
+            const message = document.getElementById('inviteMessage').value;
+            const receiverId = document.getElementById('receiverId').value;
+
+            if (!jobId) {
+                alert("Please select a job to invite the candidate to.");
+                return;
+            }
+
+            // Show loading state (optional)
+            const btn = document.querySelector('#inviteModal .btn-primary-custom');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Sending...';
+            btn.disabled = true;
+
+            $.post("/chat/send", {
+                receiverId: receiverId,
+                message: message,
+                jobId: jobId
+            })
+                .done(function () {
+                    inviteModal.hide();
+                    alert("Invitation sent successfully!");
+                })
+                .fail(function (xhr) {
+                    alert("Error sending invitation: " + (xhr.responseText || "Unknown error"));
+                })
+                .always(function () {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                });
+        }
+    </script>
+</body>
+
+</html>

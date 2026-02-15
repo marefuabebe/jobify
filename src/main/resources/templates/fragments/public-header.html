@@ -1,0 +1,312 @@
+<nav th:fragment="header(activePage)" class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        /* Standardized Header Styles (Matches Client/Freelancer Dashboard) */
+        .navbar {
+            background: #1A1A2E;
+            padding: 12px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .navbar-brand {
+            color: white !important;
+            font-weight: 700;
+            font-size: 24px;
+            text-decoration: none;
+            padding-left: 0;
+        }
+
+        .navbar .navbar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            padding: 8px 12px;
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-nav .nav-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white !important;
+        }
+
+        .navbar-nav .nav-link.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: white !important;
+        }
+
+        /* Public-Specific Button Styles */
+        .btn-login {
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            color: white;
+            padding: 0 18px;
+            height: 40px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 40px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: normal;
+            vertical-align: middle;
+        }
+
+        .btn-login:hover {
+            background: white;
+            color: #1A1A2E;
+        }
+
+        .btn-signup {
+            background: #0d6efd;
+            border: 2px solid #0d6efd;
+            color: white;
+            padding: 0 18px;
+            height: 40px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 40px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: normal;
+            vertical-align: middle;
+        }
+
+        .btn-signup:hover {
+            background: #0b5ed7;
+            border-color: #0b5ed7;
+        }
+
+        /* User Profile Styles (Standardized) */
+        .badge {
+            font-size: 11px;
+            padding: 3px 6px;
+            font-weight: 600;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            object-fit: cover;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .user-name {
+            color: white !important;
+            font-weight: 500;
+            font-size: 13px;
+            padding: 0 12px;
+        }
+
+        .user-status {
+            font-size: 11px;
+        }
+
+        .verified-badge {
+            color: #28A745;
+            background: rgba(40, 167, 69, 0.1);
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .unverified-badge {
+            color: #FFC107;
+            background: rgba(255, 193, 7, 0.1);
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .logout-btn {
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .logout-btn:hover {
+            background: white;
+            color: #FB4F14;
+        }
+    </style>
+
+    <div class="container">
+        <a class="navbar-brand" th:href="@{/}">
+            Job<span style="color: #0d6efd;">ify</span>.
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
+            aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarContent">
+            <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+                <li class="nav-item" th:if="${baseUser != null}">
+                    <a class="nav-link" th:if="${baseUser.userTypeId.userTypeId == 1}" th:href="@{/client-dashboard/}">
+                        <i class="fas fa-columns fa-sm"></i> Dashboard
+                    </a>
+                    <a class="nav-link" th:if="${baseUser.userTypeId.userTypeId == 2}"
+                        th:href="@{/freelancer-dashboard/}">
+                        <i class="fas fa-columns fa-sm"></i> Dashboard
+                    </a>
+                    <a class="nav-link" th:if="${baseUser.userTypeId.userTypeId == 3}" th:href="@{/dashboard/}">
+                        <i class="fas fa-columns fa-sm"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:classappend="${activePage == 'home' ? 'active' : ''}" th:href="@{/}">
+                        <i class="fas fa-home fa-sm"></i> Home
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:classappend="${activePage == 'find-work' ? 'active' : ''}"
+                        th:href="@{/info/find-work}">
+                        <i class="fas fa-search fa-sm"></i> Find Work
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:classappend="${activePage == 'find-talent' ? 'active' : ''}"
+                        th:href="@{/info/find-talent}">
+                        <i class="fas fa-user-tie fa-sm"></i> Find Talent
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:classappend="${activePage == 'about' ? 'active' : ''}"
+                        th:href="@{/info/about}">
+                        <i class="fas fa-info-circle fa-sm"></i> About
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:classappend="${activePage == 'blog' ? 'active' : ''}"
+                        th:href="@{/info/blog}">
+                        <i class="fas fa-blog fa-sm"></i> Blog
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:classappend="${activePage == 'news' ? 'active' : ''}"
+                        th:href="@{/info/news}">
+                        <i class="fas fa-newspaper fa-sm"></i> News
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:classappend="${activePage == 'contact' ? 'active' : ''}"
+                        th:href="@{/info/contact}">
+                        <i class="fas fa-envelope fa-sm"></i> Contact
+                    </a>
+                </li>
+            </ul>
+
+            <!-- Auth Logic: Show Buttons if Guest, User Profile if Logged In -->
+            <div class="d-flex align-items-center" th:if="${baseUser == null}" style="gap: 10px;">
+                <a th:href="@{/login}" class="btn-login">
+                    <i class="fas fa-sign-in-alt me-1"></i> Login
+                </a>
+                <a th:href="@{/register}" class="btn-signup">
+                    Sign Up
+                </a>
+            </div>
+
+            <!-- User Profile (Matches Dashboard) -->
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center" th:if="${baseUser != null}">
+                <!-- Notification Dropdown -->
+                <th:block th:replace="fragments/notification-dropdown :: notificationDropdown"></th:block>
+                <li class="nav-item dropdown ms-3">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown"
+                        role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img class="user-avatar rounded-circle me-2" th:if="${user.photosImagePath != null}"
+                            th:src="@{${user.photosImagePath}}" alt="Profile" />
+                        <!-- Fallback for no photo -->
+                        <div th:if="${user.photosImagePath == null}"
+                            class="user-avatar rounded-circle me-2 d-flex align-items-center justify-content-center bg-secondary text-white">
+                            <span
+                                th:text="${baseUser.firstName != null ? #strings.substring(baseUser.firstName, 0, 1) : 'U'}">U</span>
+                        </div>
+                        <div class="user-info me-3">
+                            <span class="user-name">
+                                <!-- Use profile name when available (non-admin), otherwise fall back to email -->
+                                <span
+                                    th:if="${userType != 'Admin' and user.firstName != null and user.lastName != null}">
+                                    <span th:text="${user.firstName}"></span>
+                                    <span th:text="${user.lastName}"></span>
+                                </span>
+                                <span
+                                    th:unless="${userType != 'Admin' and user.firstName != null and user.lastName != null}"
+                                    th:text="${baseUser.email}"></span>
+                            </span>
+                            <div class="user-status">
+                                <span th:if="${isVerified}" class="verified-badge">
+                                    <i class="fas fa-check-circle"></i> Verified
+                                </span>
+                                <span th:unless="${isVerified}" class="unverified-badge">
+                                    <i class="fas fa-exclamation-circle"></i> Pending
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                        <li>
+                            <a class="dropdown-item" th:if="${user.userTypeId.userTypeId == 1}"
+                                th:href="@{/recruiter-profile/}">
+                                <i class="fas fa-user-cog me-2"></i> Edit Profile
+                            </a>
+                            <a class="dropdown-item" th:if="${user.userTypeId.userTypeId == 2}"
+                                th:href="@{/job-seeker-profile/}">
+                                <i class="fas fa-user-cog me-2"></i> Edit Profile
+                            </a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" th:href="@{/logout}">
+                                <i class="fas fa-sign-out-alt me-2"></i> Logout
+                            </a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <input type="hidden" id="currentUserId" th:if="${baseUser != null}" th:value="${baseUser.userId}" />
+    <!-- Scripts -->
+    <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
+    <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/webjars/sockjs-client/sockjs.min.js}"></script>
+    <script th:src="@{/webjars/stomp-websocket/stomp.min.js}"></script>
+    <script th:src="@{/js/notifications.js}"></script>
+
+</nav>

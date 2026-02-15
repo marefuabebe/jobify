@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+    xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Contract Details - Jobify</title>
+    <link th:rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}" />
+    <link th:rel="stylesheet" th:href="@{/webjars/font-awesome/6.5.2/css/all.css}" />
+    <link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" />
+    <style>
+        body {
+            background-color: #f4f7fc;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, #182848 0%, #3B5998 100%);
+            padding: 80px 0 100px;
+            color: white;
+            margin-bottom: -60px;
+        }
+
+        .breadcrumb-item a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+        }
+
+        .breadcrumb-item.active {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .breadcrumb-item+.breadcrumb-item::before {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .contract-card {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            background: white;
+            position: relative;
+            z-index: 10;
+        }
+
+        .contract-header {
+            background: white;
+            padding: 30px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .contract-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #182848;
+            margin-bottom: 5px;
+        }
+
+        .contract-body {
+            padding: 40px;
+        }
+
+        .info-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #6c757d;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #2d3436;
+        }
+
+        .user-block {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-avatar-small {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background-color: #e9ecef;
+            color: #3B5998;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            margin-right: 15px;
+            font-size: 1.1rem;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            border: 1px solid #eee;
+            height: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+            border-color: #3B5998;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #3B5998;
+            margin-bottom: 5px;
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            color: #3B5998;
+            opacity: 0.15;
+            margin-bottom: 15px;
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #182848;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
+        .section-title::before {
+            content: '';
+            display: block;
+            width: 4px;
+            height: 24px;
+            background: #3B5998;
+            margin-right: 15px;
+            border-radius: 2px;
+        }
+
+        /* Reset global section-title decoration */
+        .section-title::after {
+            display: none !important;
+        }
+
+        .milestone-card {
+            border: 1px solid #f0f0f0;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            background: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .milestone-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: #e9ecef;
+            transition: background 0.3s;
+        }
+
+        .milestone-card:hover {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            transform: translateY(-3px);
+            border-color: transparent;
+        }
+
+        .milestone-card.status-active::before {
+            background: #3B5998;
+        }
+
+        .milestone-card.status-completed::before {
+            background: #28a745;
+        }
+
+        .milestone-card.status-pending::before {
+            background: #ffc107;
+        }
+
+        .milestone-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .milestone-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #2d3436;
+        }
+
+        .status-badge {
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-badge.pending {
+            background: rgba(108, 117, 125, 0.15);
+            color: #6c757d;
+        }
+
+        .status-badge.funded {
+            background: rgba(23, 162, 184, 0.15);
+            color: #117a8b;
+        }
+
+        .status-badge.approved {
+            background: rgba(40, 167, 69, 0.15);
+            color: #28a745;
+        }
+
+        .status-badge.paid {
+            background: rgba(13, 110, 253, 0.15);
+            color: #0d6efd;
+        }
+
+        .btn-action {
+            border-radius: 50px;
+            padding: 8px 24px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .btn-primary-soft {
+            background-color: rgba(59, 89, 152, 0.1);
+            color: #3B5998;
+            border: none;
+        }
+
+        .btn-primary-soft:hover {
+            background-color: #3B5998;
+            color: white;
+            box-shadow: 0 5px 15px rgba(59, 89, 152, 0.2);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Conditional Headers using th:block to prevent syntax errors with th:replace -->
+    <th:block sec:authorize="hasAuthority('Recruiter')">
+        <header th:replace="~{fragments/client-header :: clientHeader(activePage='contracts')}"></header>
+    </th:block>
+    <th:block sec:authorize="hasAuthority('Job Seeker')">
+        <header th:replace="~{fragments/freelancer-header :: freelancerHeader(activePage='contracts')}"></header>
+    </th:block>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="#" th:href="@{/dashboard/}">Dashboard</a></li>
+                            <li class="breadcrumb-item"><a href="#" th:href="@{/contract/manage}">Contracts</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Details</li>
+                        </ol>
+                    </nav>
+                    <h1 class="display-5 fw-bold mb-2">Contract Workspace</h1>
+                    <p class="lead opacity-75">Manage your project milestones, payments, and deliverables.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Alerts -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div th:if="${success}" class="alert alert-success alert-dismissible fade show shadow-sm border-0"
+                    role="alert">
+                    <i class="fas fa-check-circle me-2"></i> <span th:text="${success}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show shadow-sm border-0"
+                    role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i> <span th:text="${error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Main Content -->
+            <div class="col-lg-8 mb-4">
+                <div class="contract-card">
+                    <div class="contract-header">
+                        <div>
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <div class="info-label text-primary mb-1">Project Contract</div>
+                                    <div class="contract-title" th:text="${contract.title}">Contract Title</div>
+                                    <p class="mb-1"><i class="fas fa-file-signature me-2 text-secondary"></i> Status:
+                                        <span class="badge"
+                                            th:classappend="${contract.status == 'ACTIVE' ? 'bg-success' : (contract.status == 'COMPLETED' ? 'bg-primary' : (contract.status == 'DISPUTED' ? 'bg-danger' : 'bg-warning text-dark'))}"
+                                            th:text="${contract.status == 'COMPLETED' ? 'Paid' : contract.status}">Status</span>
+                                    </p>
+                                    <p class="mb-0"><i class="fas fa-calendar-alt me-2 text-secondary"></i> Created:
+                                        <span
+                                            th:text="${#dates.format(contract.createdDate, 'dd MMM yyyy')}">Date</span>
+                                    </p>
+                                </div>
+                                <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                                    <h3 class="fw-bold text-primary mb-0" th:text="'$' + ${contract.totalAmount}">$0.00
+                                    </h3>
+                                    <p class="text-muted small">Total Budget</p>
+
+                                    <!-- Dispute Button (Visible if Active or Disputed) -->
+                                    <button th:if="${contract.status == 'ACTIVE' or contract.status == 'DISPUTED'}"
+                                        type="button" class="btn btn-outline-danger btn-sm mt-2" data-bs-toggle="modal"
+                                        data-bs-target="#disputeModal">
+                                        <i class="fas fa-exclamation-triangle me-1"></i> Report / Dispute
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dispute Modal -->
+                    <div class="modal fade" id="disputeModal" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title text-danger"><i
+                                            class="fas fa-exclamation-triangle me-2"></i>Raise a Dispute</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <form th:action="@{/contract/dispute/{id}(id=${contract.id})}" method="post">
+                                    <div class="modal-body">
+                                        <div class="mb-3">
+                                            <label for="reason" class="form-label">Reason for
+                                                Dispute</label>
+                                            <textarea class="form-control" name="reason" rows="4" required
+                                                placeholder="Describe the issue in detail. Admin will review..."></textarea>
+                                        </div>
+                                        <div class="alert alert-warning small">
+                                            <i class="fas fa-info-circle me-1"></i> Raising a dispute will notify the
+                                            admin team. The contract status will be marked as 'DISPUTED'.
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn btn-danger">Raise Dispute</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="contract-body pt-0">
+                        <div class="section-title">Milestones & Payments</div>
+
+                        <div th:if="${contract.milestones.empty}" class="text-center py-5">
+                            <img th:src="@{/images/empty-state.svg}" width="150" class="mb-3 opacity-50"
+                                onerror="this.style.display='none'">
+                            <h5 class="text-muted">No milestones yet</h5>
+                            <p class="text-muted small">Milestones will appear here once created.</p>
+                        </div>
+
+                        <div th:each="milestone : ${contract.milestones}" class="milestone-card"
+                            th:classappend="${milestone.status == 'PENDING' ? 'status-pending' : (milestone.status == 'RELEASED' or milestone.status == 'APPROVED' or milestone.status == 'WITHDRAWN' ? 'status-completed' : 'status-active')}">
+
+                            <div class="milestone-header">
+                                <div>
+                                    <div class="milestone-title" th:text="${milestone.description}">Milestone
+                                        Description</div>
+                                    <div class="text-muted small mt-1">
+                                        <i class="far fa-calendar-alt me-1"></i> Due: <span
+                                            th:text="${milestone.dueDate != null ? #dates.format(milestone.dueDate, 'dd MMM yyyy') : 'Not set'}">Date</span>
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    <div class="h5 fw-bold text-primary mb-1" th:text="${'$' + milestone.amount}">
+                                        $0.00
+                                    </div>
+                                    <span class="status-badge" th:classappend="${milestone.status == 'PENDING' ? 'pending' : 
+                                                        (milestone.status == 'APPROVED' or milestone.status == 'RELEASED' ? 'approved' :
+                                                        (milestone.status == 'WITHDRAWN' ? 'paid' : 'funded'))}"
+                                        th:text="${milestone.status == 'PENDING' ? 'Pending' : 
+                                                      (milestone.status == 'APPROVED' or milestone.status == 'RELEASED' ? 'Approved' :
+                                                      (milestone.status == 'WITHDRAWN' ? 'Paid' : 'Funded'))}">STATUS</span>
+                                </div>
+                            </div>
+
+                            <div class="milestone-actions mt-3 pt-3 border-top"
+                                th:if="${milestone.status != 'RELEASED' and milestone.status != 'APPROVED' and milestone.status != 'WITHDRAWN'}">
+                                <div class="d-flex justify-content-end">
+                                    <!-- Client Actions -->
+                                    <div sec:authorize="hasAuthority('Recruiter')">
+                                        <a th:if="${milestone.status == 'PENDING'}"
+                                            th:href="@{/payment/checkout(jobId=${contract.jobApplication.job.jobPostId}, milestoneId=${milestone.id}, amount=${milestone.amount})}"
+                                            class="btn btn-primary btn-action shadow-sm">
+                                            <i class="fas fa-lock me-2"></i> Fund Escrow
+                                        </a>
+
+                                        <form th:if="${milestone.status == 'SUBMITTED'}"
+                                            th:action="@{/contract/milestone/approve/{id}(id=${milestone.id})}"
+                                            method="post" style="display: inline;">
+                                            <button type="submit" class="btn btn-success btn-sm">
+                                                <i class="fas fa-check me-1"></i> Approve & Release
+                                            </button>
+                                        </form>
+
+                                        <!-- Request Revision Button -->
+                                        <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal"
+                                            th:data-bs-target="'#revisionModal' + ${milestone.id}">
+                                            <i class="fas fa-undo me-1"></i> Request Revision
+                                        </button>
+
+                                        <!-- Revision Modal -->
+                                        <div class="modal fade" th:id="'revisionModal' + ${milestone.id}" tabindex="-1"
+                                            aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title">Request Revision</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                            aria-label="Close"></button>
+                                                    </div>
+                                                    <form
+                                                        th:action="@{/contract/milestone/reject/{id}(id=${milestone.id})}"
+                                                        method="post">
+                                                        <div class="modal-body">
+                                                            <div class="mb-3">
+                                                                <label for="reason" class="form-label">Reason for
+                                                                    Revision</label>
+                                                                <textarea class="form-control" name="reason" rows="3"
+                                                                    required
+                                                                    placeholder="Explain what needs to be changed..."></textarea>
+                                                            </div>
+                                                            <p class="text-muted small">Status will revert to 'In
+                                                                Progress'.</p>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary"
+                                                                data-bs-dismiss="modal">Cancel</button>
+                                                            <button type="submit" class="btn btn-warning">Submit
+                                                                Request</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Refund Button (Client Only, FUNDED status) -->
+                                        <button
+                                            th:if="${milestone.status == 'FUNDED' and contract.client.userId == #authentication.principal.userId}"
+                                            type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
+                                            th:data-bs-target="'#refundModal' + ${milestone.id}">
+                                            <i class="fas fa-ban me-1"></i> Cancel & Refund
+                                        </button>
+
+                                        <!-- Refund Modal -->
+                                        <div class="modal fade" th:id="'refundModal' + ${milestone.id}" tabindex="-1"
+                                            aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title text-danger">Cancel & Refund Outcome
+                                                        </h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                            aria-label="Close"></button>
+                                                    </div>
+                                                    <form
+                                                        th:action="@{/contract/milestone/refund/{id}(id=${milestone.id})}"
+                                                        method="post">
+                                                        <div class="modal-body">
+                                                            <p>Are you sure you want to cancel this milestone and
+                                                                refund the payment?</p>
+                                                            <div class="alert alert-danger small">
+                                                                <i class="fas fa-exclamation-triangle me-1"></i>
+                                                                This action is irreversible. The funds will be
+                                                                returned to your original payment method.
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary"
+                                                                data-bs-dismiss="modal">Close</button>
+                                                            <button type="submit" class="btn btn-danger">Confirm
+                                                                Refund</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div th:if="${milestone.status == 'FUNDED' or milestone.status == 'IN_PROGRESS'}"
+                                            class="text-muted small d-flex align-items-center">
+                                            <i class="fas fa-hourglass-half me-2 text-info"></i> Waiting for
+                                            freelancer
+                                            submission
+                                        </div>
+                                    </div>
+
+                                    <!-- Freelancer Actions -->
+                                    <div sec:authorize="hasAuthority('Job Seeker')">
+                                        <form th:if="${milestone.status == 'FUNDED'}"
+                                            th:action="@{/contract/milestone/start/{id}(id=${milestone.id})}"
+                                            method="post" class="d-inline me-2">
+                                            <button type="submit" class="btn btn-primary btn-action shadow-sm">
+                                                <i class="fas fa-play me-2"></i> Start Work
+                                            </button>
+                                        </form>
+                                        <form th:if="${milestone.status == 'IN_PROGRESS'}"
+                                            th:action="@{/contract/milestone/submit/{id}(id=${milestone.id})}"
+                                            method="post" class="d-inline">
+                                            <button type="submit" class="btn btn-primary btn-action shadow-sm">
+                                                <i class="fas fa-paper-plane me-2"></i> Submit Work
+                                            </button>
+                                        </form>
+                                        <span th:if="${milestone.status == 'PENDING'}" class="text-muted small">
+                                            <i class="fas fa-lock me-1"></i> Awaiting client funding
+                                        </span>
+                                        <span th:if="${milestone.status == 'SUBMITTED'}" class="text-muted small">
+                                            <i class="fas fa-clock me-1"></i> Awaiting client approval
+                                        </span>
+                                        <span
+                                            th:if="${milestone.status == 'APPROVED' or milestone.status == 'RELEASED'}"
+                                            class="text-muted small">
+                                            <i class="fas fa-wallet me-1"></i> Funds in your balance – withdraw from
+                                            Earnings
+                                        </span>
+                                        <span th:if="${milestone.status == 'WITHDRAWN'}" class="text-muted small">
+                                            <i class="fas fa-check-double me-1"></i> Funds withdrawn to bank
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <div class="row g-3 mb-4">
+                    <div class="col-6">
+                        <div class="stat-card">
+                            <i class="fas fa-money-bill-wave stat-icon"></i>
+                            <div class="stat-value" th:text="${'$' + contract.totalAmount}">$0</div>
+                            <div class="stat-label">Total Budget</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="stat-card">
+                            <i class="fas fa-chart-pie stat-icon"></i>
+                            <div class="stat-value" th:text="${contract.milestones.size()}">0</div>
+                            <div class="stat-label">Milestones</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="contract-card mb-4">
+                    <div class="contract-body">
+                        <div class="section-title">Participants</div>
+
+                        <div class="mb-4">
+                            <div class="info-label">Client</div>
+                            <div class="user-block mt-2">
+                                <div class="user-avatar-small">
+                                    <span
+                                        th:text="${contract.client.firstName != null ? #strings.substring(contract.client.firstName, 0, 1) : 'C'}">C</span>
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-dark"
+                                        th:text="${contract.client.firstName != null ? contract.client.firstName + ' ' + contract.client.lastName : 'Client'}">
+                                        Client Name</div>
+                                    <div class="small text-muted" th:text="${contract.client.email}">
+                                        client@example.com
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="info-label">Freelancer</div>
+                            <div class="user-block mt-2">
+                                <div class="user-avatar-small" style="background-color: #e3f2fd; color: #0d6efd;">
+                                    <span
+                                        th:text="${contract.jobApplication.userId.firstName != null ? #strings.substring(contract.jobApplication.userId.firstName, 0, 1) : 'F'}">F</span>
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-dark"
+                                        th:text="${contract.jobApplication.userId.firstName + ' ' + contract.jobApplication.userId.lastName}">
+                                        Freelancer Name</div>
+                                    <div class="small text-muted" th:text="${contract.freelancer.email}">
+                                        freelancer@example.com</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 pt-3 border-top text-center">
+                            <a th:href="@{/chat/}" class="btn btn-primary-soft w-100 rounded-pill">
+                                <i class="fas fa-comment-alt me-2"></i> Send Message
+                            </a>
+                        </div>
+
+                        <!-- End Contract Button (Inside Sidebar for better verticality) -->
+                        <div class="mt-3 pt-3 border-top text-center"
+                            th:if="${contract.status == 'ACTIVE' and contract.client.userId == #authentication.principal.userId}">
+                            <button type="button" class="btn btn-outline-dark w-100 rounded-pill" data-bs-toggle="modal"
+                                data-bs-target="#endContractModal">
+                                <i class="fas fa-flag-checkered me-2"></i> End Contract
+                            </button>
+                            <p class="text-muted small mt-2 mb-0">Complete & move to history.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center opacity-75">
+                    <small class="text-muted">Contract created on <span
+                            th:text="${#dates.format(contract.createdDate, 'dd MMM yyyy')}">Date</span></small>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+
+    <!-- End Contract Modal -->
+    <div class="modal fade" id="endContractModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">End Contract</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form th:action="@{/contract/end/{id}(id=${contract.id})}" method="post">
+                    <div class="modal-body">
+                        <p>Are you sure you want to end this contract?</p>
+                        <p class="small text-muted">This will mark the contract as completed and move it to your
+                            history. You
+                            can still access it later.</p>
+                        <div class="alert alert-info small">
+                            <i class="fas fa-info-circle me-1"></i> Ensure all milestones are settled before ending.
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">End Contract</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+    <script th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js}"></script>
+</body>
+
+</html>

@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+    xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Find Work | Jobify</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
+    <link rel="stylesheet" th:href="@{/webjars/font-awesome/css/all.min.css}" />
+    <style>
+        :root {
+            /* Global Blue Theme - Matching Dashboard #3B5998 */
+            --primary: #3B5998;
+            --primary-light: rgba(59, 89, 152, 0.1);
+            --primary-dark: #2d4373;
+            --dark: #1A1A2E;
+            --light: #F0F8FF;
+            --gray: #6C757D;
+            --border: #E0E0E0;
+            --radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            background: #f8fafc;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            color: var(--dark);
+        }
+
+
+
+        /* Dashboard Container */
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 2rem;
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+            align-items: start;
+        }
+
+        @media (max-width: 992px) {
+            .dashboard-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Sidebar Filters */
+        .sidebar {
+            background: white;
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 100px;
+        }
+
+        .sidebar-header {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--dark);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .filter-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .filter-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 0.75rem;
+            display: block;
+        }
+
+        .form-check {
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-check-input {
+            width: 1rem;
+            height: 1rem;
+            cursor: pointer;
+            margin: 0;
+        }
+
+        .form-check-label {
+            font-size: 0.85rem;
+            color: #4b5563;
+            cursor: pointer;
+            line-height: 1.2;
+            font-weight: 500;
+        }
+
+        .form-check-input:checked {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        /* Main Content */
+        .main-content {
+            min-width: 0;
+        }
+
+        /* Header Section */
+        .dashboard-header {
+            background: white;
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--dark);
+            margin: 0;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 0.75rem;
+            flex: 1;
+            min-width: 300px;
+            justify-content: flex-end;
+        }
+
+        .search-input {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.6rem 1rem;
+            font-size: 0.85rem;
+            width: 100%;
+            max-width: 240px;
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .search-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.6rem 1.25rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .search-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        /* Job Cards */
+        .job-list {
+            display: grid;
+            gap: 1.25rem;
+        }
+
+        /* Job Cards */
+        .job-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 18px;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.5s ease-out forwards;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .job-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+            border-color: var(--primary);
+        }
+
+        .job-card:hover .job-title {
+            color: var(--primary);
+        }
+
+        .job-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .job-main-info {
+            flex: 1;
+        }
+
+        .job-title-link {
+            text-decoration: none;
+            color: var(--dark);
+        }
+
+        .job-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin: 0 0 6px 0;
+            transition: color 0.3s ease;
+        }
+
+        .job-client-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .client-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            object-fit: cover;
+            background: #f1f5f9;
+        }
+
+        .client-name {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .client-meta {
+            font-size: 11px;
+            color: var(--gray);
+        }
+
+        .job-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .job-tag {
+            padding: 3px 10px;
+            background: #f1f5f9;
+            color: #475569;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .job-tag.primary {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .job-description-short {
+            font-size: 13px;
+            color: var(--gray);
+            margin-bottom: 12px;
+            display: -webkit-box;
+            line-clamp: 2;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.6;
+        }
+
+        .job-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 12px;
+            border-top: 1px solid #f1f5f9;
+            margin-top: auto;
+        }
+
+        .job-stats {
+            display: flex;
+            gap: 16px;
+        }
+
+        .job-stat {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .stat-icon-label {
+            font-size: 11px;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value-bold {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .job-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-job {
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-apply {
+            background: var(--primary);
+            color: white;
+            border: 1px solid var(--primary);
+        }
+
+        .btn-apply:hover {
+            background: var(--primary-dark);
+            box-shadow: 0 4px 12px rgba(59, 89, 152, 0.2);
+            color: white;
+        }
+
+        .btn-outline-primary {
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            background: transparent;
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .job-card:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .job-card:nth-child(2) {
+            animation-delay: 0.15s;
+        }
+
+        .job-card:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+
+        .job-card:nth-child(4) {
+            animation-delay: 0.25s;
+        }
+
+        .job-card:nth-child(5) {
+            animation-delay: 0.3s;
+        }
+
+        /* Pagination Styles */
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 3rem;
+        }
+
+        .pagination {
+            display: flex;
+            gap: 0.5rem;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .page-item .page-link {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            border: 1px solid var(--border);
+            color: var(--dark);
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-decoration: none;
+            transition: var(--transition);
+            background: white;
+        }
+
+        .page-item.active .page-link {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .page-item:not(.active) .page-link:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        /* Mobile Filter Toggle */
+        .mobile-filter-btn {
+            display: none;
+            width: 100%;
+            padding: 1rem;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--dark);
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 992px) {
+            .dashboard-container {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+                padding: 1rem;
+                margin-top: 1rem;
+            }
+
+            .mobile-filter-btn {
+                display: flex;
+            }
+
+            .sidebar {
+                position: static;
+                display: none;
+                margin-bottom: 1.5rem;
+                width: 100%;
+            }
+
+            .sidebar.active {
+                display: block;
+            }
+
+            .dashboard-header {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 1.25rem;
+            }
+
+            .search-box {
+                min-width: 100%;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .search-input {
+                max-width: 100%;
+            }
+
+            .job-footer {
+                flex-direction: column;
+                gap: 1.25rem;
+                align-items: stretch;
+            }
+
+            .job-actions {
+                justify-content: space-between;
+                gap: 0.5rem;
+            }
+
+            .job-actions .btn-job {
+                flex: 1;
+                justify-content: center;
+            }
+        }
+
+        .section-title-large {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title-large::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 40px;
+            height: 4px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <th:block th:replace="fragments/freelancer-header :: freelancerHeader('find-work')"></th:block>
+
+    <!-- Main Content -->
+    <div class="dashboard-container">
+
+        <!-- Mobile Filter Toggle -->
+        <div class="mobile-filter-btn" id="mobileFilterBtn">
+            <i class="fas fa-filter"></i> Filter Results
+        </div>
+
+        <!-- Sidebar Filters -->
+        <aside class="sidebar" id="filterSidebar">
+            <div class="sidebar-header">Filter Results</div>
+
+            <form id="filterForm" th:action="@{/find-work/}" method="get">
+                <!-- Job Category -->
+                <div class="filter-group">
+                    <div class="filter-title">Job Category</div>
+                    <select class="form-select form-select-sm" name="category"
+                        onchange="document.getElementById('filterForm').submit()">
+                        <option value="" th:selected="${category == null || category == ''}">All Categories</option>
+                        <option value="AI & Machine Learning" th:selected="${category == 'AI & Machine Learning'}">AI &
+                            Machine Learning</option>
+                        <option value="Data Science & Analytics"
+                            th:selected="${category == 'Data Science & Analytics'}">Data Science & Analytics</option>
+                        <option value="Web, Mobile & Software Development"
+                            th:selected="${category == 'Web, Mobile & Software Development'}">Software Development
+                        </option>
+                        <option value="Sales & Marketing" th:selected="${category == 'Sales & Marketing'}">Sales &
+                            Marketing</option>
+                        <option value="Design & Creative" th:selected="${category == 'Design & Creative'}">Design &
+                            Creative</option>
+                        <option value="Writing" th:selected="${category == 'Writing'}">Writing</option>
+                        <option value="Engineering & Architecture"
+                            th:selected="${category == 'Engineering & Architecture'}">Engineering</option>
+                        <option value="IT & Networking" th:selected="${category == 'IT & Networking'}">IT & Networking
+                        </option>
+                        <option value="Customer Service" th:selected="${category == 'Customer Service'}">Customer
+                            Service</option>
+                        <option value="Legal" th:selected="${category == 'Legal'}">Legal</option>
+                    </select>
+                </div>
+
+                <!-- Employment Type -->
+                <div class="filter-group">
+                    <div class="filter-title">Employment Type</div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="partTime" th:checked="${partTime}"
+                            value="Part-Time" id="partTime">
+                        <label class="form-check-label" for="partTime">Part-Time</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="fullTime" th:checked="${fullTime}"
+                            value="Full-Time" id="fullTime">
+                        <label class="form-check-label" for="fullTime">Full-Time</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="freelance" th:checked="${freelance}"
+                            value="Freelance" id="freelance">
+                        <label class="form-check-label" for="freelance">Freelance</label>
+                    </div>
+                </div>
+
+                <!-- Remote -->
+                <div class="filter-group">
+                    <div class="filter-title">Remote</div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="remoteOnly" th:checked="${remoteOnly}"
+                            value="Remote-Only" id="remoteOnly">
+                        <label class="form-check-label" for="remoteOnly">Remote Only</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="officeOnly" th:checked="${officeOnly}"
+                            value="Office-Only" id="officeOnly">
+                        <label class="form-check-label" for="officeOnly">Office Only</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="partialRemote"
+                            th:checked="${partialRemote}" value="Partial-Remote" id="partialRemote">
+                        <label class="form-check-label" for="partialRemote">Partial Remote</label>
+                    </div>
+                </div>
+
+                <!-- Date Posted -->
+                <div class="filter-group">
+                    <div class="filter-title">Date Posted</div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="today" th:checked="${today}" id="today">
+                        <label class="form-check-label" for="today">Today</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="days7" th:checked="${days7}" id="days7">
+                        <label class="form-check-label" for="days7">Last 7 Days</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="days30" th:checked="${days30}"
+                            id="days30">
+                        <label class="form-check-label" for="days30">Last 30 Days</label>
+                    </div>
+                </div>
+
+                <input type="hidden" id="hidJob" name="job" th:value="${job}">
+                <input type="hidden" id="hidLoc" name="location" th:value="${location}">
+                <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
+            </form>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+
+            <!-- Dashboard Header -->
+            <div class="dashboard-header d-flex justify-content-between align-items-center mb-4">
+                <h1 class="page-title mb-0">Find Work</h1>
+                <a th:href="@{/freelancer-dashboard/}" class="btn btn-outline-primary rounded-pill px-4 btn-sm fw-bold">
+                    <i class="fas fa-home me-2"></i> Dashboard
+                </a>
+            </div>
+
+            <div class="search-box mb-4">
+                <input type="text" id="job" class="search-input" placeholder="Search for a job" th:value="${job}">
+                <input type="text" id="loc" class="search-input" placeholder="Job Location" th:value="${location}">
+                <button type="submit" form="filterForm" class="search-btn">
+                    <i class="fas fa-search"></i> Search
+                </button>
+            </div>
+
+            <!-- Available Jobs -->
+            <div class="content-card">
+                <div class="job-list-header mb-4">
+                    <h2 class="section-title-large">Explore Opportunities</h2>
+                    <p class="text-muted">Find the perfect job for you</p>
+                </div>
+
+                <div th:if="${jobPost == null or jobPost.isEmpty()}" class="text-center py-5">
+                    <i class="fas fa-briefcase fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">No jobs found matching your criteria.</p>
+                </div>
+
+                <div class="job-list" th:if="${jobPost != null and !jobPost.isEmpty()}">
+                    <div th:each="job : ${jobPost}" class="job-card">
+                        <!-- Job Header -->
+                        <div class="job-card-header">
+                            <div class="job-main-info">
+                                <a th:href="@{/jobs/{id}(id=${job.jobPostId})}" class="job-title-link">
+                                    <h3 class="job-title" th:text="${job.jobTitle}">Job Title</h3>
+                                </a>
+                                <div class="job-client-info">
+                                    <img th:if="${job.recruiterProfilePhoto != null}"
+                                        th:src="@{${job.recruiterProfilePhoto}}" class="client-avatar" alt="Client" />
+                                    <i th:unless="${job.recruiterProfilePhoto != null}"
+                                        class="fas fa-user-tie fa-2x text-muted client-avatar"
+                                        style="padding: 10px; display: flex; align-items: center; justify-content: center;"></i>
+                                    <div class="client-details">
+                                        <div class="client-name">
+                                            <span
+                                                th:text="${job.recruiterFirstName != null ? job.recruiterFirstName + ' ' + (job.recruiterLastName != null ? job.recruiterLastName : '') : 'Anonymous Client'}">Client
+                                                Name</span>
+                                            <!-- VERIFICATION BADGE -->
+                                            <i th:if="${job.postedByVerified}" class="fas fa-check-circle text-primary"
+                                                title="Verified Client"></i>
+                                        </div>
+                                        <div class="client-meta">
+                                            <span
+                                                th:if="${job.recruiterCompany != null and !job.recruiterCompany.isEmpty()}"
+                                                th:text="${job.recruiterCompany + ' • '}">Company • </span>
+                                            <span
+                                                th:text="${job.recruiterCity != null ? job.recruiterCity + ', ' + job.recruiterCountry : 'Remote'}">City,
+                                                Country</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Job Tags -->
+                        <div class="job-tags">
+                            <span class="job-tag primary" th:text="${job.jobType}">Fixed-Price</span>
+                            <span class="job-tag"
+                                th:text="${job.projectType != null ? job.projectType : 'Project'}">Hourly</span>
+                            <span class="job-tag" th:text="${job.remote}">Remote</span>
+                        </div>
+
+                        <!-- Job Description -->
+                        <div class="job-description-short" th:utext="${job.descriptionOfJob}">
+                            Job description goes here...
+                        </div>
+
+                        <!-- Job Footer with Stats -->
+                        <div class="job-footer">
+                            <div class="job-stats">
+                                <div class="job-stat">
+                                    <span class="stat-icon-label">Budget</span>
+                                    <span class="stat-value-bold" th:text="${job.salary}">$500 - $1000</span>
+                                </div>
+                                <div class="job-stat">
+                                    <span class="stat-icon-label">Duration</span>
+                                    <span class="stat-value-bold"
+                                        th:text="${job.projectDuration != null ? job.projectDuration : 'TBD'}">3
+                                        months</span>
+                                </div>
+                            </div>
+
+                            <div class="job-actions">
+                                <a th:href="@{/job-details-apply/{id}(id=${job.jobPostId})}"
+                                    class="btn-job btn-outline-primary">View
+                                    Details</a>
+                                <a th:if="${!job.isActive}" th:href="@{/job-details-apply/{id}(id=${job.jobPostId})}"
+                                    class="btn-job btn-apply">Apply Now</a>
+                                <a th:if="${job.isActive}" th:href="@{/chat/(userId=${job.postedById.userId})}"
+                                    class="btn-job btn-message">
+                                    <i class="fas fa-comment"></i> Messages
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PAGINATION -->
+                <nav th:if="${totalPages > 0}">
+                    <ul class="pagination">
+
+                        <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                            <a class="page-link" th:href="@{/find-work(page=${currentPage - 1})}">
+                                &laquo;
+                            </a>
+                        </li>
+
+                        <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                            th:classappend="${i == currentPage} ? 'active'">
+                            <a class="page-link" th:text="${i + 1}" th:href="@{/find-work(page=${i})}">
+                            </a>
+                        </li>
+
+                        <li class="page-item" th:classappend="${currentPage + 1 == totalPages} ? 'disabled'">
+                            <a class="page-link" th:href="@{/find-work(page=${currentPage + 1})}">
+                                &raquo;
+                            </a>
+                        </li>
+
+                    </ul>
+                </nav>
+            </div>
+        </main>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Existing search logic for hidden inputs
+            const jobInput = document.getElementById('job');
+            if (jobInput) {
+                jobInput.addEventListener('input', function () {
+                    document.getElementById('hidJob').value = this.value;
+                });
+            }
+
+            const locInput = document.getElementById('loc');
+            if (locInput) {
+                locInput.addEventListener('input', function () {
+                    document.getElementById('hidLoc').value = this.value;
+                });
+            }
+
+            // Mobile Filter Toggle
+            const mobileFilterBtn = document.getElementById('mobileFilterBtn');
+            const sidebar = document.getElementById('filterSidebar');
+
+            if (mobileFilterBtn && sidebar) {
+                mobileFilterBtn.addEventListener('click', function () {
+                    sidebar.classList.toggle('active');
+                    const icon = this.querySelector('i');
+                    if (sidebar.classList.contains('active')) {
+                        icon.classList.remove('fa-filter');
+                        icon.classList.add('fa-times');
+                        this.innerHTML = '<i class="fas fa-times"></i> Close Filters';
+                    } else {
+                        icon.classList.remove('fa-times');
+                        icon.classList.add('fa-filter');
+                        this.innerHTML = '<i class="fas fa-filter"></i> Filter Results';
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

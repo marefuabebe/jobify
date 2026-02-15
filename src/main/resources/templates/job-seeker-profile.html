@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org/">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Edit Profile | Jobify</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" rel="stylesheet" />
+    <link th:href="@{/webjars/font-awesome/css/all.min.css}" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" />
+    <!-- Summernote -->
+    <link th:rel="stylesheet" type="text/css" media="all" th:href="@{/summernote/summernote-lite.min.css}" />
+    <style>
+        /* Only stick on desktop and ensure it's below header */
+        @media (min-width: 992px) {
+            .profile-sticky {
+                position: sticky;
+                top: 100px;
+                z-index: 900;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-light d-flex flex-column min-vh-100">
+
+    <!-- Header -->
+    <th:block th:replace="fragments/freelancer-header :: freelancerHeader('profile')"></th:block>
+
+    <div class="container py-5 flex-grow-1">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold mb-0">Edit Profile</h2>
+            <a th:href="@{/freelancer-dashboard/}" class="btn btn-outline-primary rounded-pill px-4 btn-sm fw-bold">
+                <i class="fas fa-arrow-left me-2"></i> Dashboard
+            </a>
+        </div>
+        <form th:action="@{/job-seeker-profile/addNew}" method="post" th:object="${profile}"
+            enctype="multipart/form-data">
+
+            <div class="row g-4">
+                <!-- Left Sidebar: Identity, Resume & Avatar -->
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow-sm rounded-4 text-center p-4 profile-sticky">
+                        <h5 class="fw-bold mb-4 text-start">Profile Photo</h5>
+                        <div class="position-relative d-inline-block mx-auto mb-3">
+                            <img id="avatarPreview"
+                                th:src="${profile.photosImagePath != null ? profile.photosImagePath : 'https://ui-avatars.com/api/?name=' + user.firstName + '+' + user.lastName + '&background=0d6efd&color=fff'}"
+                                class="rounded-circle img-thumbnail"
+                                style="width: 150px; height: 150px; object-fit: cover;" />
+                            <label for="imageUpload"
+                                class="position-absolute bottom-0 end-0 bg-primary text-white rounded-circle p-2 shadow-sm border border-white"
+                                style="cursor: pointer; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+                                <i class="fas fa-camera"></i>
+                                <input type="file" id="imageUpload" class="d-none" name="image" accept="image/*"
+                                    onchange="previewImage(this)">
+                            </label>
+                        </div>
+
+                        <h4 class="fw-bold mb-1" th:text="${(user.firstName ?: '') + ' ' + (user.lastName ?: '')}">Job
+                            Seeker Name</h4>
+                        <p class="text-primary fw-medium mb-1"
+                            th:text="${profile.title != null ? profile.title : 'No Title Set'}">Title</p>
+
+                        <!-- Verification Status -->
+                        <div class="mb-4">
+                            <span
+                                class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-2"
+                                th:if="${user.isVerified}">
+                                <i class="fas fa-check-circle me-1"></i> Verified
+                            </span>
+                            <span
+                                class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-3 py-2"
+                                th:if="${!user.isVerified && user.documentStatus == 'UNDER_REVIEW'}">
+                                <i class="fas fa-clock me-1"></i> Pending Review
+                            </span>
+                            <span
+                                class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-3 py-2"
+                                th:if="${!user.isVerified && user.documentStatus != 'UNDER_REVIEW'}">
+                                <i class="fas fa-times-circle me-1"></i> Unverified
+                            </span>
+                        </div>
+
+                        <hr class="my-4 op-1" />
+
+                        <!-- Resume Section -->
+                        <div class="text-start">
+                            <h6 class="fw-bold mb-3"><i class="fas fa-file-alt me-2 text-primary"></i>Resume</h6>
+
+                            <div class="mb-3" th:if="${profile.resume != null}">
+                                <div
+                                    class="d-flex align-items-center justify-content-between p-3 bg-light rounded border">
+                                    <div class="d-flex align-items-center text-truncate pe-2">
+                                        <i class="fas fa-file-pdf text-danger me-2 fs-5"></i>
+                                        <span class="small fw-semibold text-truncate"
+                                            th:text="${profile.resume}">resume.pdf</span>
+                                    </div>
+                                    <a th:href="@{/job-seeker-profile/downloadResume(fileName=${profile.resume}, userID=${profile.userAccountId})}"
+                                        class="btn btn-sm btn-outline-primary border-0 bg-white">
+                                        <i class="fas fa-download"></i>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <label class="form-label small fw-bold text-muted">Update Resume (PDF)</label>
+                            <input type="file" class="form-control form-control-sm" name="pdf"
+                                accept="application/pdf" />
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Right Column: Details Loop -->
+                <div class="col-lg-8">
+
+                    <!-- Section 1: Basic Info -->
+                    <div class="card border-0 shadow-sm rounded-4 mb-4 animate-up delay-100">
+                        <div class="card-header bg-white border-bottom-0 pt-4 px-4">
+                            <h5 class="fw-bold text-dark mb-0"><i
+                                    class="fas fa-user-circle text-primary me-2"></i>Personal Information
+                            </h5>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">First Name</label>
+                                    <input type="text" class="form-control" th:field="*{firstName}" placeholder="John"
+                                        required />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Last Name</label>
+                                    <input type="text" class="form-control" th:field="*{lastName}" placeholder="Doe"
+                                        required />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">City</label>
+                                    <input type="text" class="form-control" th:field="*{city}" placeholder="New York" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">State/Region</label>
+                                    <input type="text" class="form-control" th:field="*{state}" placeholder="NY" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Country</label>
+                                    <input type="text" class="form-control" th:field="*{country}"
+                                        placeholder="United States" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Employment Type</label>
+                                    <select class="form-select" th:field="*{employmentType}">
+                                        <option value="" disabled selected>Select Type</option>
+                                        <option value="Full-Time">Full-Time</option>
+                                        <option value="Part-Time">Part-Time</option>
+                                        <option value="Freelance">Freelance</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section 2: Professional Details -->
+                    <div class="card border-0 shadow-sm rounded-4 mb-4 animate-up delay-200">
+                        <div class="card-header bg-white border-bottom-0 pt-4 px-4">
+                            <h5 class="fw-bold text-dark mb-0"><i
+                                    class="fas fa-briefcase text-primary me-2"></i>Professional Details</h5>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="row g-3">
+                                <div class="col-md-12">
+                                    <label class="form-label fw-semibold">Professional Title</label>
+                                    <input type="text" class="form-control" th:field="*{title}"
+                                        placeholder="e.g. Senior Full Stack Java Developer" />
+                                </div>
+                                <div class="col-md-12">
+                                    <label class="form-label fw-semibold">Tagline <span
+                                            class="text-muted fw-normal small">(Optional)</span></label>
+                                    <input type="text" class="form-control" th:field="*{tagline}"
+                                        placeholder="Building scalable solutions for complex problems" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Hourly Rate ($)</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" step="1" min="0" class="form-control"
+                                            th:field="*{hourlyRate}" />
+                                        <span class="input-group-text">/hr</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Experience Level</label>
+                                    <select class="form-select" th:field="*{experienceLevel}">
+                                        <option value="" disabled selected>Select Level</option>
+                                        <option value="Beginner">Beginner</option>
+                                        <option value="Intermediate">Intermediate</option>
+                                        <option value="Advance">Advance</option>
+                                        <option value="Expert">Expert</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-12">
+                                    <label class="form-label fw-semibold">Skills</label>
+                                    <div class="bg-light p-3 rounded mb-2 border">
+                                        <div class="d-flex flex-wrap gap-2"
+                                            th:if="${skills != null and !skills.isEmpty()}">
+                                            <span th:each="skill : ${skills}"
+                                                class="badge bg-white text-primary border shadow-sm px-3 py-2">
+                                                <span th:text="${skill.name}">Skill</span>
+                                            </span>
+                                        </div>
+                                        <div th:if="${skills == null or skills.isEmpty()}"
+                                            class="text-muted small fst-italic">
+                                            No skills added yet.
+                                        </div>
+                                    </div>
+                                    <button type="submit" name="redirect" value="skills"
+                                        class="btn btn-outline-primary btn-sm rounded-pill font-small">
+                                        <i class="fas fa-plus me-1"></i> Add / Manage Skills
+                                    </button>
+                                </div>
+                                <div class="col-md-12">
+                                    <label class="form-label fw-semibold">Bio</label>
+                                    <textarea class="form-control" id="bio" th:field="*{bio}" rows="5"
+                                        placeholder="Tell employers about your journey..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section 3: Education & Certifications -->
+                    <div class="card border-0 shadow-sm rounded-4 mb-4 animate-up delay-300">
+                        <div class="card-header bg-white border-bottom-0 pt-4 px-4">
+                            <h5 class="fw-bold text-dark mb-0"><i
+                                    class="fas fa-graduation-cap text-primary me-2"></i>Education & Certifications</h5>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="row g-4">
+                                <!-- Education -->
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Education Documents <span
+                                            class="text-muted fw-normal small">(PDF, Word, or Images)</span></label>
+
+                                    <!-- Existing Education Doc -->
+                                    <div class="mb-3 d-flex align-items-center gap-2"
+                                        th:if="${profile.educationDoc != null and !profile.educationDoc.isEmpty()}">
+                                        <div class="p-2 border rounded bg-light flex-grow-1 overflow-hidden">
+                                            <i class="fas fa-file-alt text-primary me-2"></i>
+                                            <span class="small" th:text="${profile.educationDoc}">education.pdf</span>
+                                        </div>
+                                        <div class="form-check small">
+                                            <input class="form-check-input" type="checkbox" name="removeEducationDoc"
+                                                id="removeEducationDoc">
+                                            <label class="form-check-label text-danger fw-600"
+                                                for="removeEducationDoc">Remove</label>
+                                        </div>
+                                    </div>
+
+                                    <input type="file" class="form-control" name="educationDocFile"
+                                        accept=".pdf,.doc,.docx,image/*" />
+                                    <div class="form-text">Upload degree, transcript, or other academic evidence</div>
+
+                                    <div class="mt-3">
+                                        <label class="form-label fw-semibold small text-muted">Brief Description</label>
+                                        <textarea class="form-control" th:field="*{education}" rows="2"
+                                            placeholder="e.g. BSc Computer Science"></textarea>
+                                    </div>
+                                </div>
+
+                                <!-- Certifications -->
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Certification Documents <span
+                                            class="text-muted fw-normal small">(PDF, Word, or Images)</span></label>
+
+                                    <!-- Existing Certification Doc -->
+                                    <div class="mb-3 d-flex align-items-center gap-2"
+                                        th:if="${profile.certificationDoc != null and !profile.certificationDoc.isEmpty()}">
+                                        <div class="p-2 border rounded bg-light flex-grow-1 overflow-hidden">
+                                            <i class="fas fa-certificate text-warning me-2"></i>
+                                            <span class="small" th:text="${profile.certificationDoc}">cert.pdf</span>
+                                        </div>
+                                        <div class="form-check small">
+                                            <input class="form-check-input" type="checkbox"
+                                                name="removeCertificationsDoc" id="removeCertificationsDoc">
+                                            <label class="form-check-label text-danger fw-600"
+                                                for="removeCertificationsDoc">Remove</label>
+                                        </div>
+                                    </div>
+
+                                    <input type="file" class="form-control" name="certificationsDocFile"
+                                        accept=".pdf,.doc,.docx,image/*" />
+                                    <div class="form-text">Upload professional certificates or licenses</div>
+
+                                    <div class="mt-3">
+                                        <label class="form-label fw-semibold small text-muted">Brief Description</label>
+                                        <textarea class="form-control" th:field="*{certifications}" rows="2"
+                                            placeholder="e.g. AWS Solutions Architect"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section 4: Languages & Availability -->
+                    <div class="card border-0 shadow-sm rounded-4 mb-4 animate-up delay-400">
+                        <div class="card-header bg-white border-bottom-0 pt-4 px-4">
+                            <h5 class="fw-bold text-dark mb-0"><i
+                                    class="fas fa-language text-primary me-2"></i>Languages & Availability</h5>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="row g-4">
+                                <div class="col-md-12">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <div>
+                                            <label class="form-label fw-bold mb-0">Languages & Proficiency</label>
+                                            <p class="text-muted small mb-0">List the languages you speak and your
+                                                mastery level.</p>
+                                        </div>
+                                        <button type="button" class="btn btn-sm btn-primary rounded-pill px-3 shadow-sm"
+                                            onclick="addLanguageRow()">
+                                            <i class="fas fa-plus me-1"></i> Add Language
+                                        </button>
+                                    </div>
+
+                                    <!-- Hidden input for binding to entity -->
+                                    <input type="hidden" id="languagesHidden" th:field="*{languages}" />
+
+                                    <div id="languagesContainer" class="d-flex flex-column gap-3 mb-2">
+                                        <!-- Dynamic rows will be added here -->
+                                    </div>
+
+                                    <div class="form-text">Choose languages you speak and your proficiency level.</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Availability Status</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light"><i
+                                                class="fas fa-calendar-check"></i></span>
+                                        <select class="form-select" th:field="*{availabilityStatus}">
+                                            <option value="" disabled selected>Select Status</option>
+                                            <option value="Available">Available Now</option>
+                                            <option value="Busy">Busy - Limited Availability</option>
+                                            <option value="Not Available">Not Available</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Hours Per Week</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light"><i class="fas fa-clock"></i></span>
+                                        <select class="form-select" th:field="*{hoursPerWeek}">
+                                            <option value="" disabled selected>Select Hours</option>
+                                            <option value="Less than 10">Less than 10 hours</option>
+                                            <option value="10-20">10-20 hours</option>
+                                            <option value="20-30">20-30 hours</option>
+                                            <option value="30+">30+ hours (Full-time)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section 5: Verification -->
+                    <div class="card border-0 shadow-sm rounded-4 mb-4 animate-up delay-300">
+                        <div class="card-header bg-white border-bottom-0 pt-4 px-4">
+                            <h5 class="fw-bold text-dark mb-0"><i
+                                    class="fas fa-shield-alt text-primary me-2"></i>Identity Verification</h5>
+                        </div>
+                        <div class="card-body p-4">
+                            <!-- Existing Doc -->
+                            <div class="mb-4" th:if="${profile.verificationDocument != null}">
+                                <label class="form-label fw-semibold text-muted small text-uppercase">Submitted
+                                    Document</label>
+                                <div class="d-flex align-items-center gap-3 p-3 border rounded bg-light">
+                                    <i class="fas fa-file-contract text-primary fs-4"></i>
+                                    <span class="fw-medium text-dark"
+                                        th:text="${profile.verificationDocument}">doc.jpg</span>
+                                    <div class="ms-auto">
+                                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle"
+                                            th:if="${profile.documentStatus == 'UNDER_REVIEW'}">Under Review</span>
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle"
+                                            th:if="${user.isVerified}">Verified</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="alert alert-info bg-primary-subtle border-primary-subtle text-primary d-flex align-items-center mb-4"
+                                role="alert" th:if="${!user.isVerified}">
+                                <i class="fas fa-info-circle me-3 fs-5"></i>
+                                <div>
+                                    Upload a valid Government ID (Passport, Driver's License) to get the
+                                    <strong>Verified Badge</strong>.
+                                </div>
+                            </div>
+
+                            <div class="row g-4">
+                                <div class="col-12">
+                                    <label class="form-label fw-semibold">Upload ID Document</label>
+                                    <input type="file" class="form-control" name="verificationDoc"
+                                        accept="image/*,application/pdf" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex justify-content-end gap-3 animate-up delay-300 mb-5">
+                        <a th:href="@{/freelancer-dashboard/}" class="btn btn-light px-4 border">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-5 fw-bold shadow-sm">
+                            Save Changes
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Footer -->
+    <th:block th:replace="fragments/footer :: footer"></th:block>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        // Image Preview Logic
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    $('#avatarPreview').attr('src', e.target.result);
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // --- Dynamic Languages Logic ---
+        const languagesList = ["English", "Spanish", "French", "German", "Chinese", "Arabic", "Portuguese", "Hindi", "Japanese", "Russian", "Italian", "Turkish", "Korean", "Vietnamese", "Indonesian", "Amharic", "Dutch", "Other"];
+        const proficiencyList = ["Basic", "Conversational", "Fluent", "Native"];
+
+        function addLanguageRow(langVal = "", profVal = "") {
+            const container = document.getElementById('languagesContainer');
+            const rowId = 'lang-row-' + Date.now() + Math.floor(Math.random() * 1000);
+
+            const div = document.createElement('div');
+            div.className = 'language-row-item animate-up';
+            div.id = rowId;
+
+            let langOptions = '<option value="" disabled ' + (langVal === "" ? 'selected' : '') + '>Choose Language</option>';
+            languagesList.forEach(l => {
+                langOptions += `<option value="${l}" ${langVal === l ? 'selected' : ''}>${l}</option>`;
+            });
+
+            let profOptions = '<option value="" disabled ' + (profVal === "" ? 'selected' : '') + '>Degree of Mastery</option>';
+            proficiencyList.forEach(p => {
+                profOptions += `<option value="${p}" ${profVal === p ? 'selected' : ''}>${p}</option>`;
+            });
+
+            div.innerHTML = `
+                <div class="card border shadow-none rounded-3 overflow-hidden">
+                    <div class="card-body p-2 bg-light-subtle">
+                        <div class="row g-2 align-items-center">
+                            <div class="col-md-6">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text bg-white border-end-0"><i class="fas fa-globe text-muted"></i></span>
+                                    <select class="form-select border-start-0 lang-select" onchange="serializeLanguages()">${langOptions}</select>
+                                </div>
+                            </div>
+                            <div class="col-md-5">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text bg-white border-end-0"><i class="fas fa-signal text-muted"></i></span>
+                                    <select class="form-select border-start-0 prof-select" onchange="serializeLanguages()">${profOptions}</select>
+                                </div>
+                            </div>
+                            <div class="col-md-1 text-end">
+                                <button type="button" class="btn btn-link text-danger p-1" onclick="removeLanguageRow('${rowId}')" title="Remove">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            container.appendChild(div);
+            serializeLanguages();
+        }
+
+        function removeLanguageRow(id) {
+            const row = document.getElementById(id);
+            if (row) {
+                row.remove();
+                serializeLanguages();
+            }
+        }
+
+        function serializeLanguages() {
+            const container = document.getElementById('languagesContainer');
+            const langSelects = container.querySelectorAll('.lang-select');
+            const profSelects = container.querySelectorAll('.prof-select');
+
+            let languagesArray = [];
+            for (let i = 0; i < langSelects.length; i++) {
+                const lang = langSelects[i].value;
+                const prof = profSelects[i].value;
+                if (lang && prof) {
+                    languagesArray.push(`${lang}: ${prof}`);
+                }
+            }
+            document.getElementById('languagesHidden').value = languagesArray.join(', ');
+        }
+
+        function deserializeLanguages() {
+            const rawValue = document.getElementById('languagesHidden').value;
+            if (!rawValue || rawValue.trim() === "") return;
+
+            const pairs = rawValue.split(', ');
+            pairs.forEach(pair => {
+                const parts = pair.split(': ');
+                if (parts.length === 2) {
+                    addLanguageRow(parts[0], parts[1]);
+                }
+            });
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', function () {
+            deserializeLanguages();
+            // Add initial row if empty
+            if (document.getElementById('languagesContainer').children.length === 0) {
+                addLanguageRow();
+            }
+        });
+    </script>
+
+    <style>
+        .form-control:focus,
+        .form-select:focus {
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+            border-color: #0d6efd;
+        }
+
+        .animate-up {
+            animation: fadeInUp 0.5s ease-out forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .delay-100 {
+            animation-delay: 0.1s;
+        }
+
+        .delay-200 {
+            animation-delay: 0.2s;
+        }
+
+        .delay-300 {
+            animation-delay: 0.3s;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+
+    <!-- SweetAlert for Success/Error -->
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var success = /*[[${success}]]*/ false;
+        var verificationSuccess = /*[[${verificationSuccess}]]*/ false;
+        var errorMsg = /*[[${error}]]*/ null;
+
+        if (success) {
+            Swal.fire({
+                title: 'Profile Saved!',
+                text: 'Your profile has been updated successfully.',
+                icon: 'success',
+                confirmButtonColor: '#0d6efd'
+            });
+        }
+
+        if (verificationSuccess) {
+            Swal.fire({
+                title: 'Verification Submitted!',
+                text: 'Your documents have been submitted and are under admin review.',
+                icon: 'success',
+                confirmButtonColor: '#0d6efd'
+            });
+        }
+
+        if (errorMsg) {
+            Swal.fire({
+                title: 'Error',
+                text: 'An error occurred while saving your profile.',
+                icon: 'error',
+                confirmButtonColor: '#0d6efd'
+            });
+        }
+        /*]]>*/
+    </script>
+
+    <script th:src="@{/summernote/summernote-lite.min.js}"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Initialize Summernote for Bio
+            $('#bio').summernote({
+                height: 200,
+                placeholder: "Tell employers about your journey...",
+                toolbar: [
+                    ['style', ['style']],
+                    ['font', ['bold', 'underline', 'clear']],
+                    ['color', ['color']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['insert', ['link']],
+                    ['view', ['codeview', 'help']]
+                ]
+            });
+        });
+
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    $('#avatarPreview').attr('src', e.target.result);
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
+</body>
+
+</html>

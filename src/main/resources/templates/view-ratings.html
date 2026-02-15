@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Ratings & Reviews - Jobify</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
+    <link rel="stylesheet" th:href="@{/webjars/font-awesome/css/all.min.css}" />
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <style>
+        :root {
+            --primary: #4B6CB7;
+            --primary-light: #182848;
+            --accent: #00b4d8;
+            --success: #2ecc71;
+            --warning: #f1c40f;
+            --danger: #e74c3c;
+            --bg-body: #f5f7fa;
+            --glass-bg: rgba(255, 255, 255, 0.88);
+            --glass-border: rgba(255, 255, 255, 0.5);
+            --card-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+            --radius-xl: 24px;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f8faff 0%, #eef2f7 100%);
+            color: #2D3436;
+            font-family: 'Inter', -apple-system, sans-serif;
+            min-height: 100vh;
+        }
+
+        .navbar-custom {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-brand-custom {
+            font-weight: 800;
+            font-size: 24px;
+            color: var(--primary) !important;
+            letter-spacing: -0.5px;
+        }
+
+        .rating-hero {
+            padding: 60px 0;
+            text-align: center;
+        }
+
+        .hero-title {
+            font-weight: 900;
+            font-size: 42px;
+            color: var(--primary-light);
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+        }
+
+        .hero-subtitle {
+            color: #636E72;
+            font-size: 18px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .summary-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--card-shadow);
+            padding: 40px;
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            gap: 50px;
+        }
+
+        @media (max-width: 768px) {
+            .summary-card {
+                flex-direction: column;
+                gap: 30px;
+                text-align: center;
+            }
+        }
+
+        .avg-score {
+            font-size: 80px;
+            font-weight: 900;
+            line-height: 1;
+            color: var(--primary-light);
+        }
+
+        .stars-container i {
+            font-size: 22px;
+            margin: 0 2px;
+        }
+
+        .star-filled {
+            color: var(--warning);
+        }
+
+        .star-empty {
+            color: #dfe6e9;
+        }
+
+        .progress-stack {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .progress-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #636e72;
+        }
+
+        .p-bar-wrap {
+            flex-grow: 1;
+            height: 8px;
+            background: #eef2f7;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .p-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 10px;
+        }
+
+        .review-card {
+            background: white;
+            border-radius: var(--radius-xl);
+            padding: 30px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(0, 0, 0, 0.03);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .review-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
+            border-color: rgba(75, 108, 183, 0.1);
+        }
+
+        .client-avatar {
+            width: 50px;
+            height: 50px;
+            background: var(--primary);
+            color: white;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 18px;
+            box-shadow: 0 5px 15px rgba(75, 108, 183, 0.2);
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .client-info h4 {
+            font-size: 16px;
+            font-weight: 700;
+            margin: 0;
+            color: var(--primary-light);
+        }
+
+        .review-date {
+            font-size: 13px;
+            color: #b2bec3;
+        }
+
+        .review-text {
+            font-size: 16px;
+            line-height: 1.7;
+            color: #2d3436;
+            margin-bottom: 20px;
+        }
+
+        .project-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #f1f3f8;
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--primary);
+            text-decoration: none;
+            transition: 0.2s;
+        }
+
+        .project-badge:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .empty-state {
+            padding: 100px 20px;
+            text-align: center;
+        }
+
+        .empty-icon {
+            font-size: 80px;
+            color: #dfe6e9;
+            margin-bottom: 25px;
+            display: block;
+        }
+
+        .btn-back {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            padding: 12px 30px;
+            border-radius: 15px;
+            font-weight: 700;
+            transition: all 0.3s;
+        }
+
+        .btn-back:hover {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-3">
+                <a th:href="@{/job-seeker-profile/view/{id}(id=${freelancer.userAccountId})}"
+                    class="btn btn-back py-2 px-3 d-flex align-items-center justify-content-center"
+                    title="Back to Profile">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+                <a class="navbar-brand navbar-brand-custom m-0" th:href="@{/dashboard/}">
+                    <i class="fas fa-rocket me-2"></i>Jobify
+                </a>
+            </div>
+            <div class="navbar-nav">
+                <a th:href="@{/logout}" class="btn btn-link text-decoration-none text-muted fw-bold">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <header class="rating-hero">
+            <h1 class="hero-title">Ratings & Reviews</h1>
+            <p class="hero-subtitle">Honest feedback for <span class="fw-bold"
+                    th:text="${freelancer.firstName + ' ' + freelancer.lastName}">Freelancer Name</span></p>
+        </header>
+
+        <!-- Summary Section -->
+        <div class="summary-card">
+            <div class="text-center" style="min-width: 180px;">
+                <div class="avg-score" th:text="${#numbers.formatDecimal(averageRating, 1, 'POINT', 1, 'POINT')}">4.8
+                </div>
+                <div class="stars-container mb-2">
+                    <span th:each="i : ${#numbers.sequence(1, 5)}">
+                        <i class="fas fa-star"
+                            th:classappend="${i <= averageRating} ? 'star-filled' : 'star-empty'"></i>
+                    </span>
+                </div>
+                <div class="text-muted fw-bold" th:text="${ratingCount + ' Reviews'}">12 Reviews</div>
+            </div>
+
+            <div class="progress-stack">
+                <div class="progress-row" th:each="i : ${#numbers.sequence(5, 1)}">
+                    <span style="width: 20px;" th:text="${i}">5</span>
+                    <i class="fas fa-star text-warning small"></i>
+                    <div class="p-bar-wrap">
+                        <!-- Simplified logic for display, ideally these counts would come from backend -->
+                        <div class="p-bar-fill"
+                            th:style="'width: ' + (${averageRating >= i} ? '100%' : (${averageRating >= i - 0.5} ? '50%' : '0%'))">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reviews List -->
+        <div class="reviews-section mb-5">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="fw-bold" style="color: var(--primary-light);">Latest Feedback</h3>
+            </div>
+
+            <div th:if="${ratings == null or ratings.isEmpty()}" class="empty-state box">
+                <i class="fas fa-comment-slash empty-icon"></i>
+                <h2 class="fw-bold">No reviews yet</h2>
+                <p class="text-muted">This freelancer hasn't completed any rated projects yet.</p>
+            </div>
+
+            <div th:unless="${ratings == null or ratings.isEmpty()}">
+                <div th:each="rating : ${ratings}" class="review-card">
+                    <div class="review-header">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="client-avatar"
+                                th:text="${#strings.substring(rating.client.email, 0, 1).toUpperCase()}">C</div>
+                            <div class="client-info">
+                                <h4 th:text="${#strings.substringBefore(rating.client.email, '@')}">ClientName</h4>
+                                <span class="review-date" th:if="${rating.createdAt != null}"
+                                    th:text="${#dates.format(rating.createdAt, 'MMM dd, yyyy')}">Feb 10, 2026</span>
+                            </div>
+                        </div>
+                        <div class="stars-container">
+                            <span th:each="i : ${#numbers.sequence(1, 5)}">
+                                <i class="fas fa-star"
+                                    th:classappend="${i <= rating.ratingValue} ? 'star-filled' : 'star-empty'"></i>
+                            </span>
+                        </div>
+                    </div>
+
+                    <p class="review-text"
+                        th:text="${rating.review != null and !rating.review.isEmpty() ? rating.review : 'The client did not leave a written review for this project.'}"
+                        th:classappend="${rating.review == null or rating.review.isEmpty() ? 'text-muted fst-italic' : ''}">
+                        Review content goes here...
+                    </p>
+
+                    <div th:if="${rating.project != null and rating.project.job != null}">
+                        <a href="#" class="project-badge">
+                            <i class="fas fa-briefcase"></i>
+                            <span th:text="${rating.project.job.jobTitle}">UI/UX Design Project</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center pb-5">
+            <a th:href="@{/job-seeker-profile/view/{id}(id=${freelancer.userAccountId})}" class="btn btn-back">
+                <i class="fas fa-arrow-left me-2"></i> Return to Profile
+            </a>
+        </div>
+    </div>
+
+    <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
+    <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
+</body>
+
+</html>

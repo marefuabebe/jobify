@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>All Users - Admin</title>
+</head>
+<body>
+    <h1>All Users Admin Page</h1>
+    
+    <div th:if="${error != null}" style="color: red;">
+        <p>Error: <span th:text="${error}">Error message</span></p>
+    </div>
+    
+    <p>Total Users: <span th:text="${totalUsers}">0</span></p>
+    
+    <table border="1" th:if="${users != null and not #lists.isEmpty(users)}">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Type</th>
+                <th>Approved</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="user : ${users}">
+                <td th:text="${user.firstName}">First Name</td>
+                <td th:text="${user.email}">Email</td>
+                <td th:text="${user.userTypeId != null ? user.userTypeId.userTypeId : 'null'}">Type</td>
+                <td th:text="${user.approved}">Approved</td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <div th:if="${users == null or #lists.isEmpty(users)}">
+        <p>No users found.</p>
+    </div>
+    
+    <p>
+        <a href="/admin/dashboard">Back to Dashboard</a>
+    </p>
+</body>
+</html>

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<body>
+    <footer th:fragment="adminFooter"
+        class="admin-footer text-center py-3 mt-4"
+        style="background: #000000; border-top: 1px solid rgba(255,255,255,0.08); color: rgba(255,255,255,0.7); font-size: 12px;">
+        <span>&copy; <span th:text="${#dates.format(#dates.createNow(), 'yyyy')}">2024</span> Jobify Admin. All rights
+            reserved.</span>
+    </footer>
+</body>
+
+</html>
+
+

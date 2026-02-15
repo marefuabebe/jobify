@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+    xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>About Us - Jobify</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Bootstrap & FontAwesome -->
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
+    <link rel="stylesheet" th:href="@{/webjars/font-awesome/css/all.css}" />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+
+    <style>
+        /* Animation Classes */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .animate-up {
+            opacity: 0;
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .delay-100 {
+            transition-delay: 0.1s;
+            animation-delay: 0.1s;
+        }
+
+        .delay-200 {
+            transition-delay: 0.2s;
+            animation-delay: 0.2s;
+        }
+
+        .delay-300 {
+            transition-delay: 0.3s;
+            animation-delay: 0.3s;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <th:block th:replace="fragments/public-header :: header('about')"></th:block>
+
+    <!-- Hero Section -->
+    <section class="about-hero-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 mb-5 mb-lg-0">
+                    <h1 class="about-hero-title animate-up">Connecting Talent with <span
+                            class="highlight-text">Opportunity</span></h1>
+                    <p class="about-hero-text animate-up delay-100">
+                        Jobify is more than just a job board. We are a global community bridging the gap between
+                        world-class talent and forward-thinking companies.
+                    </p>
+                    <div class="d-flex gap-3 animate-up delay-200">
+                        <a href="/register" class="btn btn-primary btn-lg rounded-pill px-5 fw-bold shadow-sm">Join Our
+                            Mission</a>
+                        <a href="#our-story" class="btn btn-outline-primary btn-lg rounded-pill px-4 fw-bold">Read Our
+                            Story</a>
+                    </div>
+                </div>
+                <div class="col-lg-6 text-center animate-up delay-300">
+                    <img th:src="@{/assets/hero-illustration.png}" class="img-fluid" style="max-height: 450px;"
+                        alt="Team Collaboration">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-3 col-6 text-center reveal delay-100">
+                    <span class="stat-number counter" th:text="${totalUsers}" data-target="${totalUsers}">0</span>
+                    <span class="stat-label">Happy Users</span>
+                </div>
+                <div class="col-md-3 col-6 text-center reveal delay-200">
+                    <span class="stat-number counter" th:text="${totalCountries}"
+                        data-target="${totalCountries}">0</span>
+                    <span class="stat-label">Countries</span>
+                </div>
+                <div class="col-md-3 col-6 text-center reveal delay-300">
+                    <span class="stat-number counter" th:text="${totalCompanies}"
+                        data-target="${totalCompanies}">0</span>
+                    <span class="stat-label">Companies</span>
+                </div>
+                <div class="col-md-3 col-6 text-center reveal delay-300">
+                    <span class="stat-number"><span class="counter" th:text="${globalRating}"
+                            data-target="${globalRating}">0</span>%</span>
+                    <span class="stat-label">Success Rate</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ... (Rest of content) ... -->
+
+    <!-- Scripts -->
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Scroll Animation Observer
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.1
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+
+                        // Check if this is the Stats Section to trigger counters
+                        if (entry.target.querySelector('.counter')) {
+                            startCounters();
+                        }
+
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            const revealElements = document.querySelectorAll('.reveal');
+            revealElements.forEach(el => observer.observe(el));
+
+            // Counter Animation
+            function startCounters() {
+                const counters = document.querySelectorAll('.counter');
+                const speed = 200; // The lower the slower
+
+                counters.forEach(counter => {
+                    const updateCount = () => {
+                        const target = +counter.innerText; // Get target from Thymeleaf rendered text
+                        const count = +counter.getAttribute('data-count') || 0;
+
+                        // Initial setup to clear text and start from 0 if not already running
+                        if (count === 0 && counter.innerText !== '0') {
+                            counter.setAttribute('data-target', counter.innerText);
+                            counter.innerText = 0;
+                        }
+
+                        const targetNum = +counter.getAttribute('data-target');
+                        const inc = targetNum / speed;
+
+                        if (count < targetNum) {
+                            counter.innerText = Math.ceil(count + inc);
+                            counter.setAttribute('data-count', count + inc);
+                            setTimeout(updateCount, 20);
+                        } else {
+                            counter.innerText = targetNum;
+                            // Add 'M+' or 'K+' suffix logic if needed, but for now exact numbers
+                        }
+                    };
+                    updateCount();
+                });
+            }
+        });
+    </script>
+
+    <!-- Our Story Section -->
+    <section id="our-story" class="section-padding bg-white">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 mb-5 mb-lg-0 reveal">
+                    <div class="position-relative">
+                        <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                            class="img-fluid rounded-4 shadow-lg w-100" alt="Our Story">
+                        <div class="position-absolute bottom-0 start-0 bg-white p-4 rounded-3 shadow-lg m-4 d-none d-md-block"
+                            style="max-width: 250px;">
+                            <p class="mb-0 fw-bold text-primary">"Talent is universal, but opportunity is not. We're
+                                fixing that."</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 ps-lg-5 reveal delay-100">
+                    <h5 class="section-subtitle mb-2 text-uppercase fw-bold text-primary small ls-1">Our History</h5>
+                    <h2 class="section-title mb-4">It Started With a Simple Idea</h2>
+                    <p class="text-muted fs-5 mb-4">
+                        Founded in 2024, Jobify was born from a frustration with the traditional hiring process. We
+                        realized that geography shouldn't dictate career potential.
+                    </p>
+                    <p class="text-muted mb-4">
+                        Today, we've grown into a dynamic ecosystem where millions of interactions happen daily. From a
+                        small garage startup to a global platform, our mission remains unchanged: to empower
+                        professionals to work on their own terms.
+                    </p>
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2"><i class="fas fa-check-circle text-primary me-2"></i> Transparent & Secure
+                            Payments</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-primary me-2"></i> Artificial Intelligence
+                            Matching</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-primary me-2"></i> 24/7 Global Support</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Core Values -->
+    <section class="section-padding bg-light">
+        <div class="container">
+            <div class="text-center mb-5 reveal">
+                <h5 class="section-subtitle mb-2 text-uppercase fw-bold text-primary small ls-1">Our Culture</h5>
+                <h2 class="section-title">Values That Drive Us</h2>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6 reveal delay-100">
+                    <div class="value-card">
+                        <div class="value-icon-wrapper">
+                            <i class="fas fa-shield-alt fa-2x text-primary"></i>
+                        </div>
+                        <h3>Trust & Safety</h3>
+                        <p class="text-muted">We prioritize the security of our community above all else. Verified
+                            profiles and secure payments are our standard.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 reveal delay-200">
+                    <div class="value-card">
+                        <div class="value-icon-wrapper">
+                            <i class="fas fa-users fa-2x text-primary"></i>
+                        </div>
+                        <h3>Community First</h3>
+                        <p class="text-muted">We build for our users. Every feature, update, and decision is made to
+                            empower our community to succeed.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 reveal delay-300">
+                    <div class="value-card">
+                        <div class="value-icon-wrapper">
+                            <i class="fas fa-rocket fa-2x text-primary"></i>
+                        </div>
+                        <h3>Innovation</h3>
+                        <p class="text-muted">We assume nothing. We constantly challenge the status quo to provide the
+                            best tools for the modern workforce.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section class="section-padding bg-white">
+        <div class="container">
+            <div class="text-center mb-5 reveal">
+                <h5 class="section-subtitle mb-2 text-uppercase fw-bold text-primary small ls-1">The Team</h5>
+                <h2 class="section-title">Meet the Minds</h2>
+            </div>
+
+            <div class="row g-4 justify-content-center">
+                <!-- Team Member 1 -->
+                <div class="col-lg-3 col-md-6 reveal delay-100">
+                    <div class="team-card">
+                        <div class="team-img-wrapper">
+                            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="CEO" class="team-img">
+                        </div>
+                        <h4 class="team-name">Jack Jackob</h4>
+                        <p class="team-role">CEO & Founder</p>
+                        <div class="d-flex justify-content-center gap-3">
+                            <a href="#" class="text-muted"><i class="fab fa-linkedin-in"></i></a>
+                            <a href="#" class="text-muted"><i class="fab fa-twitter"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Team Member 2 -->
+                <div class="col-lg-3 col-md-6 reveal delay-200">
+                    <div class="team-card">
+                        <div class="team-img-wrapper">
+                            <img src="https://randomuser.me/api/portraits/men/44.jpg" alt="CTO" class="team-img">
+                        </div>
+                        <h4 class="team-name">Roba Ayano</h4>
+                        <p class="team-role">Chief Technology Officer</p>
+                        <div class="d-flex justify-content-center gap-3">
+                            <a href="#" class="text-muted"><i class="fab fa-linkedin-in"></i></a>
+                            <a href="#" class="text-muted"><i class="fab fa-github"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Team Member 3 -->
+                <div class="col-lg-3 col-md-6 reveal delay-300">
+                    <div class="team-card">
+                        <div class="team-img-wrapper">
+                            <img src="https://randomuser.me/api/portraits/men/85.jpg" alt="Product" class="team-img">
+                        </div>
+                        <h4 class="team-name">Fisum Girma</h4>
+                        <p class="team-role">Head of Product</p>
+                        <div class="d-flex justify-content-center gap-3">
+                            <a href="#" class="text-muted"><i class="fab fa-linkedin-in"></i></a>
+                            <a href="#" class="text-muted"><i class="fab fa-twitter"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Team Member 4 -->
+                <div class="col-lg-3 col-md-6 reveal delay-100">
+                    <div class="team-card">
+                        <div class="team-img-wrapper">
+                            <img src="https://randomuser.me/api/portraits/men/65.jpg" alt="Design" class="team-img">
+                        </div>
+                        <h4 class="team-name">Zazu Zackarya</h4>
+                        <p class="team-role">Head of Design</p>
+                        <div class="d-flex justify-content-center gap-3">
+                            <a href="#" class="text-muted"><i class="fab fa-linkedin-in"></i></a>
+                            <a href="#" class="text-muted"><i class="fab fa-dribbble"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter Section (Blue Theme) -->
+    <section class="newsletter-section py-5 position-relative overflow-hidden reveal"
+        style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);">
+
+        <div class="position-absolute top-0 start-0 w-100 h-100" style="opacity: 0.1;">
+            <div class="position-absolute top-0 start-0 translate-middle rounded-circle bg-white"
+                style="width: 300px; height: 300px; filter: blur(50px);"></div>
+            <div class="position-absolute bottom-0 end-0 translate-middle rounded-circle bg-white"
+                style="width: 400px; height: 400px; filter: blur(60px);"></div>
+        </div>
+
+        <div class="container position-relative z-1">
+            <div class="row justify-content-center align-items-center">
+                <div class="col-lg-8 text-center">
+                    <div class="icon-wrapper mb-4 d-inline-flex align-items-center justify-content-center bg-white rounded-circle shadow-lg"
+                        style="width: 80px; height: 80px; animation: float 3s ease-in-out infinite;">
+                        <i class="fas fa-paper-plane fa-2x text-primary"></i>
+                    </div>
+                    <h2 class="display-6 fw-bold text-white mb-3">Join Our Journey</h2>
+                    <p class="text-white-50 mb-5 fs-5">Stay updated with Jobify news, career tips, and platform updates.
+                    </p>
+
+                    <form action="#" class="newsletter-form w-100 mx-auto" style="max-width: 600px;">
+                        <div class="input-group p-2 bg-white rounded-pill shadow-lg">
+                            <span class="input-group-text border-0 bg-transparent ps-4 text-muted">
+                                <i class="far fa-envelope"></i>
+                            </span>
+                            <input type="email" class="form-control border-0 bg-transparent py-3 ps-2"
+                                placeholder="Enter your email address" required
+                                style="outline: none; box-shadow: none;">
+                            <button class="btn btn-dark rounded-pill px-5 fw-bold" type="submit"
+                                style="transition: all 0.3s ease;">Subscribe</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <!-- Footer -->
+    <th:block th:replace="fragments/footer :: footer"></th:block>
+
+
+</body>
+
+</html>

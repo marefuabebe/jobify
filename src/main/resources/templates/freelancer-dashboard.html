@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org/"
+    xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Freelancer Dashboard | Jobify</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" rel="stylesheet" />
+    <link th:href="@{/webjars/font-awesome/css/all.min.css}" rel="stylesheet" />
+    <link th:href="@{/css/styles.css}" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            /* Global Blue Theme - Matching requested color #3B5998 */
+            --primary: #3B5998;
+            --primary-light: rgba(59, 89, 152, 0.1);
+            --primary-dark: #2d4373;
+            --dark: #1A1A2E;
+            --light: #F0F8FF;
+            --gray: #6C757D;
+            --border: #E0E0E0;
+            --radius: 8px;
+            --transition: all 0.3s ease;
+
+            --glass-bg: rgba(255, 255, 255, 0.9);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        .dashboard-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 1.5rem;
+            align-items: start;
+        }
+
+        @media (max-width: 992px) {
+            .dashboard-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .sticky-sidebar {
+                position: static !important;
+                margin-bottom: 2rem;
+                z-index: 1;
+            }
+        }
+
+        /* Sidebar Styles */
+        .sticky-sidebar {
+            position: sticky;
+            top: 100px;
+            z-index: 10;
+        }
+
+        .filter-card {
+            background: white;
+            border-radius: 1.25rem;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            padding: 1.25rem;
+        }
+
+        .filter-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--dark);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.75rem;
+            display: block;
+        }
+
+        .form-check {
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-check-input {
+            width: 1rem;
+            height: 1rem;
+            cursor: pointer;
+            margin: 0;
+        }
+
+        .form-check-label {
+            font-size: 0.85rem;
+            color: #4b5563;
+            cursor: pointer;
+            line-height: 1.2;
+            font-weight: 500;
+        }
+
+        .form-check-input:checked {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        /* Stats Cards */
+        .stat-card-premium {
+            background: white;
+            padding: 1rem 1.25rem;
+            border-radius: 1.25rem;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            height: 100%;
+        }
+
+        .stat-card-premium:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .icon-proposals {
+            background: #e0f2fe;
+            color: var(--primary);
+        }
+
+        .icon-projects {
+            background: #f0fdf4;
+            color: #22c55e;
+        }
+
+        .icon-saved {
+            background: #fef2f2;
+            color: #ef4444;
+        }
+
+        .icon-messages {
+            background: #fdf4ff;
+            color: #a855f7;
+        }
+
+        /* Job List & Cards - Exactly like Find Work Page */
+        .job-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: grid;
+            gap: 20px;
+        }
+
+        .job-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 18px;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.5s ease-out forwards;
+            cursor: pointer;
+        }
+
+        .job-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+            border-color: var(--primary);
+        }
+
+        .job-card:hover .job-title {
+            color: var(--primary);
+        }
+
+        .job-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .job-main-info {
+            flex: 1;
+        }
+
+        .job-title-link {
+            text-decoration: none;
+            color: var(--dark);
+        }
+
+        .job-card .job-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin: 0 0 6px 0;
+            color: var(--dark);
+            transition: color 0.3s ease;
+        }
+
+        .job-card:hover .job-title {
+            color: var(--primary);
+        }
+
+        .job-client-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .client-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            object-fit: cover;
+            background: #f0f0f0;
+        }
+
+        .client-name {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .client-meta {
+            font-size: 11px;
+            color: var(--gray);
+        }
+
+        .job-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .job-tag {
+            padding: 3px 10px;
+            background: #F1F3F5;
+            color: #495057;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .job-tag.primary {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .job-description-short {
+            font-size: 13px;
+            color: var(--gray);
+            margin-bottom: 12px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.6;
+        }
+
+        .job-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 12px;
+            border-top: 1px solid #F1F3F5;
+            margin-top: auto;
+        }
+
+        .job-stats {
+            display: flex;
+            gap: 16px;
+        }
+
+        .job-stat {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .stat-icon-label {
+            font-size: 11px;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value-bold {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .job-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-job {
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-apply {
+            background: var(--primary);
+            color: white;
+            border: 1px solid var(--primary);
+        }
+
+        .btn-apply:hover {
+            background: var(--primary-dark);
+            box-shadow: 0 4px 12px rgba(59, 89, 152, 0.2);
+            color: white;
+        }
+
+        .btn-outline-primary {
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            background: transparent;
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .btn-message {
+            border: 1px solid var(--border);
+            color: var(--gray);
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .btn-message:hover {
+            background: #F8F9FA;
+            color: var(--dark);
+            border-color: var(--gray);
+        }
+
+        .search-hero {
+            background: linear-gradient(135deg, #1A1A2E 0%, #16213E 100%);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .search-hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(0, 180, 216, 0.2) 0%, transparent 70%);
+            z-index: 0;
+        }
+    </style>
+</head>
+
+<body class="bg-light d-flex flex-column min-vh-100">
+
+    <!-- Header -->
+    <th:block th:replace="fragments/freelancer-header :: freelancerHeader('dashboard')"></th:block>
+
+    <div class="container py-4 flex-grow-1">
+
+        <!-- Search Hero Section -->
+        <div class="search-hero animate-up shadow-lg">
+            <div class="position-relative z-1 mb-4">
+                <h1 class="fw-bold mb-2">Welcome back, <span class="text-primary"
+                        th:text="${user.firstName}">Freelancer</span>!</h1>
+                <p class="opacity-75 mb-0">Discover top-rated opportunities tailored to your skills.</p>
+            </div>
+
+            <form id="filterForm" th:action="@{/freelancer-dashboard/}" method="get"
+                class="row g-2 position-relative z-1">
+                <div class="col-md-5">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-0"><i class="fas fa-search text-muted"></i></span>
+                        <input type="text" id="job" name="job" class="form-control border-0 py-3"
+                            placeholder="Job title or keywords..." th:value="${job}">
+                    </div>
+                </div>
+                <div class="col-md-5">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-0"><i
+                                class="fas fa-map-marker-alt text-muted"></i></span>
+                        <input type="text" id="loc" name="location" class="form-control border-0 py-3"
+                            placeholder="City or Country..." th:value="${location}">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100 py-3 fw-bold rounded-3">
+                        Find Work
+                    </button>
+                </div>
+
+                <!-- Hidden fields for other filters to persist during search -->
+                <input type="hidden" name="partTime" th:value="${partTime ? 'Part-Time' : ''}" th:if="${partTime}">
+                <input type="hidden" name="fullTime" th:value="${fullTime ? 'Full-Time' : ''}" th:if="${fullTime}">
+                <input type="hidden" name="freelance" th:value="${freelance ? 'Freelance' : ''}" th:if="${freelance}">
+                <input type="hidden" name="remoteOnly" th:value="${remoteOnly ? 'Remote-Only' : ''}"
+                    th:if="${remoteOnly}">
+                <input type="hidden" name="officeOnly" th:value="${officeOnly ? 'Office-Only' : ''}"
+                    th:if="${officeOnly}">
+                <input type="hidden" name="partialRemote" th:value="${partialRemote ? 'Partial-Remote' : ''}"
+                    th:if="${partialRemote}">
+                <input type="hidden" name="today" th:value="${today}" th:if="${today}">
+                <input type="hidden" name="days7" th:value="${days7}" th:if="${days7}">
+                <input type="hidden" name="days30" th:value="${days30}" th:if="${days30}">
+            </form>
+        </div>
+
+        <!-- Dashboard Body -->
+        <div class="dashboard-layout">
+
+            <!-- Sidebar: Filters -->
+            <aside class="sticky-sidebar animate-up">
+                <!-- Mobile Toggle Button -->
+                <button class="btn btn-white w-100 mb-3 d-lg-none shadow-sm fw-bold text-primary" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#filterCollapse" aria-expanded="false"
+                    aria-controls="filterCollapse">
+                    <i class="fas fa-sliders-h me-2"></i> Show/Hide Filters
+                </button>
+
+                <div class="collapse d-lg-block" id="filterCollapse">
+                    <div class="filter-card border-0">
+                        <div class="d-flex align-items-center gap-2 mb-4 pb-3 border-bottom border-light">
+                            <i class="fas fa-sliders-h text-primary fs-5"></i>
+                            <h5 class="fw-800 text-dark mb-0" style="letter-spacing: -0.5px;">Refine Results</h5>
+                        </div>
+
+                        <form th:action="@{/freelancer-dashboard/}" method="get" id="advancedFilterForm">
+                            <!-- Employment Type -->
+                            <div class="mb-4">
+                                <span class="filter-title">Employment Type</span>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" name="partTime"
+                                        th:checked="${partTime}" value="Part-Time" id="f_partTime"
+                                        onchange="this.form.submit()">
+                                    <label class="form-check-label" for="f_partTime text-truncate">Part-Time</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" name="fullTime"
+                                        th:checked="${fullTime}" value="Full-Time" id="f_fullTime"
+                                        onchange="this.form.submit()">
+                                    <label class="form-check-label" for="f_fullTime text-truncate">Full-Time</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="freelance"
+                                        th:checked="${freelance}" value="Freelance" id="f_freelance"
+                                        onchange="this.form.submit()">
+                                    <label class="form-check-label" for="f_freelance text-truncate">Freelance</label>
+                                </div>
+                            </div>
+
+                            <!-- Work Mode -->
+                            <div class="mb-4">
+                                <span class="filter-title">Work Mode</span>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" name="remoteOnly"
+                                        th:checked="${remoteOnly}" value="Remote-Only" id="f_remote"
+                                        onchange="this.form.submit()">
+                                    <label class="form-check-label" for="f_remote">Remote Only</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" name="officeOnly"
+                                        th:checked="${officeOnly}" value="Office-Only" id="f_office"
+                                        onchange="this.form.submit()">
+                                    <label class="form-check-label" for="f_office">Office Only</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="partialRemote"
+                                        th:checked="${partialRemote}" value="Partial-Remote" id="f_partial"
+                                        onchange="this.form.submit()">
+                                    <label class="form-check-label" for="f_partial">Partial Remote</label>
+                                </div>
+                            </div>
+
+                            <!-- Time Posted -->
+                            <div>
+                                <span class="filter-title">Time Posted</span>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" name="today" th:checked="${today}"
+                                        id="f_today" onchange="this.form.submit()">
+                                    <label class="form-check-label" for="f_today">Today</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" name="days7" th:checked="${days7}"
+                                        id="f_days7" onchange="this.form.submit()">
+                                    <label class="form-check-label" for="f_days7">Last 7 Days</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="days30" th:checked="${days30}"
+                                        id="f_days30" onchange="this.form.submit()">
+                                    <label class="form-check-label" for="f_days30">Last 30 Days</label>
+                                </div>
+                            </div>
+
+                            <!-- Maintain search terms -->
+                            <input type="hidden" name="job" th:value="${job}">
+                            <input type="hidden" name="location" th:value="${location}">
+                        </form>
+
+                        <a th:href="@{/freelancer-dashboard/}"
+                            class="btn btn-link btn-sm text-decoration-none text-muted w-100 mt-4">
+                            <i class="fas fa-undo me-1"></i>Reset Filters
+                        </a>
+
+                        <!-- Verification Promo relocated inside sidebar -->
+                        <div class="card mt-4 border-0 rounded-4 bg-primary text-white p-4 shadow-sm"
+                            th:if="${!isVerified}">
+                            <h6 class="fw-bold mb-2"><i class="fas fa-shield-check me-2"></i>Get Verified</h6>
+                            <p class="small opacity-75 mb-3">Boost your trust and apply for premium projects.</p>
+                            <a th:href="@{/job-seeker-profile/}"
+                                class="btn btn-light btn-sm w-100 fw-bold border-0 text-primary">
+                                Verify Identity
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Stream -->
+            <div>
+                <!-- Stats Row -->
+                <div class="row g-3 mb-4 animate-up delay-100 align-items-stretch">
+                    <div class="col-lg-3 col-6 d-flex">
+                        <div class="stat-card-premium flex-fill">
+                            <div class="stat-icon icon-proposals"><i class="fas fa-file-invoice"></i></div>
+                            <div>
+                                <h4 class="fw-bold mb-0" th:text="${appliedJobs != null ? appliedJobs.size() : 0}">0
+                                </h4>
+                                <span class="text-muted small fw-medium">Proposals</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-6 d-flex">
+                        <div class="stat-card-premium flex-fill">
+                            <div class="stat-icon icon-projects"><i class="fas fa-briefcase"></i></div>
+                            <div>
+                                <h4 class="fw-bold mb-0"
+                                    th:text="${ongoingProjects != null ? ongoingProjects.size() : 0}">0</h4>
+                                <span class="text-muted small fw-medium">Active Works</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-6 d-flex">
+                        <div class="stat-card-premium flex-fill">
+                            <div class="stat-icon icon-saved"><i class="fas fa-bookmark"></i></div>
+                            <div>
+                                <h4 class="fw-bold mb-0" th:text="${savedJobs != null ? savedJobs.size() : 0}">0</h4>
+                                <span class="text-muted small fw-medium">Saved</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-6 d-flex">
+                        <div class="stat-card-premium flex-fill">
+                            <div class="stat-icon icon-messages"><i class="fas fa-comment-dots"></i></div>
+                            <div>
+                                <h4 class="fw-bold mb-0" id="dashMsgCount"
+                                    th:text="${unreadMessagesCount != null ? unreadMessagesCount : 0}">0</h4>
+                                <span class="text-muted small fw-medium">Unread</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Available Jobs Feed -->
+                <div class="d-flex justify-content-between align-items-center mb-4 animate-up delay-200">
+                    <h4 class="fw-bold text-dark mb-0">Recommended for You</h4>
+                    <span class="text-muted small fw-medium" th:text="${jobPost.size() + ' jobs found'}">0 jobs
+                        found</span>
+                </div>
+
+                <div class="job-list animate-up delay-300">
+
+                    <!-- Empty State -->
+                    <div th:if="${jobPost == null or jobPost.isEmpty()}"
+                        class="bg-white rounded-5 p-5 text-center shadow-sm">
+                        <div class="bg-light d-inline-flex p-4 rounded-circle mb-4">
+                            <i class="fas fa-search-minus fa-3x text-muted opacity-50"></i>
+                        </div>
+                        <h4 class="fw-bold">No results found</h4>
+                        <p class="text-muted">Try adjusting your filters or search keywords.</p>
+                        <a th:href="@{/freelancer-dashboard/}"
+                            class="btn btn-outline-primary px-4 rounded-pill btn-sm fw-bold">Reset All</a>
+                    </div>
+
+                    <!-- Job Cards Loop - Identical to Find Work Page -->
+                    <div th:each="job : ${jobPost}" class="job-card">
+                        <!-- Job Header -->
+                        <div class="job-card-header">
+                            <div class="job-main-info">
+                                <a th:href="@{/job-details-apply/{id}(id=${job.jobPostId})}" class="job-title-link">
+                                    <h3 class="job-title" th:text="${job.jobTitle}">Job Title</h3>
+                                </a>
+                                <div class="job-client-info">
+                                    <img th:src="${job.recruiterProfilePhoto != null ? job.recruiterProfilePhoto : 'https://ui-avatars.com/api/?name=' + (job.recruiterFirstName != null ? job.recruiterFirstName : 'Client') + '&background=random'}"
+                                        class="client-avatar border shadow-sm">
+                                    <div class="client-details">
+                                        <div class="client-name">
+                                            <span
+                                                th:text="${job.recruiterFirstName != null ? job.recruiterFirstName + ' ' + (job.recruiterLastName != null ? job.recruiterLastName : '') : 'Anonymous Client'}">Client
+                                                Name</span>
+                                            <i th:if="${job.postedByVerified}" class="fas fa-check-circle text-primary"
+                                                title="Verified Client"></i>
+                                        </div>
+                                        <div class="client-meta">
+                                            <span
+                                                th:if="${job.recruiterCompany != null and !job.recruiterCompany.isEmpty()}"
+                                                th:text="${job.recruiterCompany + ' • '}">Company • </span>
+                                            <span
+                                                th:text="${job.recruiterCity != null ? job.recruiterCity + ', ' + job.recruiterCountry : 'Remote'}">City,
+                                                Country</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Job Tags -->
+                        <div class="job-tags">
+                            <span class="job-tag primary" th:text="${job.jobType}">Fixed-Price</span>
+                            <span class="job-tag"
+                                th:text="${job.projectType != null ? job.projectType : 'Project'}">Hourly</span>
+                            <span class="job-tag" th:text="${job.remote}">Remote</span>
+                        </div>
+
+                        <!-- Job Description -->
+                        <div class="job-description-short" th:utext="${job.descriptionOfJob}">
+                            Job description goes here...
+                        </div>
+
+                        <!-- Job Footer with Stats -->
+                        <div class="job-footer">
+                            <div class="job-stats">
+                                <div class="job-stat">
+                                    <span class="stat-icon-label">Budget</span>
+                                    <span class="stat-value-bold" th:text="${job.salary}">$500 - $1000</span>
+                                </div>
+                                <div class="job-stat">
+                                    <span class="stat-icon-label">Duration</span>
+                                    <span class="stat-value-bold"
+                                        th:text="${job.projectDuration != null ? job.projectDuration : 'TBD'}">3
+                                        months</span>
+                                </div>
+                            </div>
+
+                            <div class="job-actions">
+                                <a th:href="@{/job-details-apply/{id}(id=${job.jobPostId})}"
+                                    class="btn-job btn-outline-primary btn-sm fw-bold">View Details</a>
+                                <a th:if="${!job.isActive}" th:href="@{/job-details-apply/{id}(id=${job.jobPostId})}"
+                                    class="btn-job btn-apply btn-sm fw-bold">Apply Now</a>
+                                <a th:if="${job.isActive}" th:href="@{/chat/(userId=${job.postedById.userId})}"
+                                    class="btn-job btn-message btn-sm fw-bold">
+                                    <i class="fas fa-comment"></i> Messages
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Browse All CTA -->
+                <div class="browse-all-section text-center mt-4 mb-5 pb-4">
+                    <div class="p-4 bg-white rounded-5 shadow-sm border border-light animate-up delay-400">
+                        <div class="bg-primary-subtle d-inline-flex p-2 rounded-circle mb-3">
+                            <i class="fas fa-rocket fa-lg text-primary"></i>
+                        </div>
+                        <h5 class="fw-bold text-dark mb-1">Looking for more?</h5>
+                        <p class="text-muted small mb-3 mx-auto" style="max-width: 400px;">
+                            Discover hundreds of new projects and premium opportunities tailored to your skills in our
+                            marketplace.
+                        </p>
+                        <a th:href="@{/find-work/}"
+                            class="btn btn-primary px-4 py-2 rounded-pill fw-bold shadow-sm d-inline-flex align-items-center gap-2 small">
+                            Explore Marketplace <i class="fas fa-arrow-right fa-sm"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Verification Success Modal -->
+    <div class="modal fade" id="verificationModal" tabindex="-1" th:if="${verificationSuccess}">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 rounded-4 shadow-lg p-3">
+                <div class="modal-body text-center py-5">
+                    <div class="bg-success-subtle text-success d-inline-flex p-4 rounded-circle mb-4">
+                        <i class="fas fa-check-circle fa-4x"></i>
+                    </div>
+                    <h3 class="fw-bold mb-3">Verification Submitted!</h3>
+                    <p class="text-muted">Your documents are under review. We'll notify you once your profile is
+                        verified.</p>
+                    <button type="button" class="btn btn-primary px-5 py-2 rounded-pill fw-bold mt-3"
+                        data-bs-dismiss="modal">Great!</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Toast for Messages -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-4" style="z-index: 1050">
+        <div id="liveToast" class="toast border-0 rounded-4 shadow-lg" role="alert">
+            <div class="toast-header border-0 bg-primary text-white p-3 rounded-top-4">
+                <i class="fas fa-comment-dots me-2"></i>
+                <strong class="me-auto" id="toastSender">New Message</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body p-3 bg-white rounded-bottom-4">
+                <div id="toastMessage" class="fw-medium text-dark mb-2">Message Preview Content...</div>
+                <a th:href="@{/chat/}" class="btn btn-primary btn-sm w-100 rounded-3">Open Chat</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <th:block th:replace="fragments/footer :: footer"></th:block>
+
+    <!-- Scripts -->
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $(document).ready(function () {
+            // Show verification success if needed
+            if ($('#verificationModal').length) {
+                const modal = new bootstrap.Modal(document.getElementById('verificationModal'));
+                modal.show();
+            }
+
+            // Sync search inputs across form and hero
+            $('#job').on('input', function () {
+                $('input[name="job"]').val($(this).val());
+            });
+            $('#loc').on('input', function () {
+                $('input[name="location"]').val($(this).val());
+            });
+
+            // WebSocket connection for live notifications
+            const currentUserId = /*[[${currentUser.userId}]]*/ null;
+            if (currentUserId) {
+                const socket = new SockJS('/ws');
+                const stompClient = Stomp.over(socket);
+                stompClient.debug = null;
+
+                stompClient.connect({}, function () {
+                    stompClient.subscribe('/topic/messages/' + currentUserId, function (message) {
+                        const msg = JSON.parse(message.body);
+
+                        // Update badge
+                        const countEl = $('#dashMsgCount');
+                        let count = parseInt(countEl.text()) || 0;
+                        countEl.text(count + 1);
+
+                        // Also update header badge if exists
+                        const headerBadge = $('#freelancerHeaderMessageBadge');
+                        if (headerBadge.length) {
+                            headerBadge.text(parseInt(headerBadge.text() || 0) + 1).show();
+                        }
+
+                        // Show Toast
+                        $('#toastSender').text(msg.senderId ? msg.senderId.email : 'Client');
+                        $('#toastMessage').text(msg.message);
+                        const toast = new bootstrap.Toast(document.getElementById('liveToast'));
+                        toast.show();
+                    });
+                });
+            }
+        });
+
+        // Show Profile Saved Success Message
+        var successMsg = /*[[${success}]]*/ null;
+        if (successMsg) {
+            Swal.fire({
+                title: 'Success!',
+                text: successMsg,
+                icon: 'success',
+                confirmButtonColor: '#3B5998'
+            });
+        }
+        /*]]>*/
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - Jobify</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+
+
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <th:block th:replace="fragments/public-header :: header('blog')"></th:block>
+
+    <!-- Header -->
+    <header class="blog-hero">
+        <div class="container">
+            <h1 class="animate-up">Our Blog</h1>
+            <p class="animate-up delay-100">Insights, tips, and stories for freelancers and businesses.</p>
+        </div>
+    </header>
+
+    <!-- Content -->
+    <div class="container pb-5">
+
+        <!-- Search & Filter -->
+        <div class="row mb-5 justify-content-center">
+            <div class="col-lg-8 animate-up delay-200">
+                <div class="input-group input-group-lg shadow-sm rounded-pill overflow-hidden border bg-white">
+                    <span class="input-group-text bg-white border-0 ps-4"><i
+                            class="fas fa-search text-muted"></i></span>
+                    <input type="text" class="form-control border-0" placeholder="Search articles, topics..."
+                        style="outline: none; box-shadow: none;">
+                    <button class="btn btn-primary px-4 fw-bold">Search</button>
+                </div>
+                <div class="text-center mt-3">
+                    <span class="text-muted small fw-bold me-2">POPULAR:</span>
+                    <a href="#" class="badge bg-light text-dark text-decoration-none border me-1">Freelancing</a>
+                    <a href="#" class="badge bg-light text-dark text-decoration-none border me-1">Career Growth</a>
+                    <a href="#" class="badge bg-light text-dark text-decoration-none border me-1">Remote Work</a>
+                    <a href="#" class="badge bg-light text-dark text-decoration-none border">Technology</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Featured Article -->
+        <div class="card border-0 shadow-lg rounded-3 overflow-hidden mb-5 reveal">
+            <div class="row g-0">
+                <div class="col-lg-6">
+                    <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+                        class="img-fluid h-100 object-fit-cover" alt="Featured">
+                </div>
+                <div class="col-lg-6 d-flex align-items-center">
+                    <div class="p-5">
+                        <span class="category-badge">Featured Story</span>
+                        <h2 class="display-6 fw-bold mb-3">The Future of Work: AI and the Gig Economy</h2>
+                        <p class="lead text-muted mb-4">Artificial Intelligence isn't replacing freelancers—it's
+                            empowering them. Discover how top professionals are leveraging AI tools to double their
+                            productivity.</p>
+                        <div class="d-flex align-items-center mb-4">
+                            <img src="https://randomuser.me/api/portraits/women/44.jpg" class="rounded-circle me-3"
+                                width="48" alt="Author">
+                            <div>
+                                <h6 class="mb-0 fw-bold">Sarah Jenkins</h6>
+                                <small class="text-muted">Jan 12, 2026 · 8 min read</small>
+                            </div>
+                        </div>
+                        <a href="/info/blog/article" class="btn btn-outline-primary rounded-pill px-4">Read Article</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Article Grid -->
+        <h3 class="fw-bold mb-4 border-start border-4 border-primary ps-3 reveal">Latest Insights</h3>
+        <div class="row g-4 mb-5">
+
+            <!-- Article 1 -->
+            <div class="col-lg-4 col-md-6 reveal delay-100">
+                <div class="blog-card h-100 d-flex flex-column">
+                    <div class="position-relative">
+                        <img src="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+                            class="card-img-top" alt="Laptop">
+                        <span
+                            class="position-absolute top-0 end-0 m-3 badge bg-white text-dark shadow-sm">Freelancing</span>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <h3 class="card-title h4">Top 10 High-Paying Skills in 2026</h3>
+                        <p class="card-text flex-grow-1">Discover which tech and creative skills are in highest demand
+                            this year and
+                            how you can master them.</p>
+                        <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+                            <div class="d-flex align-items-center">
+                                <small class="text-muted fw-bold">Jan 5, 2026</small>
+                            </div>
+                            <a href="/info/blog/article" class="read-more-btn">Read More <i
+                                    class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Article 2 -->
+            <div class="col-lg-4 col-md-6 reveal delay-200">
+                <div class="blog-card h-100 d-flex flex-column">
+                    <div class="position-relative">
+                        <img src="https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+                            class="card-img-top" alt="Team">
+                        <span
+                            class="position-absolute top-0 end-0 m-3 badge bg-white text-dark shadow-sm">Clients</span>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <h3 class="card-title h4">How to Hire the Perfect Developer</h3>
+                        <p class="card-text flex-grow-1">A step-by-step guide for startups to identify, interview, and
+                            onboard
+                            top-tier remote talent.</p>
+                        <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+                            <div class="d-flex align-items-center">
+                                <small class="text-muted fw-bold">Jan 2, 2026</small>
+                            </div>
+                            <a href="/info/blog/article" class="read-more-btn">Read More <i
+                                    class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Article 3 -->
+            <div class="col-lg-4 col-md-6 reveal delay-300">
+                <div class="blog-card h-100 d-flex flex-column">
+                    <div class="position-relative">
+                        <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+                            class="card-img-top" alt="Remote">
+                        <span
+                            class="position-absolute top-0 end-0 m-3 badge bg-white text-dark shadow-sm">Productivity</span>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <h3 class="card-title h4">Mastering Remote Work Life Balance</h3>
+                        <p class="card-text flex-grow-1">Tips and strategies to stay productive while working from home
+                            without
+                            burning out.</p>
+                        <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+                            <div class="d-flex align-items-center">
+                                <small class="text-muted fw-bold">Dec 28, 2025</small>
+                            </div>
+                            <a href="/info/blog/article" class="read-more-btn">Read More <i
+                                    class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Article 4 -->
+            <div class="col-lg-4 col-md-6 reveal delay-100">
+                <div class="blog-card h-100 d-flex flex-column">
+                    <div class="position-relative">
+                        <img src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+                            class="card-img-top" alt="Success">
+                        <span
+                            class="position-absolute top-0 end-0 m-3 badge bg-white text-dark shadow-sm">Success</span>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <h3 class="card-title h4">From $0 to $10k/Month on Jobify</h3>
+                        <p class="card-text flex-grow-1">Read how Sarah transformed her graphic design side hustle into
+                            a full-time
+                            verified agency.</p>
+                        <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+                            <div class="d-flex align-items-center">
+                                <small class="text-muted fw-bold">Dec 15, 2025</small>
+                            </div>
+                            <a href="/info/blog/article" class="read-more-btn">Read More <i
+                                    class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Article 5 -->
+            <div class="col-lg-4 col-md-6 reveal delay-200">
+                <div class="blog-card h-100 d-flex flex-column">
+                    <div class="position-relative">
+                        <img src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+                            class="card-img-top" alt="Security">
+                        <span class="position-absolute top-0 end-0 m-3 badge bg-white text-dark shadow-sm">Update</span>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <h3 class="card-title h4">Introducing Secure Escrow Payments</h3>
+                        <p class="card-text flex-grow-1">We've upgraded our payment protection system to ensure peace of
+                            mind for
+                            both clients and freelancers.</p>
+                        <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+                            <div class="d-flex align-items-center">
+                                <small class="text-muted fw-bold">Dec 10, 2025</small>
+                            </div>
+                            <a href="/info/blog/article" class="read-more-btn">Read More <i
+                                    class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Article 6 -->
+            <div class="col-lg-4 col-md-6 reveal delay-300">
+                <div class="blog-card h-100 d-flex flex-column">
+                    <div class="position-relative">
+                        <img src="https://images.unsplash.com/photo-1531403009284-440f080d1e12?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+                            class="card-img-top" alt="Career">
+                        <span class="position-absolute top-0 end-0 m-3 badge bg-white text-dark shadow-sm">Career</span>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <h3 class="card-title h4">Why Soft Skills Matter More Than Ever</h3>
+                        <p class="card-text flex-grow-1">Technical skills get you the job, but communication and
+                            reliability keep
+                            the clients coming back.</p>
+                        <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+                            <div class="d-flex align-items-center">
+                                <small class="text-muted fw-bold">Nov 22, 2025</small>
+                            </div>
+                            <a href="/info/blog/article" class="read-more-btn">Read More <i
+                                    class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Newsletter Section (Standardized Blue Theme) -->
+    <section class="newsletter-section py-5 position-relative overflow-hidden reveal"
+        style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);">
+
+        <div class="position-absolute top-0 start-0 w-100 h-100" style="opacity: 0.1;">
+            <div class="position-absolute top-0 start-0 translate-middle rounded-circle bg-white"
+                style="width: 300px; height: 300px; filter: blur(50px);"></div>
+            <div class="position-absolute bottom-0 end-0 translate-middle rounded-circle bg-white"
+                style="width: 400px; height: 400px; filter: blur(60px);"></div>
+        </div>
+
+        <div class="container position-relative z-1">
+            <div class="row justify-content-center align-items-center">
+                <div class="col-lg-8 text-center">
+                    <div class="icon-wrapper mb-4 d-inline-flex align-items-center justify-content-center bg-white rounded-circle shadow-lg"
+                        style="width: 80px; height: 80px; animation: float 3s ease-in-out infinite;">
+                        <i class="fas fa-paper-plane fa-2x text-primary"></i>
+                    </div>
+                    <h2 class="display-6 fw-bold text-white mb-3">Join Our Journey</h2>
+                    <p class="text-white-50 mb-5 fs-5">Get the latest career advice, platform updates, and success
+                        stories delivered directly to your inbox.</p>
+
+                    <form action="#" class="newsletter-form w-100 mx-auto" style="max-width: 600px;">
+                        <div class="input-group p-2 bg-white rounded-pill shadow-lg">
+                            <span class="input-group-text border-0 bg-transparent ps-4 text-muted">
+                                <i class="far fa-envelope"></i>
+                            </span>
+                            <input type="email" class="form-control border-0 bg-transparent py-3 ps-2"
+                                placeholder="Enter your email address" required
+                                style="outline: none; box-shadow: none;">
+                            <button class="btn btn-dark rounded-pill px-5 fw-bold" type="submit"
+                                style="transition: all 0.3s ease;">Subscribe</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer-upwork bg-dark text-white pt-5 pb-3">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <a href="/" class="footer-logo text-white text-decoration-none h4 fw-bold mb-3 d-block">Jobify</a>
+                    <p class="text-white-50">Transforming how businesses and freelancers connect. Join our professional
+                        community to find the perfect match for your career or business needs.</p>
+                    <div class="social-links mt-4">
+                        <a href="#" class="text-white me-3"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-white me-3"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" class="text-white me-3"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-white"><i class="fab fa-facebook-f"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h5 class="text-white mb-3">Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="/find-work/" class="text-white-50 text-decoration-none">Browse
+                                Jobs</a></li>
+                        <li class="mb-2"><a href="/register" class="text-white-50 text-decoration-none">Sign Up</a></li>
+                        <li class="mb-2"><a href="/login" class="text-white-50 text-decoration-none">Log In</a></li>
+                        <li class="mb-2"><a href="/info/terms" class="text-white-50 text-decoration-none">Terms of
+                                Service</a></li>
+                        <li class="mb-2"><a href="/info/privacy" class="text-white-50 text-decoration-none">Privacy
+                                Policy</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h5 class="text-white mb-3">Resources</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="/info/about" class="text-white-50 text-decoration-none">About Us</a>
+                        </li>
+                        <li class="mb-2"><a href="/info/blog" class="text-white-50 text-decoration-none">Blog</a></li>
+                        <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Help Center</a></li>
+                        <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Careers</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h5 class="text-white mb-3">Contact</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="mailto:support@jobify.com"
+                                class="text-white-50 text-decoration-none"><i class="fas fa-envelope me-2"></i>
+                                support@jobify.com</a></li>
+                        <li class="mb-2"><a href="tel:+15551234567" class="text-white-50 text-decoration-none"><i
+                                    class="fas fa-phone me-2"></i> +1 (555) 123-4567</a></li>
+                        <li class="mb-2"><span class="text-white-50"><i class="fas fa-map-marker-alt me-2"></i> San
+                                Francisco, CA</span></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-top border-secondary pt-3 mt-4 text-center">
+                <p class="text-white-50 mb-0">&copy; 2024 Jobify. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.1
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            const revealElements = document.querySelectorAll('.reveal');
+            revealElements.forEach(el => observer.observe(el));
+
+            // Trigger initial animations
+            setTimeout(() => {
+                document.querySelectorAll('.animate-up').forEach((el, index) => {
+                    // Ensure animate-up elements run even if not observed or slightly off screen
+                });
+            }, 100);
+        });
+    </script>
+</body>
+
+</html>

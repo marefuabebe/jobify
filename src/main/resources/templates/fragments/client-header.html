@@ -1,0 +1,826 @@
+<th:block th:fragment="clientHeader(activePage)">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+            /* Header specific styles extracted from add-jobs.html */
+            .navbar {
+                background: #1A1A2E;
+                padding: 12px 0;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+                position: sticky;
+                top: 0;
+                z-index: 1060;
+                font-family: 'Inter', sans-serif;
+                -webkit-font-smoothing: antialiased;
+            }
+
+            .navbar-brand {
+                color: white !important;
+                font-weight: 700;
+                font-size: 24px;
+                text-decoration: none;
+                padding-left: 0;
+                margin-right: 20px;
+            }
+
+            .navbar .navbar-nav .nav-link {
+                color: rgba(255, 255, 255, 0.9) !important;
+                padding: 8px 12px;
+                font-size: 13px;
+                font-weight: 500;
+                border-radius: 6px;
+                transition: all 0.3s ease;
+                white-space: nowrap;
+            }
+
+            .navbar-nav .nav-link:hover {
+                background: rgba(255, 255, 255, 0.1);
+                color: white !important;
+            }
+
+            .navbar-nav .nav-link.active {
+                background: rgba(255, 255, 255, 0.15);
+                color: white !important;
+            }
+
+            .user-avatar {
+                width: 36px;
+                height: 36px;
+                object-fit: cover;
+                border: 2px solid rgba(255, 255, 255, 0.3);
+                transition: all 0.3s ease;
+            }
+
+            .user-name {
+                color: white !important;
+                font-weight: 500;
+                font-size: 13px;
+                line-height: 1.2;
+            }
+
+            .verified-badge {
+                color: #28A745;
+                background: rgba(40, 167, 69, 0.1);
+                padding: 2px 6px;
+                border-radius: 10px;
+                font-size: 11px;
+                font-weight: 600;
+            }
+
+            .unverified-badge {
+                color: #FFC107;
+                background: rgba(255, 193, 7, 0.1);
+                padding: 2px 6px;
+                border-radius: 10px;
+                font-size: 11px;
+                font-weight: 600;
+            }
+
+            /* Mobile Menu Polish - Sidebar Drawer */
+            @media (max-width: 991.98px) {
+                .navbar-collapse {
+                    position: fixed;
+                    top: 0;
+                    left: -280px;
+                    /* Start off-screen */
+                    width: 280px;
+                    height: 100vh;
+                    background: #1A1A2E;
+                    margin-top: 0;
+                    padding: 0;
+                    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+                    display: block !important;
+                    /* Always block, controlled by transform */
+                    visibility: hidden;
+                    z-index: 1050;
+                    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
+                    overflow-y: auto;
+                }
+
+                .navbar-collapse.show {
+                    left: 0;
+                    visibility: visible;
+                }
+
+                /* Main navigation items */
+                .navbar-nav {
+                    padding: 10px 0;
+                }
+
+                .navbar-collapse .nav-link {
+                    padding: 12px 24px !important;
+                    border-bottom: none !important;
+                    display: flex !important;
+                    align-items: center;
+                    gap: 15px;
+                    font-size: 14px !important;
+                    color: rgba(255, 255, 255, 0.7) !important;
+                }
+
+                .navbar-collapse .nav-link i {
+                    width: 20px;
+                    text-align: center;
+                    opacity: 0.8;
+                    font-size: 16px;
+                }
+
+                .navbar-collapse .nav-link:hover,
+                .navbar-collapse .nav-link.active {
+                    background: rgba(255, 255, 255, 0.05) !important;
+                    color: white !important;
+                    padding-left: 24px !important;
+                }
+
+                .navbar-collapse .nav-link.active {
+                    border-left: 4px solid #0d6efd;
+                    background: rgba(13, 110, 253, 0.1) !important;
+                }
+
+                /* Mobile User Info Greeting */
+                .user-info-mobile {
+                    padding: 40px 24px 20px 24px;
+                    background: rgba(255, 255, 255, 0.03);
+                    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+                    margin-bottom: 15px;
+                }
+
+                .user-info-mobile .user-avatar {
+                    width: 64px !important;
+                    height: 64px !important;
+                    border: 3px solid rgba(255, 255, 255, 0.1);
+                }
+
+                /* Backdrop Overlay */
+                .navbar-backdrop {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100vw;
+                    height: 100vh;
+                    background: rgba(0, 0, 0, 0.6);
+                    backdrop-filter: blur(4px);
+                    z-index: 1040;
+                    display: none;
+                    opacity: 0;
+                    transition: opacity 0.3s ease;
+                }
+
+                .navbar-backdrop.show {
+                    display: block;
+                    opacity: 1;
+                }
+            }
+
+            /* Hover functionality for dropdowns */
+            @media (min-width: 992px) {
+                .navbar-nav .dropdown:hover .dropdown-menu {
+                    display: block;
+                    margin-top: 0;
+                    animation: fadeInUp 0.3s;
+                }
+            }
+
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translate3d(0, 10px, 0);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translate3d(0, 0, 0);
+                }
+            }
+        </style>
+
+        <div class="container-fluid" style="padding-left: 0.25rem; padding-right: 0.25rem;">
+            <a class="navbar-brand d-flex align-items-center"
+                style="font-size: 1.25rem; margin-right: 1.5rem; padding-left: 0;" th:href="@{/client-dashboard/}">
+                Job<span style="color: #0d6efd;">ify</span>.
+            </a>
+
+            <!-- Mobile: Profile Avatar & Info (Visible on Mobile) -->
+            <div class="d-flex align-items-center d-lg-none ms-auto me-3" th:if="${user != null}">
+                <!-- Notification Bell (Mobile) -->
+                <ul class="navbar-nav flex-row me-3">
+                    <th:block th:replace="fragments/notification-dropdown :: notificationDropdown"></th:block>
+                </ul>
+
+                <!-- Profile Dropdown (Mobile) -->
+                <div class="dropdown d-flex align-items-center">
+                    <div class="me-2 text-end" style="line-height: 1.1;">
+                        <div class="text-white fw-bold" style="font-size: 13px;"
+                            th:text="${(user.firstName ?: '') + ' ' + (user.lastName ?: '')}">User Name</div>
+                        <div class="d-flex justify-content-end align-items-center">
+                            <span th:if="${user.isVerified}" class="badge bg-success-soft text-success p-0"
+                                style="font-size: 10px;">
+                                <i class="fas fa-check-circle me-1"></i>Verified
+                            </span>
+                            <span th:unless="${user.isVerified}" class="badge bg-warning-soft text-warning p-0"
+                                style="font-size: 10px;">
+                                <i class="fas fa-exclamation-circle me-1"></i>Unverified
+                            </span>
+                        </div>
+                    </div>
+                    <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"
+                        class="text-decoration-none">
+                        <img th:if="${user.photosImagePath != null}" th:src="@{${user.photosImagePath}}"
+                            class="user-avatar rounded-circle" style="border: 2px solid rgba(255,255,255,0.2);"
+                            alt="Profile" />
+                        <div th:unless="${user.photosImagePath != null}"
+                            class="user-avatar rounded-circle d-flex align-items-center justify-content-center bg-secondary text-white"
+                            style="font-size: 14px; border: 2px solid rgba(255,255,255,0.2);">
+                            <span
+                                th:text="${user.firstName != null ? #strings.substring(user.firstName, 0, 1) : 'U'}">U</span>
+                        </div>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0"
+                        style="background: #1A1A2E; margin-top: 10px;">
+                        <li><a class="dropdown-item text-white" th:href="@{/recruiter-profile/}"><i
+                                    class="fas fa-user-circle me-2"></i> Profile</a></li>
+                        <li>
+                            <hr class="dropdown-divider bg-secondary opacity-25">
+                        </li>
+                        <li><a class="dropdown-item text-white" th:href="@{/logout}"><i
+                                    class="fas fa-sign-out-alt me-2 text-danger"></i> Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <button class="navbar-toggler border-0 shadow-none" type="button"
+                onclick="document.getElementById('navbarContent').classList.toggle('show'); document.getElementById('navbarBackdrop').classList.toggle('show');">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Sidebar Components -->
+            <div id="navbarBackdrop" class="navbar-backdrop"
+                onclick="document.getElementById('navbarContent').classList.remove('show'); this.classList.remove('show');">
+            </div>
+
+            <div class="collapse navbar-collapse" id="navbarContent">
+
+                <!-- Mobile User Info Greeting -->
+                <div class="d-lg-none user-info-mobile" th:if="${user != null}">
+                    <div class="d-flex align-items-center">
+                        <img th:if="${user.photosImagePath != null}" th:src="@{${user.photosImagePath}}"
+                            class="user-avatar rounded-circle me-3" alt="Profile" />
+                        <div th:unless="${user.photosImagePath != null}"
+                            class="user-avatar rounded-circle me-3 d-flex align-items-center justify-content-center bg-secondary text-white"
+                            style="font-size: 18px;">
+                            <span
+                                th:text="${user.firstName != null ? #strings.substring(user.firstName, 0, 1) : 'U'}">U</span>
+                        </div>
+                        <div>
+                            <div class="text-white fw-bold"
+                                th:text="${(user.firstName ?: '') + ' ' + (user.lastName ?: '')}">User Name</div>
+                            <div class="text-muted small" th:text="${user.userId.email}">email@example.com</div>
+                        </div>
+                    </div>
+                </div>
+
+                <ul class="navbar-nav mb-2 mb-lg-0" style="gap: 12px;">
+                    <li class="nav-item">
+                        <a class="nav-link" th:classappend="${activePage == 'dashboard' ? 'active' : ''}"
+                            th:href="@{/client-dashboard/}">
+                            <i class="fas fa-home fa-sm"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:classappend="${activePage == 'find-talent' ? 'active' : ''}"
+                            th:href="@{/find-talent/}">
+                            <i class="fas fa-search fa-sm"></i> Find Talent
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:classappend="${activePage == 'post-job' ? 'active' : ''}"
+                            th:href="@{/dashboard/add}">
+                            <i class="fas fa-plus-circle fa-sm"></i> Post Job
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:classappend="${activePage == 'jobs' ? 'active' : ''}"
+                            th:href="@{/client-dashboard/jobs}">
+                            <i class="fas fa-briefcase fa-sm"></i> My Jobs
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="workDropdown" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false"
+                            th:classappend="${activePage == 'proposals' or activePage == 'projects' ? 'active' : ''}">
+                            <i class="fas fa-briefcase fa-sm"></i> Work
+                        </a>
+                        <ul class="dropdown-menu shadow-lg border-0" aria-labelledby="workDropdown"
+                            style="background: #1A1A2E; margin-top: 10px;">
+                            <li>
+                                <a class="dropdown-item text-white d-flex justify-content-between align-items-center"
+                                    th:href="@{/client-dashboard/proposals}">
+                                    <span><i class="fas fa-file-alt me-2"></i> Proposals</span>
+                                    <span class="badge bg-danger rounded-pill ms-2"
+                                        th:if="${unseenProposals != null and unseenProposals > 0}"
+                                        th:text="${unseenProposals}">0</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item text-white d-flex justify-content-between align-items-center"
+                                    th:href="@{/client-dashboard/projects}">
+                                    <span><i class="fas fa-project-diagram me-2"></i> Projects</span>
+                                    <span class="badge bg-success rounded-pill ms-2"
+                                        th:if="${activeProjects != null and activeProjects > 0}"
+                                        th:text="${activeProjects}">0</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="financeDropdown" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false"
+                            th:classappend="${activePage == 'contracts' or activePage == 'payments' ? 'active' : ''}">
+                            <i class="fas fa-wallet fa-sm"></i> Financials
+                        </a>
+                        <ul class="dropdown-menu shadow-lg border-0" aria-labelledby="financeDropdown"
+                            style="background: #1A1A2E; margin-top: 10px;">
+                            <li>
+                                <a class="dropdown-item text-white" th:href="@{/contract/manage}">
+                                    <i class="fas fa-file-contract me-2"></i> Contracts
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item text-white" th:href="@{/client-dashboard/payments}">
+                                    <i class="fas fa-credit-card me-2"></i> Payments
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:classappend="${activePage == 'messages' ? 'active' : ''}"
+                            th:href="@{/chat/}">
+                            <i class="fas fa-comments fa-sm"></i> Messages
+                            <span id="messageBadge" class="badge bg-warning ms-1"
+                                th:style="${unreadMessagesCount != null and unreadMessagesCount > 0 ? '' : 'display: none;'}"
+                                th:text="${unreadMessagesCount}">0</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:classappend="${activePage == 'profile' ? 'active' : ''}"
+                            th:href="@{/recruiter-profile/}">
+                            <i class="fas fa-user-circle fa-sm"></i> Profile
+                        </a>
+                    </li>
+                </ul>
+
+                <!-- Desktop: User Profile (Hidden on Mobile) -->
+                <div class="d-none d-lg-flex align-items-center ms-3" th:if="${user != null}">
+                    <ul class="navbar-nav align-items-center">
+                        <!-- Notification Dropdown -->
+                        <th:block th:replace="fragments/notification-dropdown :: notificationDropdown"></th:block>
+                    </ul>
+
+                    <div class="dropdown ms-3">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center p-0" href="#" id="userDropdown"
+                            role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img th:if="${user.photosImagePath != null}" th:src="@{${user.photosImagePath}}"
+                                class="user-avatar rounded-circle me-2" alt="Profile" />
+                            <div th:unless="${user.photosImagePath != null}"
+                                class="user-avatar rounded-circle me-2 d-flex align-items-center justify-content-center bg-secondary text-white">
+                                <span
+                                    th:text="${user.firstName != null ? #strings.substring(user.firstName, 0, 1) : 'U'}">U</span>
+                            </div>
+
+                            <div class="user-info text-start">
+                                <span class="user-name"
+                                    th:text="${(user.firstName ?: '') + ' ' + (user.lastName ?: '')}">User
+                                    Name</span>
+                                <div class="user-status" style="margin-top: 2px;">
+                                    <span class="verified-badge" th:if="${user.isVerified}">
+                                        <i class="fas fa-check-circle me-1"></i>Verified
+                                    </span>
+                                    <span class="unverified-badge" th:unless="${user.isVerified}">
+                                        <i class="fas fa-exclamation-circle me-1"></i>Unverified
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0" aria-labelledby="userDropdown"
+                            style="background: #1A1A2E; margin-top: 15px;">
+                            <li><a class="dropdown-item text-white" th:href="@{/recruiter-profile/}"><i
+                                        class="fas fa-user-circle me-2"></i> Profile</a></li>
+                            <li>
+                                <hr class="dropdown-divider bg-secondary opacity-25">
+                            </li>
+                            <li><a class="dropdown-item text-white" th:href="@{/logout}"><i
+                                        class="fas fa-sign-out-alt me-2 text-danger"></i> Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <input type="hidden" id="currentUserId" th:if="${user != null}"
+            th:value="${user.userId != null ? user.userId.userId : (user.userAccountId != null ? user.userAccountId : '')}" />
+    </nav>
+    <!-- Scripts -->
+    <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
+    <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/webjars/sockjs-client/sockjs.min.js}"></script>
+    <script th:src="@{/webjars/stomp-websocket/stomp.min.js}"></script>
+    <script th:src="@{/js/notifications.js}"></script>
+</th:block>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+    /* Header specific styles extracted from add-jobs.html */
+    .navbar {
+        background: #1A1A2E;
+        padding: 12px 0;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        position: sticky;
+        top: 0;
+        z-index: 1060;
+        font-family: 'Inter', sans-serif;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    .navbar-brand {
+        color: white !important;
+        font-weight: 700;
+        font-size: 24px;
+        text-decoration: none;
+        padding-left: 0;
+        margin-right: 20px;
+    }
+
+    .navbar .navbar-nav .nav-link {
+        color: rgba(255, 255, 255, 0.9) !important;
+        padding: 8px 12px;
+        font-size: 13px;
+        font-weight: 500;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+        white-space: nowrap;
+    }
+
+    .navbar-nav .nav-link:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: white !important;
+    }
+
+    .navbar-nav .nav-link.active {
+        background: rgba(255, 255, 255, 0.15);
+        color: white !important;
+    }
+
+    .user-avatar {
+        width: 36px;
+        height: 36px;
+        object-fit: cover;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        transition: all 0.3s ease;
+    }
+
+    .user-name {
+        color: white !important;
+        font-weight: 500;
+        font-size: 13px;
+        line-height: 1.2;
+    }
+
+    .verified-badge {
+        color: #28A745;
+        background: rgba(40, 167, 69, 0.1);
+        padding: 2px 6px;
+        border-radius: 10px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    .unverified-badge {
+        color: #FFC107;
+        background: rgba(255, 193, 7, 0.1);
+        padding: 2px 6px;
+        border-radius: 10px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    /* Mobile Menu Polish - Sidebar Drawer */
+    @media (max-width: 991.98px) {
+        .navbar-collapse {
+            position: fixed;
+            top: 0;
+            left: -280px;
+            /* Start off-screen */
+            width: 280px;
+            height: 100vh;
+            background: #1A1A2E;
+            margin-top: 0;
+            padding: 0;
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            display: block !important;
+            /* Always block, controlled by transform */
+            visibility: hidden;
+            z-index: 1050;
+            box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
+            overflow-y: auto;
+        }
+
+        .navbar-collapse.show {
+            left: 0;
+            visibility: visible;
+        }
+
+        /* Main navigation items */
+        .navbar-nav {
+            padding: 10px 0;
+        }
+
+        .navbar-collapse .nav-link {
+            padding: 12px 24px !important;
+            border-bottom: none !important;
+            display: flex !important;
+            align-items: center;
+            gap: 15px;
+            font-size: 14px !important;
+            color: rgba(255, 255, 255, 0.7) !important;
+        }
+
+        .navbar-collapse .nav-link i {
+            width: 20px;
+            text-align: center;
+            opacity: 0.8;
+            font-size: 16px;
+        }
+
+        .navbar-collapse .nav-link:hover,
+        .navbar-collapse .nav-link.active {
+            background: rgba(255, 255, 255, 0.05) !important;
+            color: white !important;
+            padding-left: 24px !important;
+        }
+
+        .navbar-collapse .nav-link.active {
+            border-left: 4px solid #0d6efd;
+            background: rgba(13, 110, 253, 0.1) !important;
+        }
+
+        /* Mobile User Info Greeting */
+        .user-info-mobile {
+            padding: 40px 24px 20px 24px;
+            background: rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 15px;
+        }
+
+        .user-info-mobile .user-avatar {
+            width: 64px !important;
+            height: 64px !important;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Backdrop Overlay */
+        .navbar-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 1040;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .navbar-backdrop.show {
+            display: block;
+            opacity: 1;
+        }
+    }
+</style>
+
+<div class="container-fluid" style="padding-left: 0.25rem; padding-right: 0.25rem;">
+    <a class="navbar-brand d-flex align-items-center" style="font-size: 1.25rem; margin-right: 1.5rem; padding-left: 0;"
+        th:href="@{/client-dashboard/}">
+        Job<span style="color: #0d6efd;">ify</span>.
+    </a>
+
+    <!-- Mobile: Profile Avatar & Info (Visible on Mobile) -->
+    <div class="d-flex align-items-center d-lg-none ms-auto me-3" th:if="${user != null}">
+        <!-- Notification Bell (Mobile) -->
+        <ul class="navbar-nav flex-row me-3">
+            <th:block th:replace="fragments/notification-dropdown :: notificationDropdown"></th:block>
+        </ul>
+
+        <!-- Profile Dropdown (Mobile) -->
+        <div class="dropdown d-flex align-items-center">
+            <div class="me-2 text-end" style="line-height: 1.1;">
+                <div class="text-white fw-bold" style="font-size: 13px;"
+                    th:text="${(user.firstName ?: '') + ' ' + (user.lastName ?: '')}">User Name</div>
+                <div class="d-flex justify-content-end align-items-center">
+                    <span th:if="${user.isVerified}" class="badge bg-success-soft text-success p-0"
+                        style="font-size: 10px;">
+                        <i class="fas fa-check-circle me-1"></i>Verified
+                    </span>
+                    <span th:unless="${user.isVerified}" class="badge bg-warning-soft text-warning p-0"
+                        style="font-size: 10px;">
+                        <i class="fas fa-exclamation-circle me-1"></i>Unverified
+                    </span>
+                </div>
+            </div>
+            <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" class="text-decoration-none">
+                <img th:if="${user.photosImagePath != null}" th:src="@{${user.photosImagePath}}"
+                    class="user-avatar rounded-circle" style="border: 2px solid rgba(255,255,255,0.2);" alt="Profile" />
+                <div th:unless="${user.photosImagePath != null}"
+                    class="user-avatar rounded-circle d-flex align-items-center justify-content-center bg-secondary text-white"
+                    style="font-size: 14px; border: 2px solid rgba(255,255,255,0.2);">
+                    <span th:text="${user.firstName != null ? #strings.substring(user.firstName, 0, 1) : 'U'}">U</span>
+                </div>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0"
+                style="background: #1A1A2E; margin-top: 10px;">
+                <li><a class="dropdown-item text-white" th:href="@{/recruiter-profile/}"><i
+                            class="fas fa-user-circle me-2"></i> Profile</a></li>
+                <li>
+                    <hr class="dropdown-divider bg-secondary opacity-25">
+                </li>
+                <li><a class="dropdown-item text-white" th:href="@{/logout}"><i
+                            class="fas fa-sign-out-alt me-2 text-danger"></i> Logout</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <button class="navbar-toggler border-0 shadow-none" type="button"
+        onclick="document.getElementById('navbarContent').classList.toggle('show'); document.getElementById('navbarBackdrop').classList.toggle('show');">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Sidebar Components -->
+    <div id="navbarBackdrop" class="navbar-backdrop"
+        onclick="document.getElementById('navbarContent').classList.remove('show'); this.classList.remove('show');">
+    </div>
+
+    <div class="collapse navbar-collapse" id="navbarContent">
+
+        <!-- Mobile User Info Greeting -->
+        <div class="d-lg-none user-info-mobile" th:if="${user != null}">
+            <div class="d-flex align-items-center">
+                <img th:if="${user.photosImagePath != null}" th:src="@{${user.photosImagePath}}"
+                    class="user-avatar rounded-circle me-3" alt="Profile" />
+                <div th:unless="${user.photosImagePath != null}"
+                    class="user-avatar rounded-circle me-3 d-flex align-items-center justify-content-center bg-secondary text-white"
+                    style="font-size: 18px;">
+                    <span th:text="${user.firstName != null ? #strings.substring(user.firstName, 0, 1) : 'U'}">U</span>
+                </div>
+                <div>
+                    <div class="text-white fw-bold" th:text="${(user.firstName ?: '') + ' ' + (user.lastName ?: '')}">
+                        User Name</div>
+                    <div class="text-muted small" th:text="${user.userId.email}">email@example.com</div>
+                </div>
+            </div>
+        </div>
+
+        <ul class="navbar-nav mb-2 mb-lg-0" style="gap: 12px;">
+            <li class="nav-item">
+                <a class="nav-link" th:classappend="${activePage == 'dashboard' ? 'active' : ''}"
+                    th:href="@{/client-dashboard/}">
+                    <i class="fas fa-home fa-sm"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:classappend="${activePage == 'find-talent' ? 'active' : ''}"
+                    th:href="@{/find-talent/}">
+                    <i class="fas fa-search fa-sm"></i> Find Talent
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:classappend="${activePage == 'post-job' ? 'active' : ''}"
+                    th:href="@{/dashboard/add}">
+                    <i class="fas fa-plus-circle fa-sm"></i> Post Job
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:classappend="${activePage == 'jobs' ? 'active' : ''}"
+                    th:href="@{/client-dashboard/jobs}">
+                    <i class="fas fa-briefcase fa-sm"></i> My Jobs
+                </a>
+            </li>
+            <li class="nav-item">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="workDropdown" role="button" data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                    th:classappend="${activePage == 'proposals' or activePage == 'projects' ? 'active' : ''}">
+                    <i class="fas fa-briefcase fa-sm"></i> Work
+                </a>
+                <ul class="dropdown-menu shadow-lg border-0" aria-labelledby="workDropdown"
+                    style="background: #1A1A2E; margin-top: 10px;">
+                    <li>
+                        <a class="dropdown-item text-white d-flex justify-content-between align-items-center"
+                            th:href="@{/client-dashboard/proposals}">
+                            <span><i class="fas fa-file-alt me-2"></i> Proposals</span>
+                            <span class="badge bg-danger rounded-pill ms-2"
+                                th:if="${unseenProposals != null and unseenProposals > 0}"
+                                th:text="${unseenProposals}">0</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item text-white d-flex justify-content-between align-items-center"
+                            th:href="@{/client-dashboard/projects}">
+                            <span><i class="fas fa-project-diagram me-2"></i> Projects</span>
+                            <span class="badge bg-success rounded-pill ms-2"
+                                th:if="${activeProjects != null and activeProjects > 0}"
+                                th:text="${activeProjects}">0</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="financeDropdown" role="button"
+                    data-bs-toggle="dropdown" aria-expanded="false"
+                    th:classappend="${activePage == 'contracts' or activePage == 'payments' ? 'active' : ''}">
+                    <i class="fas fa-wallet fa-sm"></i> Financials
+                </a>
+                <ul class="dropdown-menu shadow-lg border-0" aria-labelledby="financeDropdown"
+                    style="background: #1A1A2E; margin-top: 10px;">
+                    <li>
+                        <a class="dropdown-item text-white" th:href="@{/contract/manage}">
+                            <i class="fas fa-file-contract me-2"></i> Contracts
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item text-white" th:href="@{/client-dashboard/payments}">
+                            <i class="fas fa-credit-card me-2"></i> Payments
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:classappend="${activePage == 'messages' ? 'active' : ''}" th:href="@{/chat/}">
+                    <i class="fas fa-comments fa-sm"></i> Messages
+                    <span id="messageBadge" class="badge bg-warning ms-1"
+                        th:style="${unreadMessagesCount != null and unreadMessagesCount > 0 ? '' : 'display: none;'}"
+                        th:text="${unreadMessagesCount}">0</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:classappend="${activePage == 'profile' ? 'active' : ''}"
+                    th:href="@{/recruiter-profile/}">
+                    <i class="fas fa-user-circle fa-sm"></i> Profile
+                </a>
+            </li>
+        </ul>
+
+        <!-- Desktop: User Profile (Hidden on Mobile) -->
+        <div class="d-none d-lg-flex align-items-center ms-3" th:if="${user != null}">
+            <ul class="navbar-nav align-items-center">
+                <!-- Notification Dropdown -->
+                <th:block th:replace="fragments/notification-dropdown :: notificationDropdown"></th:block>
+            </ul>
+
+            <div class="dropdown ms-3">
+                <a class="nav-link dropdown-toggle d-flex align-items-center p-0" href="#" id="userDropdown"
+                    role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <img th:if="${user.photosImagePath != null}" th:src="@{${user.photosImagePath}}"
+                        class="user-avatar rounded-circle me-2" alt="Profile" />
+                    <div th:unless="${user.photosImagePath != null}"
+                        class="user-avatar rounded-circle me-2 d-flex align-items-center justify-content-center bg-secondary text-white">
+                        <span
+                            th:text="${user.firstName != null ? #strings.substring(user.firstName, 0, 1) : 'U'}">U</span>
+                    </div>
+
+                    <div class="user-info text-start">
+                        <span class="user-name" th:text="${(user.firstName ?: '') + ' ' + (user.lastName ?: '')}">User
+                            Name</span>
+                        <div class="user-status" style="margin-top: 2px;">
+                            <span class="verified-badge" th:if="${user.isVerified}">
+                                <i class="fas fa-check-circle me-1"></i>Verified
+                            </span>
+                            <span class="unverified-badge" th:unless="${user.isVerified}">
+                                <i class="fas fa-exclamation-circle me-1"></i>Unverified
+                            </span>
+                        </div>
+                    </div>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0" aria-labelledby="userDropdown"
+                    style="background: #1A1A2E; margin-top: 15px;">
+                    <li><a class="dropdown-item text-white" th:href="@{/recruiter-profile/}"><i
+                                class="fas fa-user-circle me-2"></i> Profile</a></li>
+                    <li>
+                        <hr class="dropdown-divider bg-secondary opacity-25">
+                    </li>
+                    <li><a class="dropdown-item text-white" th:href="@{/logout}"><i
+                                class="fas fa-sign-out-alt me-2 text-danger"></i> Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<input type="hidden" id="currentUserId" th:if="${user != null}"
+    th:value="${user.userId != null ? user.userId.userId : (user.userAccountId != null ? user.userAccountId : '')}" />
+<!-- Scripts -->
+<script th:src="@{/webjars/jquery/jquery.min.js}"></script>
+<script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/webjars/sockjs-client/sockjs.min.js}"></script>
+<script th:src="@{/webjars/stomp-websocket/stomp.min.js}"></script>
+<script th:src="@{/js/notifications.js}"></script>
+</nav>

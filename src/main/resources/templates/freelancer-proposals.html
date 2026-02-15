@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org/">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>My Proposals | Jobify</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" rel="stylesheet" />
+    <link th:href="@{/webjars/font-awesome/css/all.min.css}" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" />
+    <style>
+        .proposal-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .proposal-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08) !important;
+        }
+
+        .proposal-card.pending {
+            border-left-color: #ffc107;
+        }
+
+        .proposal-card.hired {
+            border-left-color: #198754;
+        }
+
+        .proposal-card.rejected {
+            border-left-color: #dc3545;
+        }
+
+        .proposal-card.shortlisted {
+            border-left-color: #0dcaf0;
+        }
+
+        .avatar-small {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+
+        .status-badge {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 20px;
+        }
+    </style>
+</head>
+
+<body class="bg-light d-flex flex-column min-vh-100">
+
+    <!-- Header -->
+    <th:block th:replace="fragments/freelancer-header :: freelancerHeader('proposals')"></th:block>
+
+    <div class="container py-5 flex-grow-1">
+
+        <!-- Page Header -->
+        <div class="d-flex justify-content-between align-items-center mb-5 animate-up">
+            <div>
+                <h2 class="fw-bold text-dark mb-1">My Proposals</h2>
+                <p class="text-muted mb-0">Track your applications and their progress.</p>
+            </div>
+            <div class="d-flex gap-3">
+                <a th:href="@{/find-work/}"
+                    class="btn btn-outline-primary rounded-pill px-4 btn-sm fw-bold shadow-sm btn-nowrap"
+                    th:if="${isVerified}">
+                    <i class="fas fa-search me-2"></i>Find More Jobs
+                </a>
+                <a th:href="@{/freelancer-dashboard/}"
+                    class="btn btn-outline-primary rounded-pill px-4 btn-sm fw-bold shadow-sm btn-nowrap">
+                    <i class="fas fa-home me-2"></i> Dashboard
+                </a>
+            </div>
+        </div>
+
+        <!-- Verification Warning -->
+        <div class="alert alert-warning rounded-4 shadow-sm p-4 mb-4 animate-up" th:if="${!isVerified}">
+            <div class="d-flex align-items-center gap-3">
+                <div class="bg-warning-subtle text-warning p-3 rounded-circle">
+                    <i class="fas fa-user-shield fa-2x"></i>
+                </div>
+                <div>
+                    <h5 class="fw-bold mb-1">Account Verification Required</h5>
+                    <p class="mb-0">You must verify your identity before you can submit and manage proposals.</p>
+                    <a th:href="@{/job-seeker-profile/}"
+                        class="btn btn-warning btn-sm mt-2 fw-bold text-dark rounded-pill px-3">
+                        Complete Verification Now
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="text-center py-5 animate-up" th:if="${proposals == null or proposals.isEmpty()}">
+            <div class="bg-white rounded-circle shadow-sm d-inline-flex align-items-center justify-content-center mb-4"
+                style="width: 100px; height: 100px;">
+                <i class="far fa-paper-plane fa-3x text-muted opacity-50"></i>
+            </div>
+            <h4 class="fw-bold text-dark">No Proposals Yet</h4>
+            <p class="text-muted mb-4">Start applying to jobs to build your client list.</p>
+            <a th:href="@{/find-work/}" class="btn btn-primary px-4 rounded-pill">
+                Browse Available Jobs
+            </a>
+        </div>
+
+        <!-- Proposals List -->
+        <div class="row g-4" th:if="${proposals != null and !proposals.isEmpty()}">
+            <div class="col-12" th:each="proposal, iterStat : ${proposals}">
+                <div class="card border-0 shadow-sm rounded-4 proposal-card animate-up"
+                    th:classappend="${#strings.toLowerCase(proposal.applicationStatus)} + ' delay-' + ${iterStat.index * 100}">
+
+                    <div class="card-body p-4">
+                        <div class="row align-items-center">
+                            <!-- Job Info -->
+                            <div class="col-lg-4 mb-3 mb-lg-0">
+                                <h5 class="fw-bold text-dark mb-2">
+                                    <a th:href="@{/job-details-apply/{id}(id=${proposal.job.jobPostId})}"
+                                        class="text-decoration-none text-dark hover-primary"
+                                        th:text="${proposal.job.jobTitle}">Job Title</a>
+                                </h5>
+                                <div class="d-flex align-items-center text-muted small">
+                                    <i class="fas fa-building me-2"></i>
+                                    <span th:text="${proposal.job.jobCompanyId.name}">Company</span>
+                                    <span class="mx-2">•</span>
+                                    <i class="fas fa-map-marker-alt me-2"></i>
+                                    <span
+                                        th:text="${proposal.job.jobLocationId.city + ', ' + proposal.job.jobLocationId.state}">Location</span>
+                                </div>
+                            </div>
+
+                            <!-- Client & Rate -->
+                            <div class="col-lg-3 mb-3 mb-lg-0">
+                                <div class="d-flex align-items-center mb-2">
+                                    <img th:src="${proposal.job.recruiterProfilePhoto != null ? proposal.job.recruiterProfilePhoto : 'https://ui-avatars.com/api/?name=' + (proposal.job.recruiterFirstName != null ? proposal.job.recruiterFirstName : 'Client') + '&background=random'}"
+                                        class="avatar-small me-3 border shadow-sm">
+                                    <div class="small">
+                                        <div class="fw-bold text-dark"
+                                            th:text="${proposal.job.recruiterFirstName != null ? proposal.job.recruiterFirstName + ' ' + (proposal.job.recruiterLastName != null ? proposal.job.recruiterLastName : '') : 'Client'}">
+                                            Name</div>
+                                        <div class="text-muted text-truncate" style="max-width: 150px;"
+                                            th:text="${proposal.job.postedById.email}">email</div>
+                                    </div>
+                                </div>
+                                <div class="fw-bold text-success small" th:if="${proposal.proposedRate != null}">
+                                    Proposed: <span
+                                        th:text="${'$' + #numbers.formatDecimal(proposal.proposedRate, 0, 'COMMA', 2, 'POINT')}">$0.00</span>
+                                </div>
+                            </div>
+
+                            <!-- Date & Status -->
+                            <div class="col-6 col-lg-2 text-lg-center">
+                                <div class="text-muted small mb-1">Applied Date</div>
+                                <div class="fw-medium text-dark small"
+                                    th:text="${#dates.format(proposal.applyDate, 'MMM dd, yyyy')}">Jan 01</div>
+                            </div>
+
+                            <div class="col-6 col-lg-3 text-end">
+                                <span class="status-badge mb-3 d-inline-block"
+                                    th:classappend="${proposal.applicationStatus == 'PENDING' ? 'bg-warning-subtle text-warning' : 
+                                                     (proposal.applicationStatus == 'HIRED' ? 'bg-success-subtle text-success' : 
+                                                     (proposal.applicationStatus == 'REJECTED' ? 'bg-danger-subtle text-danger' : 'bg-info-subtle text-info'))}"
+                                    th:text="${proposal.applicationStatus}">PENDING</span>
+
+                                <div class="d-flex gap-2 justify-content-end">
+                                    <a th:href="@{/job-details-apply/{id}(id=${proposal.job.jobPostId})}"
+                                        class="btn btn-light btn-sm rounded-3 px-3 shadow-sm border"
+                                        title="View Proposal">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a th:if="${proposal.applicationStatus == 'PENDING'}"
+                                        th:href="@{/dashboard/edit-proposal/{id}(id=${proposal.id})}"
+                                        class="btn btn-light btn-sm rounded-3 px-3 shadow-sm border"
+                                        title="Edit Proposal">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a th:href="@{/chat/{userId}(userId=${proposal.job.postedById.userId}, jobId=${proposal.job.jobPostId})}"
+                                        class="btn btn-primary btn-sm rounded-3 px-3 shadow-sm" title="Message Client">
+                                        <i class="fas fa-comment-dots"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <th:block th:replace="fragments/footer :: footer"></th:block>
+
+    <!-- Scripts -->
+
+
+</body>
+
+</html>

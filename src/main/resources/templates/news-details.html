@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jobify Launches New AI-Powered Matching Algorithm - Jobify News</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <style>
+        .news-article-hero {
+            background-color: #f8f9fa;
+            padding: 80px 0 60px;
+            text-align: center;
+        }
+
+        .article-meta {
+            color: #6c757d;
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .article-content {
+            font-size: 1.15rem;
+            line-height: 1.8;
+            color: #2c3e50;
+        }
+
+        .article-content h2 {
+            font-weight: 700;
+            margin-top: 2.5rem;
+            margin-bottom: 1.25rem;
+            color: #1a1a2e;
+        }
+
+        .article-content p {
+            margin-bottom: 1.5rem;
+        }
+
+        .share-sidebar {
+            position: sticky;
+            top: 100px;
+        }
+
+        .share-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 1px solid #e9ecef;
+            color: #495057;
+            margin-bottom: 10px;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .share-link:hover {
+            background-color: #4B6CB7;
+            color: white;
+            border-color: #4B6CB7;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <th:block th:replace="fragments/public-header :: header('news')"></th:block>
+
+    <!-- Article Hero -->
+    <header class="news-article-hero">
+        <div class="container animate-up">
+            <a th:href="@{/info/news}" class="btn btn-sm btn-outline-secondary rounded-pill mb-4"><i
+                    class="fas fa-arrow-left me-2"></i> Back to News</a>
+            <div class="article-meta text-uppercase ls-1">Product Announcement &bull; February 05, 2026</div>
+            <h1 class="display-4 fw-bold mb-4 mx-auto" style="max-width: 900px;">Jobify Launches New AI-Powered Matching
+                Algorithm</h1>
+            <p class="lead opacity-75 mx-auto" style="max-width: 700px;">A standardized leap forward in how we connect
+                talent with opportunity.</p>
+        </div>
+    </header>
+
+    <!-- Content -->
+    <div class="container py-5">
+        <div class="row">
+            <!-- Share Sidebar -->
+            <div class="col-lg-1 d-none d-lg-block">
+                <div class="share-sidebar">
+                    <div class="small fw-bold text-muted mb-3 text-center">SHARE</div>
+                    <a href="#" class="share-link"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="share-link"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#" class="share-link"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="share-link"><i class="fas fa-envelope"></i></a>
+                </div>
+            </div>
+
+            <!-- Main Article -->
+            <div class="col-lg-8 mx-auto">
+                <article class="article-content animate-up delay-100">
+                    <p class="lead fw-medium">San Francisco, CA — Today, Jobify unveiled its most significant platform
+                        update to date: a proprietary AI-powered matching engine designed to reduce hiring time by 50%
+                        while improving match quality.</p>
+
+                    <p>The new system, dubbed "Jobify Neural Match," moves beyond simple keyword matching to understand
+                        the semantic context of job descriptions and freelancer portfolios. By analyzing successful past
+                        contracts, skill assessments, and behavioral data, the algorithm can predict compatibility with
+                        unprecedented accuracy.</p>
+
+                    <h2>Beyond Keywords</h2>
+                    <p>"Traditional search is broken," said Jane Doe, VP of Product at Jobify. "It relies on users
+                        knowing exactly what keywords to search for. Our new AI understands intent. If a client asks for
+                        a 'React developer who knows design,' our system knows to look for candidates with strong
+                        frontend skills and UI/UX portfolio pieces, even if they don't explicitly list those exact
+                        keywords in that order."</p>
+
+                    <blockquote
+                        class="border-start border-4 border-primary ps-4 fst-italic my-5 py-2 bg-light rounded-end">
+                        "This isn't just about speed. It's about finding the *right* person. In our beta testing, client
+                        satisfaction scores increased by 30%."
+                    </blockquote>
+
+                    <h2>Key Features</h2>
+                    <ul>
+                        <li class="mb-3"><strong>Semantic Search:</strong> Understands natural language queries like
+                            "Find me a logo designer with a minimalist style."</li>
+                        <li class="mb-3"><strong>Skill Verification:</strong> Automatically cross-references claimed
+                            skills with portfolio evidence and past project ratings.</li>
+                        <li class="mb-3"><strong>Bias Reduction:</strong> The algorithm is trained to prioritize skills
+                            and experience, actively mitigating unconscious bias in the hiring process.</li>
+                    </ul>
+
+                    <h2>Availability</h2>
+                    <p>The new matching engine is live today for all Enterprise clients and will be rolling out to all
+                        users over the next two weeks. We’re excited to see how this technology empowers our community
+                        to do their best work.</p>
+
+                    <hr class="my-5">
+
+                    <div class="d-flex align-items-center bg-light p-4 rounded-3">
+                        <div class="me-3">
+                            <span class="fa-stack fa-lg">
+                                <i class="fas fa-circle fa-stack-2x text-primary"></i>
+                                <i class="fas fa-bullhorn fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-1">Media Contact</h5>
+                            <p class="mb-0 text-muted small">For press inquiries, please contact <a
+                                    href="mailto:press@jobify.com">press@jobify.com</a></p>
+                        </div>
+                    </div>
+                </article>
+            </div>
+
+            <!-- Empty Sidebar Column for balance -->
+            <div class="col-lg-1"></div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <!-- Footer -->
+    <th:block th:replace="fragments/footer :: footer"></th:block>
+
+    <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
+    <script>
+        // Animation script
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.animate-up').forEach(el => {
+                el.style.animation = 'fadeInUp 0.8s ease-out forwards';
+                el.style.opacity = '1';
+            });
+        });
+    </script>
+</body>
+
+</html>

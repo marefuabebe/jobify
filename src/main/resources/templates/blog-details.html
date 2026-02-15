@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Future of Work: AI and the Gig Economy - Jobify Blog</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <style>
+        .article-hero {
+            background: linear-gradient(135deg, #4B6CB7 0%, #182848 100%);
+            padding: 120px 0 80px;
+            color: white;
+            position: relative;
+        }
+
+        .article-content {
+            font-size: 1.15rem;
+            line-height: 1.8;
+            color: #2c3e50;
+        }
+
+        .article-content h2 {
+            margin-top: 2.5rem;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+            color: #1a1d1f;
+        }
+
+        .dropcap::first-letter {
+            font-size: 3.5rem;
+            font-weight: 800;
+            float: left;
+            line-height: 0.8;
+            margin-right: 0.5rem;
+            color: var(--primary);
+        }
+
+        .author-card {
+            background: #f8f9fa;
+            border-left: 4px solid var(--primary);
+            padding: 2rem;
+            border-radius: 0 12px 12px 0;
+        }
+
+        .share-sticky {
+            position: sticky;
+            top: 100px;
+        }
+
+        .social-share-btn {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s;
+            color: #666;
+            background: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+            margin-bottom: 10px;
+        }
+
+        .social-share-btn:hover {
+            color: white;
+            background: var(--primary);
+            transform: translateX(5px);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <th:block th:replace="fragments/public-header :: header('blog')"></th:block>
+
+    <!-- Article Hero -->
+    <header class="article-hero">
+        <div class="container text-center">
+            <div class="text-start mb-4">
+                <a href="/info/blog" class="text-white text-decoration-none fw-bold"><i
+                        class="fas fa-arrow-left me-2"></i> Back to Blog</a>
+            </div>
+            <span
+                class="badge bg-white text-primary mb-3 px-3 py-2 rounded-pill fw-bold text-uppercase ls-1">Freelancing</span>
+            <h1 class="display-4 fw-bold mb-4 animate-up">The Future of Work: AI and the Gig Economy</h1>
+            <div class="d-flex justify-content-center align-items-center text-white-50 animate-up delay-100">
+                <img src="https://randomuser.me/api/portraits/women/44.jpg"
+                    class="rounded-circle me-2 border border-2 border-white" width="40" alt="Sarah Jenkins">
+                <span class="me-3 text-white">Sarah Jenkins</span>
+                <span class="me-3">&bull;</span>
+                <span>Jan 12, 2026</span>
+                <span class="ms-3">&bull;</span>
+                <span class="ms-2"><i class="far fa-clock me-1"></i> 8 min read</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Content -->
+    <div class="container py-5">
+        <div class="row">
+            <!-- Share Sidebar -->
+            <div class="col-lg-1 d-none d-lg-block">
+                <div class="share-sticky text-center">
+                    <small class="d-block text-uppercase fw-bold text-muted mb-3"
+                        style="writing-mode: vertical-rl; text-orientation: mixed; transform: rotate(180deg);">Share</small>
+                    <a href="#" class="social-share-btn"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-share-btn"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-share-btn"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#" class="social-share-btn"><i class="fas fa-link"></i></a>
+                </div>
+            </div>
+
+            <!-- Main Article -->
+            <div class="col-lg-8">
+                <!-- Featured Image -->
+                <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+                    class="img-fluid rounded-4 shadow-sm mb-5 w-100 animate-up delay-200" alt="Future of Work">
+
+                <div class="article-content animate-up delay-300">
+                    <p class="dropcap">A</p>
+                    <p>rtificial Intelligence is no longer just a buzzword—it's a fundamental force reshaping the global
+                        workforce. For freelancers and independent contractors, this shift brings both uncertainty and
+                        unprecedented opportunity. As AI tools becomes more sophisticated, the question isn't whether AI
+                        will replace freelancers, but rather effectively freelancers who use AI will replace those who
+                        don't.</p>
+
+                    <h2>The AI Advantage for Freelancers</h2>
+                    <p>The gig economy has always rewarded efficiency. Today, AI-powered tools are enabling freelancers
+                        to accomplish tasks that previously took hours in mere minutes. From generating code snippets
+                        and drafting marketing copy to automating client scheduling and invoicing, the barrier to entry
+                        for high-output productivity has never been lower.</p>
+
+                    <blockquote
+                        class="blockquote my-5 p-4 border-start border-5 border-primary bg-light fst-italic rounded-end">
+                        "The most successful freelancers in 2026 aren't just selling their time; they're selling their
+                        ability to leverage technology to deliver superior results faster than any traditional employee
+                        could."
+                    </blockquote>
+
+                    <h2>Upskilling in the Age of Automation</h2>
+                    <p>To stay competitive, freelancers must pivot from routine execution to strategic oversight. While
+                        an AI can write a blog post, it takes a human expert to infuse it with brand voice, emotional
+                        resonance, and strategic intent. The top skills in demand on Jobify this quarter reflect this
+                        shift:</p>
+
+                    <ul class="list-check mb-4 ps-0" style="list-style: none;">
+                        <li class="mb-2"><i class="fas fa-check-circle text-primary me-2"></i> AI Prompt Engineering
+                        </li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-primary me-2"></i> Strategic Brand
+                            Consulting</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-primary me-2"></i> Complex Problem Solving
+                        </li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-primary me-2"></i> Ethical AI Implementation
+                        </li>
+                    </ul>
+
+                    <p>Those who embrace these tools are documenting a 3x increase in their hourly effective rate. By
+                        automating the mundane, creative professionals are freeing up mental bandwidth for what truly
+                        matters: innovation and client relationships.</p>
+
+                    <h2 class="mb-4">Conclusion</h2>
+                    <p>The future of work is hybrid—not just in terms of location, but in terms of intelligence. The
+                        collaboration between human creativity and machine efficiency is defining the next era of the
+                        gig economy. At Jobify, we're building the infrastructure to support this evolution, ensuring
+                        that every freelancer has the tools they need to thrive in this new landscape.</p>
+                </div>
+
+                <!-- Tags -->
+                <div class="mt-5 pt-4 border-top">
+                    <span class="fw-bold me-2">Tags:</span>
+                    <a href="#" class="badge bg-light text-dark text-decoration-none border me-1">#FutureOfWork</a>
+                    <a href="#" class="badge bg-light text-dark text-decoration-none border me-1">#AI</a>
+                    <a href="#" class="badge bg-light text-dark text-decoration-none border me-1">#Freelancing</a>
+                    <a href="#" class="badge bg-light text-dark text-decoration-none border">#Productivity</a>
+                </div>
+
+                <!-- Author Bio -->
+                <div class="author-card mt-5 d-flex align-items-center">
+                    <img src="https://randomuser.me/api/portraits/women/44.jpg" class="rounded-circle me-4 shadow-sm"
+                        width="80" alt="Sarah Jenkins">
+                    <div>
+                        <h5 class="fw-bold mb-1">Sarah Jenkins</h5>
+                        <p class="text-muted mb-2">Senior Tech Journalist & Jobify Top Rated Freelancer</p>
+                        <p class="mb-0 small">Sarah writes about the intersection of technology and human potential. She
+                            has helped over 500 startups scale their remote teams.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-3 offset-lg-0 mt-5 mt-lg-0">
+                <h5 class="fw-bold mb-4">Related Articles</h5>
+
+                <div class="card border-0 shadow-sm mb-4">
+                    <img src="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+                        class="card-img-top" alt="Related">
+                    <div class="card-body">
+                        <h6 class="fw-bold"><a href="#" class="text-decoration-none text-dark">Top 10 High-Paying Skills
+                                in 2026</a></h6>
+                        <small class="text-muted">Jan 5, 2026</small>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm mb-4">
+                    <img src="https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+                        class="card-img-top" alt="Related">
+                    <div class="card-body">
+                        <h6 class="fw-bold"><a href="#" class="text-decoration-none text-dark">How to Hire the Perfect
+                                Developer</a></h6>
+                        <small class="text-muted">Jan 2, 2026</small>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-light rounded-3 mt-5 text-center">
+                    <h5 class="fw-bold">Ready to start?</h5>
+                    <p class="small text-muted mb-3">Join thousands of freelancers earning on Jobify today.</p>
+                    <a href="/register" class="btn btn-primary w-100 rounded-pill">Create Account</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Newsletter Section (Standardized) -->
+    <section class="newsletter-section py-5 position-relative overflow-hidden"
+        style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);">
+        <div class="container position-relative z-1 text-center">
+            <h2 class="h3 fw-bold text-white mb-3">Subscribe for more updates</h2>
+            <form action="#" class="newsletter-form w-100 mx-auto" style="max-width: 500px;">
+                <div class="input-group p-1 bg-white rounded-pill shadow-sm">
+                    <input type="email" class="form-control border-0 bg-transparent ps-4" placeholder="Email address">
+                    <button class="btn btn-dark rounded-pill px-4" type="submit">Subscribe</button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer-upwork bg-dark text-white pt-5 pb-3">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <a href="/" class="footer-logo text-white text-decoration-none h4 fw-bold mb-3 d-block">Jobify</a>
+                    <p class="text-white-50">Transforming how businesses and freelancers connect.</p>
+                </div>
+                <!-- Simplified footer for details page -->
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h5 class="text-white mb-3">Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="/find-work/" class="text-white-50 text-decoration-none">Browse
+                                Jobs</a></li>
+                        <li class="mb-2"><a href="/info/blog" class="text-white-50 text-decoration-none">Back to
+                                Blog</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-top border-secondary pt-3 mt-4 text-center">
+                <p class="text-white-50 mb-0">&copy; 2024 Jobify. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
+    <script>
+        // Simple animation script reuse
+        document.addEventListener('DOMContentLoaded', function () {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                    }
+                });
+            });
+            document.querySelectorAll('.animate-up').forEach(el => observer.observe(el));
+        });
+    </script>
+</body>
+
+</html>

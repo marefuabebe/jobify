@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Client Profile | Jobify</title>
+
+    <link th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" rel="stylesheet" />
+    <link th:href="@{/webjars/font-awesome/css/all.min.css}" rel="stylesheet" />
+    <link th:href="@{/css/styles.css}" rel="stylesheet" />
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .profile-header {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 8px;
+            /* Slightly squarer for logos */
+            border: 4px solid #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1rem;
+        }
+
+        .section-box {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            margin-bottom: 1.5rem;
+        }
+
+        :root {
+            --primary: #FB4F14;
+            --primary-light: #FFE9E1;
+            --primary-dark: #E34812;
+            --dark: #1A1A2E;
+            --light: #F8F9FA;
+            --gray: #6C757D;
+            --border: #E0E0E0;
+            --radius: 6px;
+            --transition: all 0.3s ease;
+            --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Header */
+        .navbar {
+            background: var(--dark);
+            padding: 12px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-brand {
+            color: white !important;
+            font-weight: 700;
+            font-size: 24px;
+            text-decoration: none;
+            padding-left: 0;
+        }
+
+        .navbar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.9);
+            padding: 8px 12px;
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: var(--radius);
+            transition: var(--transition);
+        }
+
+        .navbar-nav .nav-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .navbar-nav .nav-link.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+        }
+
+        .badge {
+            font-size: 11px;
+            padding: 3px 6px;
+            font-weight: 600;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            object-fit: cover;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            transition: var(--transition);
+        }
+
+        .user-name {
+            color: white;
+            font-weight: 500;
+            font-size: 13px;
+            padding: 0 12px;
+        }
+
+        .user-status {
+            font-size: 11px;
+        }
+
+        .verified-badge {
+            color: #28A745;
+            background: rgba(40, 167, 69, 0.1);
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .unverified-badge {
+            color: #FFC107;
+            background: rgba(255, 193, 7, 0.1);
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .logout-btn {
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            color: white;
+            padding: 6px 16px;
+            border-radius: var(--radius);
+            font-size: 13px;
+        }
+
+        .logout-btn:hover {
+            background: white;
+            color: var(--primary);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header>
+        <!-- For authenticated Clients -->
+        <div sec:authorize="hasAuthority('Client')">
+            <div th:replace="fragments/client-header :: clientHeader(activePage='profile')"></div>
+        </div>
+
+        <!-- For authenticated Freelancers -->
+        <div sec:authorize="hasAuthority('Freelancer')">
+            <div th:replace="fragments/freelancer-header :: freelancerHeader(activePage='profile')"></div>
+        </div>
+
+        <!-- For authenticated Admins -->
+        <div sec:authorize="hasAuthority('Admin')">
+            <div th:replace="fragments/public-header :: header(activePage='profile')"></div>
+        </div>
+
+        <!-- For anonymous users (Guests) -->
+        <div sec:authorize="isAnonymous()">
+            <div th:replace="fragments/public-header :: header(activePage='profile')"></div>
+        </div>
+    </header>
+
+
+    <div class="container py-4">
+        <div class="row">
+
+            <!-- LEFT COLUMN -->
+            <div class="col-md-4">
+                <div class="profile-header">
+
+                    <img class="profile-avatar" th:src="${profile.profilePhoto != null
+                     ? '/photos/recruiter/' + profile.userAccountId + '/' + profile.profilePhoto
+                     : '/images/avatar.png'}" alt="Profile Photo" />
+
+                    <h4 class="fw-bold mb-1">
+                        <span
+                            th:text="${profile.company != null ? profile.company : (profile.firstName + ' ' + profile.lastName)}">
+                            Company Name</span>
+                        <i class="fas fa-check-circle text-primary ms-1" th:if="${profile.isVerified}"
+                            title="Verified Client" style="font-size: 0.8em;"></i>
+                    </h4>
+
+                    <p class="text-muted mb-2" th:if="${profile.tagline}" th:text="${profile.tagline}">Tagline</p>
+
+                    <div th:if="${profile.isVerified}" class="badge bg-success mb-3">
+                        Verified Client
+                    </div>
+
+                    <p class="text-muted small">
+                        <i class="fas fa-map-marker-alt me-1"></i>
+                        <span
+                            th:text="${(profile.city != null ? profile.city : '') + ', ' + (profile.country != null ? profile.country : '')}">Location</span>
+                    </p>
+
+                    <!-- ACTIONS -->
+                    <div class="d-grid gap-2 mt-3">
+                        <a th:if="${profile.website}" th:href="${profile.website}" target="_blank"
+                            class="btn btn-outline-primary">
+                            <i class="fas fa-globe me-1"></i> Visit Website
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN -->
+            <div class="col-md-8">
+
+                <div class="section-box">
+                    <h5 class="border-bottom pb-2 mb-3">About</h5>
+                    <div th:utext="${profile.bio ?: 'No description provided.'}" class="bio-text">
+                        Bio
+                    </div>
+                </div>
+
+                <div class="section-box">
+                    <h5 class="border-bottom pb-2 mb-3">Details</h5>
+                    <div class="row">
+                        <div class="col-sm-4 text-muted">Recruiter Name</div>
+                        <div class="col-sm-8 fw-bold mb-2" th:text="${profile.firstName + ' ' + profile.lastName}">
+                            Name
+                        </div>
+
+                        <div class="col-sm-4 text-muted">Company</div>
+                        <div class="col-sm-8 fw-bold mb-2" th:text="${profile.company}">
+                            Company
+                        </div>
+
+                        <div class="col-sm-4 text-muted" th:if="${profile.website}">Website</div>
+                        <div class="col-sm-8 fw-bold mb-2" th:if="${profile.website}">
+                            <a th:href="${profile.website}" target="_blank" th:text="${profile.website}">Website</a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
+</body>
+
+</html>

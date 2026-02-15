@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<body>
+    <li th:fragment="notificationDropdown" class="nav-item dropdown" style="margin: 0;">
+        <a class="nav-link dropdown-toggle position-relative" href="#" id="notificationDropdown" role="button"
+            data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fas fa-bell fa-lg text-white"></i>
+            <span class="position-absolute top-10 start-90 translate-middle badge rounded-pill bg-danger"
+                th:if="${unreadNotificationsCount > 0}" th:text="${unreadNotificationsCount}"
+                style="font-size: 0.6rem;">
+                0
+                <span class="visually-hidden">unread messages</span>
+            </span>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end shadow animated--grow-in px-2" aria-labelledby="notificationDropdown"
+            style="width: 280px; max-height: 400px; overflow-y: auto; z-index: 1070; position: absolute !important; inset: 0px 0px auto auto !important;">
+            <li>
+                <h6 class="dropdown-header d-flex justify-content-between align-items-center">
+                    Notifications
+                    <a th:href="@{/notifications/mark-all-read}" class="text-decoration-none small"
+                        th:if="${unreadNotificationsCount > 0}">Mark all read</a>
+                </h6>
+            </li>
+            <li>
+                <hr class="dropdown-divider">
+            </li>
+
+            <li th:if="${notifications == null or notifications.isEmpty()}">
+                <a class="dropdown-item text-center small text-muted py-3" href="#">No new notifications</a>
+            </li>
+
+            <th:block th:if="${notifications != null}">
+                <li th:each="notification : ${notifications}">
+                    <a class="dropdown-item d-flex align-items-start p-2 border-bottom"
+                        th:href="@{/notifications/read/{id}(id=${notification.id})}"
+                        th:classappend="${!notification.isRead ? 'bg-light' : ''}">
+                        <div class="me-2 mt-1">
+                            <i class="fas fa-info-circle text-primary" th:if="${notification.type == 'INFO'}"></i>
+                            <i class="fas fa-check-circle text-success" th:if="${notification.type == 'SUCCESS'}"></i>
+                            <i class="fas fa-exclamation-circle text-warning"
+                                th:if="${notification.type == 'WARNING'}"></i>
+                            <i class="fas fa-times-circle text-danger" th:if="${notification.type == 'ERROR'}"></i>
+                            <i class="fas fa-envelope text-info" th:if="${notification.type == 'MESSAGE'}"></i>
+                            <i class="fas fa-bell text-secondary" th:if="${notification.type == null}"></i>
+                        </div>
+                        <div>
+                            <div class="small fw-bold" th:text="${notification.title}">Notification Title</div>
+                            <div class="small text-muted text-truncate" style="max-width: 200px;"
+                                th:text="${notification.message}">Notification Message</div>
+                            <div class="text-muted" style="font-size: 0.7rem;"
+                                th:text="${#dates.format(notification.createdAt, 'dd MMM HH:mm')}">Time</div>
+                        </div>
+                    </a>
+                </li>
+            </th:block>
+
+            <li>
+                <hr class="dropdown-divider">
+            </li>
+            <li><a class="dropdown-item text-center small text-primary" th:href="@{/notifications}">View All
+                    Notifications</a></li>
+        </ul>
+    </li>
+</body>
+
+</html>

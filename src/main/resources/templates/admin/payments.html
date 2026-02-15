@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payments Monitoring - Jobify Admin</title>
+    <link th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/webjars/font-awesome/css/all.min.css}" rel="stylesheet">
+    <link th:href="@{/css/admin-styles.css}" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+</head>
+
+<body th:classappend="${session.theme == 'light' ? 'light-theme' : ''}">
+
+    <!-- Sidebar Fragment -->
+    <div th:replace="~{admin/fragments/sidebar :: sidebar('payments')}"></div>
+
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <button class="btn btn-primary d-lg-none me-3" id="sidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="page-title">
+                <div class="title-icon">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <h1>Payments & Transactions Monitoring</h1>
+            </div>
+
+            <div class="user-menu d-flex align-items-center gap-2">
+                <!-- Theme Toggle Removed -->
+                <a href="/logout" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="container-fluid px-0">
+
+            <!-- Summary Stats -->
+            <div class="row g-4 mb-4">
+                <!-- Total Revenue -->
+                <div class="col-xl-3 col-md-6">
+                    <div
+                        class="card border-0 shadow-sm h-100 card-scale-up bg-gradient-success position-relative overflow-hidden">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start z-1 position-relative">
+                                <div>
+                                    <h2 class="fw-bold mb-1 text-white">
+                                        $<span class="stat-counter"
+                                            th:text="${#numbers.formatDecimal(stats.totalRevenue, 1, 'COMMA', 2, 'POINT')}"
+                                            th:attr="data-target=${stats.totalRevenue}" data-counter="true">0.00</span>
+                                    </h2>
+                                    <p class="mb-0 text-white-50 fw-medium">Total Revenue</p>
+                                </div>
+                                <div class="icon-circle-white">
+                                    <i class="fas fa-dollar-sign"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total Volume -->
+                <div class="col-xl-3 col-md-6">
+                    <div
+                        class="card border-0 shadow-sm h-100 card-scale-up bg-gradient-info position-relative overflow-hidden">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start z-1 position-relative">
+                                <div>
+                                    <h2 class="fw-bold mb-1 text-white">
+                                        $<span class="stat-counter"
+                                            th:text="${#numbers.formatDecimal(stats.totalVolume, 1, 'COMMA', 2, 'POINT')}"
+                                            th:attr="data-target=${stats.totalVolume}" data-counter="true">0.00</span>
+                                    </h2>
+                                    <p class="mb-0 text-white-50 fw-medium">Total Volume</p>
+                                </div>
+                                <div class="icon-circle-white">
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pending Escrow -->
+                <div class="col-xl-3 col-md-6">
+                    <div
+                        class="card border-0 shadow-sm h-100 card-scale-up bg-gradient-warning position-relative overflow-hidden">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start z-1 position-relative">
+                                <div>
+                                    <h2 class="fw-bold mb-1 text-white">
+                                        $<span class="stat-counter"
+                                            th:text="${#numbers.formatDecimal(stats.pendingEscrow, 1, 'COMMA', 2, 'POINT')}"
+                                            th:attr="data-target=${stats.pendingEscrow}" data-counter="true">0.00</span>
+                                    </h2>
+                                    <p class="mb-0 text-white-50 fw-medium">Pending Escrow</p>
+                                </div>
+                                <div class="icon-circle-white">
+                                    <i class="fas fa-hand-holding-usd"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Projects -->
+                <div class="col-xl-3 col-md-6">
+                    <div
+                        class="card border-0 shadow-sm h-100 card-scale-up bg-gradient-purple position-relative overflow-hidden">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start z-1 position-relative">
+                                <div>
+                                    <h2 class="fw-bold mb-1 text-white" th:text="${totalProjects}">0</h2>
+                                    <p class="mb-0 text-white-50 fw-medium">Active Projects</p>
+                                </div>
+                                <div class="icon-circle-white">
+                                    <i class="fas fa-briefcase"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Projects Table -->
+                <div class="col-xl-8 mb-4">
+                    <div class="projects-card"
+                        style="background: var(--bg-card); border-radius: var(--radius); padding: 1.5rem; border: 1px solid var(--border); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);">
+                        <div class="card-header"
+                            style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border);">
+                            <h3
+                                style="font-size: 1.25rem; font-weight: 700; color: var(--text); margin: 0; display: flex; align-items: center; gap: 0.75rem;">
+                                <i class="fas fa-tasks text-primary"></i> Recent Projects
+                            </h3>
+                            <div class="d-flex gap-2">
+                                <a href="#" class="btn btn-sm btn-outline-light">View All</a>
+                                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-download me-1"></i>
+                                    Export</a>
+                            </div>
+                        </div>
+
+                        <div th:if="${#lists.isEmpty(projects)}" class="empty-state"
+                            style="text-align: center; padding: 3rem 1rem; color: var(--text-light);">
+                            <i class="fas fa-folder-open empty-icon"
+                                style="font-size: 2.5rem; color: var(--primary); opacity: 0.3; margin-bottom: 1rem;"></i>
+                            <h5>No projects found</h5>
+                            <p>There are no active projects in the system currently.</p>
+                        </div>
+
+                        <div class="table-responsive" th:unless="${#lists.isEmpty(projects)}">
+                            <table class="projects-table admin-table"
+                                style="width: 100%; border-collapse: separate; border-spacing: 0;">
+                                <thead>
+                                    <tr>
+                                        <th>Project / Context</th>
+                                        <th>Client</th>
+                                        <th>Freelancer</th>
+                                        <th>Budget</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="project : ${projects}">
+                                        <td>
+                                            <div class="d-flex flex-column">
+                                                <a th:href="@{'/admin/projects/' + ${project.id}}" class="project-link"
+                                                    style="color: var(--primary); text-decoration: none; font-weight: 500;"
+                                                    th:text="${#strings.abbreviate(project.context, 30)}">Project
+                                                    Name</a>
+                                                <span class="date-text"
+                                                    style="color: var(--text-light); font-size: 0.9rem;">
+                                                    <i class="far fa-clock me-1"></i>
+                                                    <span
+                                                        th:text="${#temporals.format(project.createdAt, 'MMM dd, yyyy')}">Date</span>
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <a th:href="@{'/admin/users/' + ${project.clientId.userId.userId}}"
+                                                class="user-link"
+                                                style="color: var(--text); text-decoration: none; font-weight: 500;">
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <div class="avatar-sm rounded-circle bg-light d-flex align-items-center justify-content-center"
+                                                        style="width: 24px; height: 24px;">
+                                                        <i class="fas fa-user-tie fa-xs text-secondary"></i>
+                                                    </div>
+                                                    <span
+                                                        th:text="${project.clientId.firstName + ' ' + project.clientId.lastName}">Client</span>
+                                                </div>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <a th:href="@{'/admin/users/' + ${project.freelancerId.userId.userId}}"
+                                                class="user-link"
+                                                style="color: var(--text); text-decoration: none; font-weight: 500;">
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <div class="avatar-sm rounded-circle bg-light d-flex align-items-center justify-content-center"
+                                                        style="width: 24px; height: 24px;">
+                                                        <i class="fas fa-user fa-xs text-secondary"></i>
+                                                    </div>
+                                                    <span
+                                                        th:text="${project.freelancerId.firstName + ' ' + project.freelancerId.lastName}">Freelancer</span>
+                                                </div>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <span class="rate-badge"
+                                                style="background: rgba(var(--success-rgb), 0.1); color: var(--success); padding: 0.25rem 0.75rem; border-radius: 20px; font-weight: 600; font-size: 0.9rem; display: inline-block;">
+                                                $<span th:text="${project.budget}">0</span>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="status-badge status-active"
+                                                style="padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600; display: inline-block; background: rgba(var(--success-rgb), 0.1); color: var(--success);">
+                                                Active
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a th:href="@{'/admin/projects/' + ${project.id}}" class="action-btn"
+                                                style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: rgba(var(--primary-rgb), 0.1); color: var(--primary); border: 1px solid rgba(var(--primary-rgb), 0.2); border-radius: 6px; font-size: 0.85rem; font-weight: 500; text-decoration: none;">
+                                                Details <i class="fas fa-arrow-right"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Info Column -->
+                <div class="col-xl-4 mb-4">
+                    <div class="info-card"
+                        style="background: var(--bg-card); border-radius: var(--radius); padding: 1.5rem; border: 1px solid var(--border); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);">
+                        <h4 class="mb-3 fw-bold" style="color: var(--text);">Transaction Overview</h4>
+                        <div class="info-content" style="color: var(--text-light); line-height: 1.6;">
+                            <p>
+                                Monitor all financial milestones and project budgets in real-time. Use this dashboard to
+                                ensure platform integrity and investigate any unusual activity.
+                            </p>
+                            <p>
+                                <strong>Note:</strong> Payments are processed externally. This view reflects the
+                                agreement data stored within the platform.
+                            </p>
+                        </div>
+
+                        <div class="info-note"
+                            style="background: rgba(var(--warning-rgb), 0.1); border-left: 4px solid var(--warning); padding: 1rem; border-radius: 0 var(--radius) var(--radius) 0; margin-top: 1.5rem;">
+                            <div class="d-flex">
+                                <i class="fas fa-exclamation-triangle mt-1"
+                                    style="color: var(--warning); margin-right: 0.5rem;"></i>
+                                <div>
+                                    <h6 class="fw-bold mb-1" style="color: var(--text);">Dispute Resolution</h6>
+                                    <p class="mb-0 small" style="color: var(--text-light);">
+                                        If you notice discrepancies in budget amounts, please check the Disputes section
+                                        for any active tickets.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <a href="/admin/disputes" class="btn btn-outline-warning w-100 mt-3 fw-bold">
+                            Go to Disputes
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Short Admin Footer -->
+    <div th:replace="~{admin/fragments/footer :: adminFooter}"></div>
+
+    <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
+    <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/js/admin-scripts.js}"></script>
+</body>
+
+</html>

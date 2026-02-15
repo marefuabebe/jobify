@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Jobs - Admin Dashboard - Jobify</title>
+    <link th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/webjars/font-awesome/css/all.min.css}" rel="stylesheet">
+    <link th:href="@{/css/admin-styles.css}" rel="stylesheet">
+</head>
+
+<body th:classappend="${session.theme == 'light' ? 'light-theme' : ''}">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar" id="sidebar" th:replace="~{admin/fragments/sidebar :: sidebar(activeLink='jobs')}">
+        <!-- Content replaced by fragment -->
+    </aside>
+
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <button class="btn btn-primary d-lg-none me-3" id="sidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="page-title">
+                <div class="title-icon">
+                    <i class="fas fa-briefcase"></i>
+                </div>
+                <div>
+                    <h1 class="h3 fw-bold mb-1">All Jobs</h1>
+                    <p class="text-muted mb-0">Manage and moderate job postings</p>
+                </div>
+            </div>
+
+            <div class="user-menu d-flex align-items-center gap-2">
+                <!-- Theme Toggle Removed -->
+                <a href="/logout" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Jobs Container -->
+        <div class="card border-0 shadow-sm" style="background: var(--bg-card); border-radius: var(--radius);">
+            <div class="table-responsive">
+                <table class="table admin-table table-hover mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4">Job Title</th>
+                            <th>Company</th>
+                            <th>Location</th>
+                            <th>Type</th>
+                            <th>Posted Date</th>
+                            <th>Status</th>
+                            <th class="text-end pe-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${jobs.isEmpty()}">
+                            <td colspan="7" class="text-center py-5 text-muted">
+                                <i class="fas fa-briefcase fa-3x mb-3 opacity-25"></i>
+                                <p class="mb-0">No jobs found.</p>
+                            </td>
+                        </tr>
+                        <tr th:each="job : ${jobs}">
+                            <td class="ps-4">
+                                <div class="fw-bold text-dark" th:text="${job.jobTitle}">Job Title</div>
+                            </td>
+                            <td>
+                                <span class="d-flex align-items-center gap-2">
+                                    <i class="fas fa-building text-muted opacity-50"></i>
+                                    <span
+                                        th:text="${job.jobCompanyId != null ? job.jobCompanyId.name : 'N/A'}">Company</span>
+                                </span>
+                            </td>
+                            <td>
+                                <span class="text-muted"
+                                    th:text="${job.jobLocationId != null} ? |${job.jobLocationId.city}, ${job.jobLocationId.state}| : 'N/A'">Location</span>
+                            </td>
+                            <td>
+                                <span class="badge bg-soft-secondary text-secondary rounded-pill"
+                                    style="background: rgba(var(--secondary-rgb), 0.1); color: var(--text-light) !important; border: 1px solid var(--border);"
+                                    th:text="${job.jobType}">Full-Time</span>
+                            </td>
+                            <td class="text-muted">
+                                <span th:text="${#dates.format(job.postedDate, 'MMM dd, yyyy')}">Jan 01, 2024</span>
+                            </td>
+                            <td>
+                                <span class="badge rounded-pill bg-success" th:if="${job.status == 'OPEN'}">Open</span>
+                                <span class="badge rounded-pill bg-warning text-dark"
+                                    th:if="${job.status == 'PAUSED'}">Paused</span>
+                                <span class="badge rounded-pill bg-info text-white"
+                                    th:if="${job.status == 'UNDER_REVIEW'}"
+                                    th:title="${job.moderationNote}">Reviewing</span>
+                                <span class="badge rounded-pill bg-danger" th:if="${job.status == 'VIOLATION'}"
+                                    th:title="${job.moderationNote}">Violation</span>
+                                <span class="badge rounded-pill bg-secondary"
+                                    th:if="${job.status == 'REJECTED'}">Rejected</span>
+                            </td>
+                            <td class="text-end pe-4">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a th:href="@{/job-details-apply/{id}(id=${job.jobPostId})}"
+                                        class="btn btn-sm btn-icon btn-outline-primary" title="View Job">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <button class="btn btn-sm btn-icon btn-outline-info"
+                                        th:onclick="'showModerationHistory(' + ${job.jobPostId} + ')'"
+                                        title="View History">
+                                        <i class="fas fa-history"></i>
+                                    </button>
+                                    <button th:if="${job.status != 'VIOLATION'}"
+                                        class="btn btn-sm btn-icon btn-outline-danger"
+                                        th:onclick="'reportViolation(' + ${job.jobPostId} + ')'"
+                                        title="Mark as Violation">
+                                        <i class="fas fa-flag"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="card-footer bg-transparent border-top border-light py-3" th:if="${totalPages > 1}">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="text-muted small">
+                        Showing <span th:text="${currentPage * pageSize + 1}">1</span> to
+                        <span
+                            th:text="${(currentPage + 1) * pageSize < totalJobs ? (currentPage + 1) * pageSize : totalJobs}">10</span>
+                        of <span th:text="${totalJobs}">0</span> jobs
+                    </div>
+                    <nav aria-label="Jobs pagination">
+                        <ul class="pagination pagination-sm mb-0">
+                            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                                <a class="page-link rounded-start-pill border-0 shadow-sm"
+                                    th:href="@{/admin/jobs(page=${currentPage - 1}, size=${pageSize})}">
+                                    <i class="fas fa-chevron-left me-1"></i> Previous
+                                </a>
+                            </li>
+                            <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                                th:classappend="${i == currentPage} ? 'active'">
+                                <a class="page-link border-0 shadow-sm mx-1 rounded-circle"
+                                    style="width: 30px; height: 30px; text-align: center; line-height: 18px;"
+                                    th:href="@{/admin/jobs(page=${i}, size=${pageSize})}" th:text="${i + 1}">1</a>
+                            </li>
+                            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                                <a class="page-link rounded-end-pill border-0 shadow-sm"
+                                    th:href="@{/admin/jobs(page=${currentPage + 1}, size=${pageSize})}">
+                                    Next <i class="fas fa-chevron-right ms-1"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Short Admin Footer -->
+    <div th:replace="~{admin/fragments/footer :: adminFooter}"></div>
+    <form id="violationForm" th:action="@{/admin/jobs/violation}" method="post" style="display: none;">
+        <input type="hidden" name="id" id="violationId">
+        <input type="hidden" name="reason" id="violationReason">
+        <input type="hidden" name="category" id="violationCategory">
+        <input type="hidden" name="severity" id="violationSeverity">
+    </form>
+
+    <!-- History Modal -->
+    <div class="modal fade" id="historyModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content overflow-hidden"
+                style="border-radius: 15px; border: none; background: var(--bg-card);">
+                <div class="modal-header border-bottom border-secondary bg-primary text-white">
+                    <h5 class="modal-title font-weight-bold"><i class="fas fa-history me-2"></i> Job Moderation History
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4" id="historyContent">
+                    <!-- History will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
+    <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script th:inline="javascript">
+        function reportViolation(id) {
+            Swal.fire({
+                title: 'Report violation',
+                html: `
+                    <div class="text-start mb-3">
+                        <label class="form-label text-dark">Violation Category</label>
+                        <select id="swal-category" class="form-select mb-2">
+                            <option value="TOS_VIOLATION">ToS Violation</option>
+                            <option value="SCAM">Scam / Fraud</option>
+                            <option value="SPAM">Spam</option>
+                            <option value="INAPPROPRIATE_CONTENT">Inappropriate Content</option>
+                        </select>
+                        
+                        <label class="form-label text-dark">Severity Level</label>
+                        <select id="swal-severity" class="form-select mb-2">
+                            <option value="LOW">Low (Warning)</option>
+                            <option value="MEDIUM" selected>Medium (Temporary Block)</option>
+                            <option value="HIGH">High (Permanent)</option>
+                        </select>
+                        
+                        <label class="form-label text-dark">Reason</label>
+                        <textarea id="swal-reason" class="form-control" placeholder="Detailed reason..."></textarea>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonColor: '#f91880',
+                cancelButtonColor: '#8899a6',
+                confirmButtonText: 'Flag and Remove',
+                preConfirm: () => {
+                    const reason = document.getElementById('swal-reason').value;
+                    const category = document.getElementById('swal-category').value;
+                    const severity = document.getElementById('swal-severity').value;
+                    if (!reason) {
+                        Swal.showValidationMessage('Violation reason is required')
+                    }
+                    return { reason, category, severity }
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const form = document.getElementById('violationForm');
+                    form.action = '/admin/jobs/' + id + '/violation';
+                    document.getElementById('violationReason').value = result.value.reason;
+                    document.getElementById('violationCategory').value = result.value.category;
+                    document.getElementById('violationSeverity').value = result.value.severity;
+                    form.submit();
+                }
+            })
+        }
+
+        function showModerationHistory(jobId) {
+            const content = document.getElementById('historyContent');
+            content.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary" role="status"></div><p class="mt-2 text-light">Loading history...</p></div>';
+
+            const myModal = new bootstrap.Modal(document.getElementById('historyModal'));
+            myModal.show();
+
+            fetch('/admin/jobs/' + jobId + '/history')
+                .then(response => response.json())
+                .then(data => {
+                    if (!data || data.length === 0) {
+                        content.innerHTML = '<div class="text-center py-4"><i class="fas fa-info-circle fa-3x text-muted mb-3"></i><p class="text-light">No moderation history found for this job.</p></div>';
+                        return;
+                    }
+
+                    let html = '<div class="timeline">';
+                    data.forEach((log) => {
+                        const date = new Date(log.timestamp).toLocaleString();
+                        const isViolation = log.newStatus === 'VIOLATION';
+                        const badgeClass = isViolation ? 'bg-danger' : (log.newStatus === 'UNDER_REVIEW' ? 'bg-info' : 'bg-success');
+
+                        html += `
+                            <div class="mb-4 pb-4 border-bottom border-secondary">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h6 class="fw-bold mb-0 text-white">Status Change: <span class="badge ${badgeClass}">${log.oldStatus} &rarr; ${log.newStatus}</span></h6>
+                                    <small class="text-muted">${date}</small>
+                                </div>
+                                <div class="p-3 rounded" style="font-size: 14px; background: rgba(255,255,255,0.05); color: #ccc;">
+                                    <strong>Moderator:</strong> ${log.actionBy ? log.actionBy.email : 'System'}<br>
+                                    <strong>Reason:</strong> ${log.reason || 'N/A'}<br>
+                                    ${log.category ? `<strong>Category:</strong> ${log.category}<br>` : ''}
+                                    ${log.severity ? `<strong>Severity:</strong> ${log.severity}` : ''}
+                                </div>
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                    content.innerHTML = html;
+                })
+                .catch(err => {
+                    content.innerHTML = '<div class="alert alert-danger">Error loading history. Please try again later.</div>';
+                });
+        }
+    </script>
+    <script th:src="@{/js/admin-scripts.js}"></script>
+</body>
+
+</html>

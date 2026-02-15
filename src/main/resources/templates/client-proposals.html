@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+    xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Proposals - Jobify</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
+    <link rel="stylesheet" th:href="@{/webjars/font-awesome/css/all.min.css}" />
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+
+    <style>
+        .page-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            min-height: calc(100vh - 200px);
+        }
+
+        .section-header {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+
+        .section-subtitle {
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        /* Proposal Card Pro */
+        .proposal-card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 24px;
+            margin-bottom: 20px;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .proposal-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+            border-color: #bfafe8;
+        }
+
+        .card-header-flex {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+
+        .freelancer-avatar {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
+        }
+
+        .freelancer-info {
+            flex: 1;
+        }
+
+        .freelancer-name-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 4px;
+        }
+
+        .freelancer-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--dark);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .freelancer-name:hover {
+            color: var(--primary);
+        }
+
+        .verified-badge {
+            color: #28a745;
+            font-size: 14px;
+        }
+
+        .tagline {
+            font-size: 14px;
+            color: var(--dark);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .meta-row {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            font-size: 13px;
+            color: var(--gray);
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .job-context-badge {
+            background: #f0f4ff;
+            color: var(--primary);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 12px;
+            text-decoration: none;
+        }
+
+        .job-context-badge:hover {
+            background: #e1e9ff;
+            color: var(--primary-dark);
+        }
+
+        /* Skills Chips */
+        .skills-container {
+            margin-top: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .skill-chip {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            color: #495057;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        /* Side Stats */
+        .proposal-stats {
+            text-align: right;
+            min-width: 160px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 12px;
+        }
+
+        .rate-box {
+            background: #f8fff0;
+            border: 1px solid #d3f9d8;
+            padding: 10px 16px;
+            border-radius: 8px;
+            text-align: right;
+            width: 100%;
+        }
+
+        .rate-label {
+            font-size: 11px;
+            color: #2b8a3e;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .rate-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2b8a3e;
+        }
+
+        .delivery-time {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        /* Relevant Skills Box */
+        .relevant-skills-box {
+            background: #fff9db;
+            border: 1px solid #ffec99;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-top: 16px;
+            font-size: 14px;
+            color: #664d03;
+        }
+
+        .relevant-label {
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 11px;
+            margin-bottom: 4px;
+            display: block;
+            color: #e67700;
+        }
+
+        /* Cover Letter Accordion */
+        .cover-letter-section {
+            margin-top: 16px;
+            border-top: 1px solid #f1f3f5;
+            padding-top: 16px;
+        }
+
+        .btn-toggle-cover {
+            color: var(--primary);
+            font-size: 13px;
+            font-weight: 600;
+            background: none;
+            border: none;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .btn-toggle-cover:hover {
+            text-decoration: underline;
+        }
+
+        .cover-letter-content {
+            font-size: 14px;
+            color: #495057;
+            line-height: 1.6;
+            margin-top: 12px;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .cover-letter-content.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Actions Footer */
+        .card-actions {
+            margin-top: 20px;
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            border-top: 1px solid #f1f3f5;
+            padding-top: 16px;
+            align-items: center;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            background: white;
+            border-radius: 16px;
+            border: 1px dashed var(--border-color);
+        }
+
+        .empty-illustration {
+            width: 140px;
+            opacity: 0.8;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 768px) {
+            .section-title {
+                font-size: 20px;
+            }
+
+            .proposal-card {
+                padding: 16px;
+            }
+
+            .card-header-flex {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .freelancer-avatar {
+                width: 56px;
+                height: 56px;
+            }
+
+            .freelancer-name {
+                font-size: 16px;
+            }
+
+            .proposal-stats {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: space-between;
+                width: 100%;
+                margin-top: 10px;
+                text-align: left;
+                align-items: center;
+                gap: 15px;
+            }
+
+            .rate-box {
+                text-align: left;
+                width: 100%;
+                flex: 1 1 100%;
+            }
+
+            .card-actions {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
+
+            .card-actions .btn {
+                width: 100%;
+                margin: 0 !important;
+            }
+
+            .me-auto {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body class="d-flex flex-column min-vh-100" style="background-color: #f9faff;">
+
+    <!-- Header -->
+    <th:block th:replace="fragments/client-header :: clientHeader('proposals')"></th:block>
+
+    <div class="page-container">
+
+        <!-- Messages -->
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show shadow-sm border-0 mb-4"
+            role="alert">
+            <i class="fas fa-check-circle me-2"></i> <span th:text="${success}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show shadow-sm border-0 mb-4"
+            role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i> <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <!-- Section Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="section-title mb-1">Incoming Proposals</h1>
+                <p class="section-subtitle mb-0">Manage applications with our advanced candidate reviewal tools.</p>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <div th:if="${proposals != null and !proposals.isEmpty()}">
+                    <span class="badge bg-white text-dark border shadow-sm px-3 py-2">
+                        <span th:text="${proposals.size()}" class="fw-bold">0</span> Candidates
+                    </span>
+                </div>
+                <a th:href="@{/client-dashboard/}" class="btn btn-outline-primary rounded-pill px-4 btn-sm fw-bold">
+                    <i class="fas fa-arrow-left me-2"></i> Dashboard
+                </a>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" th:if="${proposals == null or proposals.isEmpty()}">
+            <img th:src="@{/images/hero-illustration.png}" class="empty-illustration" alt="No proposals">
+            <h3 class="h5 fw-bold text-dark">No proposals yet</h3>
+            <p class="text-muted mb-4">Your job posts haven't received any applications yet.<br>Try optimizing your job
+                description.</p>
+            <a th:href="@{/dashboard/add}" class="btn btn-primary rounded-pill px-4">
+                <i class="fas fa-plus-circle me-2"></i> Post a New Job
+            </a>
+        </div>
+
+        <!-- Pro Proposal List -->
+        <div class="proposals-list" th:if="${proposals != null and !proposals.isEmpty()}">
+            <div th:each="proposal : ${proposals}" class="proposal-card">
+
+                <div class="card-header-flex">
+                    <!-- Avatar -->
+                    <img th:if="${proposal.userId.photosImagePath != null}"
+                        th:src="@{${proposal.userId.photosImagePath}}" class="freelancer-avatar" alt="Avatar">
+                    <img th:unless="${proposal.userId.photosImagePath != null}" th:src="@{/images/default-user.png}"
+                        class="freelancer-avatar" alt="Avatar">
+
+                    <!-- Info -->
+                    <div class="freelancer-info">
+                        <a th:href="@{/job-details-apply/{id}(id=${proposal.job.jobPostId})}" class="job-context-badge">
+                            <i class="fas fa-briefcase me-1"></i> Applied for: <span
+                                th:text="${proposal.job.jobTitle}">Job Title</span>
+                        </a>
+
+                        <div class="freelancer-name-row">
+                            <a th:href="@{/job-seeker-profile/view/{id}(id=${proposal.userId.userAccountId})}"
+                                class="freelancer-name"
+                                th:text="${proposal.userId.firstName + ' ' + proposal.userId.lastName}">Name</a>
+                            <i class="fas fa-check-circle verified-badge" th:if="${proposal.userId.isVerified}"
+                                title="Verified Freelancer"></i>
+                        </div>
+
+                        <div class="tagline" th:if="${proposal.userId.tagline != null}"
+                            th:text="${proposal.userId.tagline}">Full Stack Developer</div>
+                        <div class="tagline text-muted fst-italic" th:unless="${proposal.userId.tagline != null}">No
+                            tagline set</div>
+
+                        <div class="meta-row">
+                            <div class="meta-item" th:if="${proposal.userId.country != null}">
+                                <i class="fas fa-map-marker-alt text-muted"></i> <span
+                                    th:text="${proposal.userId.country}">Country</span>
+                            </div>
+                            <div class="meta-item" th:if="${proposal.userId.experienceLevel != null}">
+                                <i class="fas fa-layer-group text-muted"></i> <span
+                                    th:text="${proposal.userId.experienceLevel}">level</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="far fa-clock text-muted"></i> Applied <span
+                                    th:text="${#dates.format(proposal.applyDate, 'MMM dd')}">Date</span>
+                            </div>
+                            <!-- Availability & Languages Indicators -->
+                            <div class="meta-item" th:if="${proposal.userId.availabilityStatus != null}">
+                                <i class="fas fa-calendar-check"
+                                    th:classappend="${proposal.userId.availabilityStatus == 'Available' ? 'text-success' : 'text-warning'}"></i>
+                                <span th:text="${proposal.userId.availabilityStatus}">Available</span>
+                            </div>
+                            <div class="meta-item"
+                                th:if="${proposal.userId.languages != null and !proposal.userId.languages.isEmpty()}">
+                                <i class="fas fa-language text-primary"></i>
+                                <span
+                                    th:text="${#strings.arraySplit(proposal.userId.languages, ', ').length + ' Languages'}">2
+                                    Languages</span>
+                            </div>
+                            <div class="meta-item" th:if="${proposal.userId.hoursPerWeek != null}">
+                                <i class="fas fa-hourglass-half text-muted"></i>
+                                <span th:text="${proposal.userId.hoursPerWeek}">40hr/wk</span>
+                            </div>
+                        </div>
+
+                        <!-- Skill Chips -->
+                        <div class="skills-container"
+                            th:if="${proposal.userId.skills != null and !proposal.userId.skills.isEmpty()}">
+                            <span class="skill-chip" th:each="skill, iterStat : ${proposal.userId.skills}"
+                                th:if="${iterStat.count <= 5}" th:text="${skill.name}">Skill</span>
+                            <span class="skill-chip bg-light text-muted" th:if="${proposal.userId.skills.size() > 5}"
+                                th:text="${'+' + (proposal.userId.skills.size() - 5)}">More</span>
+                        </div>
+                    </div>
+
+                    <!-- Stats & Price -->
+                    <div class="proposal-stats">
+                        <div class="rate-box">
+                            <div class="rate-label">Proposed Rate</div>
+                            <div class="rate-value" th:if="${proposal.proposedRate != null}"
+                                th:text="${'$' + #numbers.formatDecimal(proposal.proposedRate, 0, 'COMMA', 2, 'POINT')}">
+                                $0.00</div>
+                            <div class="rate-value text-muted" th:unless="${proposal.proposedRate != null}">N/A</div>
+                            <div class="delivery-time" th:if="${proposal.expectedCompletionTime != null}">
+                                <i class="fas fa-stopwatch me-1"></i> <span
+                                    th:text="${proposal.expectedCompletionTime}">5 Days</span>
+                            </div>
+                        </div>
+
+                        <div class="text-end mt-2">
+                            <span class="badge rounded-pill px-3 py-2"
+                                th:classappend="${proposal.applicationStatus == 'PENDING'} ? 'bg-warning text-dark' : (${proposal.applicationStatus == 'HIRED'} ? 'bg-success' : (${proposal.applicationStatus == 'SHORTLISTED'} ? 'bg-info' : 'bg-light text-dark'))"
+                                th:text="${proposal.applicationStatus}">Status</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Relevant Skills Pitch -->
+                <div class="relevant-skills-box"
+                    th:if="${proposal.relevantSkills != null and !proposal.relevantSkills.isEmpty()}">
+                    <span class="relevant-label"><i class="fas fa-star me-1"></i> Why I'm a fit:</span>
+                    <span th:text="${proposal.relevantSkills}">Detailed explanation of relevant skills...</span>
+                </div>
+
+                <!-- Cover Letter -->
+                <div class="cover-letter-section"
+                    th:if="${proposal.coverLetter != null and !proposal.coverLetter.isEmpty()}">
+                    <button class="btn-toggle-cover" type="button"
+                        th:onclick="'document.getElementById(\'cover-' + ${proposal.id} + '\').classList.toggle(\'show\'); this.querySelector(\'span\').textContent = this.querySelector(\'span\').textContent === \'Show Cover Letter\' ? \'Hide Cover Letter\' : \'Show Cover Letter\';'">
+                        <i class="fas fa-quote-left"></i> <span>Show Cover Letter</span>
+                    </button>
+                    <div th:id="'cover-' + ${proposal.id}" class="cover-letter-content">
+                        <strong class="d-block mb-2 text-dark">Cover Letter:</strong>
+                        <span th:text="${proposal.coverLetter}">Cover letter text...</span>
+                    </div>
+                </div>
+
+                <!-- Actions / Workflow -->
+                <div class="card-actions">
+                    <!-- Download Resume -->
+                    <a th:if="${proposal.userId.resume != null and !proposal.userId.resume.isEmpty()}"
+                        th:href="@{'/job-seeker-profile/downloadResume?fileName=' + ${proposal.userId.resume} + '&userID=' + ${proposal.userId.userAccountId}}"
+                        class="btn btn-outline-secondary btn-sm rounded-pill px-3 me-auto">
+                        <i class="fas fa-download me-1"></i> Resume
+                    </a>
+
+                    <span class="me-auto"
+                        th:unless="${proposal.userId.resume != null and !proposal.userId.resume.isEmpty()}"></span>
+
+                    <a th:href="@{/chat/{userId}(userId=${proposal.userId.userAccountId}, jobId=${proposal.job.jobPostId})}"
+                        class="btn btn-primary btn-sm rounded-pill px-4 fw-bold shadow-sm">
+                        <i class="fas fa-comment-dots me-2"></i> Message
+                    </a>
+
+                    <a th:href="@{/job-seeker-profile/view/{id}(id=${proposal.userId.userAccountId})}"
+                        class="btn btn-outline-primary btn-sm rounded-pill px-4 fw-bold">Profile</a>
+
+                    <!-- Hire Action -->
+                    <form
+                        th:if="${isVerified and proposal.applicationStatus != 'HIRED' and proposal.applicationStatus != 'REJECTED'}"
+                        th:action="@{/contract/hire/{id}(id=${proposal.id})}" method="post" style="display: inline;">
+                        <button type="submit" class="btn btn-success btn-sm rounded-pill px-4 fw-bold shadow-sm"
+                            onclick="return confirm('Start contract and proceed to payment?');">
+                            <i class="fas fa-check me-2"></i> Hire & Pay
+                        </button>
+                    </form>
+
+                    <!-- Workflow Buttons (Only show if not already hired/rejected) -->
+                    <form th:if="${proposal.applicationStatus == 'PENDING'}"
+                        th:action="@{/applications/{id}/status(id=${proposal.id})}" method="post"
+                        style="display: inline;">
+                        <input type="hidden" name="status" value="SHORTLISTED">
+                        <button type="submit" class="btn btn-outline-info btn-sm rounded-pill px-3 fw-bold">
+                            <i class="fas fa-thumbs-up me-1"></i> Shortlist
+                        </button>
+                    </form>
+
+                    <form
+                        th:if="${proposal.applicationStatus == 'PENDING' or proposal.applicationStatus == 'SHORTLISTED'}"
+                        th:action="@{/applications/{id}/status(id=${proposal.id})}" method="post"
+                        style="display: inline;">
+                        <input type="hidden" name="status" value="REJECTED">
+                        <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3 fw-bold"
+                            onclick="return confirm('Are you sure you want to reject this proposal?');">
+                            <i class="fas fa-times me-1"></i> Reject
+                        </button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <th:block th:replace="fragments/footer :: footer"></th:block>
+
+
+</body>
+
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #E34812;
+            --bg-danger: #dc3545;
+        }
+
+        .notification-badge {
+            background: var(--bg-danger);
+            color: white;
+            font-size: 0.7rem;
+            padding: 0.15rem 0.35rem;
+            border-radius: 10px;
+            min-width: 18px;
+            text-align: center;
+            position: absolute;
+            top: -5px;
+            right: -8px;
+            border: 2px solid white;
+        }
+
+        .nav-link {
+            position: relative;
+            color: inherit;
+            text-decoration: none;
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-link:hover {
+            background: rgba(227, 72, 18, 0.1);
+            color: var(--primary);
+        }
+
+        .nav-link i {
+            font-size: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <th:block th:fragment="notificationBadge">
+        <a th:href="@{/notifications/}" class="nav-link">
+            <i class="fas fa-bell"></i>
+            <span>Notifications</span>
+            <span id="notificationBadge" class="notification-badge" style="display: none;">0</span>
+        </a>
+
+        <script th:inline="javascript">
+            // Load notification count on page load
+            (function () {
+                fetch('/notifications/count')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        var badge = document.getElementById('notificationBadge');
+                        if (badge && data.count > 0) {
+                            badge.textContent = data.count > 99 ? '99+' : data.count;
+                            badge.style.display = 'inline';
+
+                            // Add shake animation for new notifications
+                            badge.style.animation = 'shake 0.5s ease';
+                            setTimeout(() => {
+                                badge.style.animation = '';
+                            }, 500);
+                        }
+                    })
+                    .catch(error => console.error('Error loading notification count:', error));
+            })();
+
+            // Shake animation for badge
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes shake {
+                    0%, 100% { transform: translateX(0); }
+                    10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
+                    20%, 40%, 60%, 80% { transform: translateX(2px); }
+                }
+            `;
+            document.head.appendChild(style);
+        </script>
+    </th:block>
+</body>
+
+</html>

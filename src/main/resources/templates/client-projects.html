@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+    xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Projects - Jobify</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
+    <link rel="stylesheet" th:href="@{/webjars/font-awesome/css/all.min.css}" />
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+
+    <style>
+        .page-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            min-height: calc(100vh - 200px);
+        }
+
+        .section-header {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+
+        .section-subtitle {
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        /* Active Project Card Pro */
+        .project-card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 0;
+            margin-bottom: 24px;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+            overflow: hidden;
+        }
+
+        .project-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+            border-color: #bfafe8;
+        }
+
+        /* Card Header */
+        .project-header {
+            background: #f8f9fa;
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .project-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--dark);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .project-title:hover {
+            color: var(--primary);
+        }
+
+        .hired-badge {
+            background: #dbe4ff;
+            color: #4263eb;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Card Body */
+        .project-body {
+            padding: 24px;
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+        }
+
+        .freelancer-section {
+            flex: 1;
+            display: flex;
+            gap: 20px;
+        }
+
+        .freelancer-avatar {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
+        }
+
+        .freelancer-details h4 {
+            font-size: 18px;
+            font-weight: 700;
+            margin: 0 0 4px 0;
+            color: var(--dark);
+        }
+
+        .freelancer-details h4 a {
+            color: var(--dark);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .freelancer-details h4 a:hover {
+            color: var(--primary);
+        }
+
+        .freelancer-tagline {
+            font-size: 14px;
+            color: var(--gray);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .freelancer-meta {
+            font-size: 13px;
+            color: #868e96;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        /* Skills Chips */
+        .skills-container {
+            margin-top: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .skill-chip {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            color: #495057;
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        /* Relevant Skills Snippet */
+        .project-scope-box {
+            background: #fff9db;
+            border: 1px solid #ffec99;
+            border-radius: 8px;
+            padding: 10px 14px;
+            margin-top: 14px;
+            font-size: 13px;
+            color: #664d03;
+        }
+
+        .scope-label {
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 10px;
+            color: #e67700;
+            display: block;
+            margin-bottom: 3px;
+        }
+
+        /* Stats Column */
+        .project-stats {
+            min-width: 200px;
+            border-left: 1px solid #f1f3f5;
+            padding-left: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .stat-item {
+            text-align: right;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .stat-value-highlight {
+            color: var(--primary);
+        }
+
+        .timeline-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #e6fcf5;
+            color: #0ca678;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        /* Footer Actions */
+        .project-footer {
+            padding: 16px 24px;
+            background: white;
+            border-top: 1px solid #f1f3f5;
+            display: flex;
+            justify-content: space-between;
+            /* Changed to space-between for left/right actions */
+            align-items: center;
+        }
+
+        .footer-left {
+            display: flex;
+            gap: 10px;
+        }
+
+        .footer-right {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            background: white;
+            border-radius: 16px;
+            border: 1px dashed var(--border-color);
+        }
+
+        .empty-illustration {
+            width: 160px;
+            opacity: 0.8;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 768px) {
+            .section-title {
+                font-size: 20px;
+            }
+
+            .project-header {
+                padding: 12px 16px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .project-body {
+                padding: 16px;
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .freelancer-section {
+                gap: 15px;
+            }
+
+            .freelancer-avatar {
+                width: 56px;
+                height: 56px;
+            }
+
+            .freelancer-details h4 {
+                font-size: 16px;
+            }
+
+            .project-stats {
+                border-left: none;
+                padding-left: 0;
+                border-top: 1px solid #f1f3f5;
+                padding-top: 20px;
+                width: 100%;
+                text-align: left;
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 20px;
+            }
+
+            .stat-item {
+                text-align: left;
+                flex: 1 1 140px;
+            }
+
+            .stat-value {
+                font-size: 16px;
+            }
+
+            .project-footer {
+                padding: 16px;
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .footer-left,
+            .footer-right {
+                width: 100%;
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .btn {
+                width: 100%;
+                margin: 0 !important;
+            }
+        }
+    </style>
+</head>
+
+<body class="d-flex flex-column min-vh-100" style="background-color: #f9faff;">
+
+    <!-- Header -->
+    <th:block th:replace="fragments/client-header :: clientHeader('projects')"></th:block>
+
+    <div class="page-container">
+
+        <!-- Messages -->
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show shadow-sm border-0 mb-4"
+            role="alert">
+            <i class="fas fa-check-circle me-2"></i> <span th:text="${success}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show shadow-sm border-0 mb-4"
+            role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i> <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <!-- Section Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="section-title mb-1">Ongoing Projects</h1>
+                <p class="section-subtitle mb-0">Track milestones, manage payments, and review work.</p>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <div th:if="${ongoingProjects != null and !ongoingProjects.isEmpty()}">
+                    <span class="badge bg-white text-dark border shadow-sm px-3 py-2">
+                        <span th:text="${ongoingProjects.size()}" class="fw-bold">0</span> Active
+                    </span>
+                </div>
+                <a th:href="@{/client-dashboard/}" class="btn btn-outline-primary rounded-pill px-4 btn-sm fw-bold">
+                    <i class="fas fa-arrow-left me-2"></i> Dashboard
+                </a>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" th:if="${ongoingProjects == null or ongoingProjects.isEmpty()}">
+            <img th:src="@{/images/hero-illustration.png}" class="empty-illustration" alt="No projects">
+            <h3 class="h5 fw-bold text-dark">No Active Projects</h3>
+            <p class="text-muted mb-4">You haven't hired any freelancers yet.<br>Review your proposals to start a new
+                project.</p>
+            <a th:href="@{/client-dashboard/proposals}" class="btn btn-primary rounded-pill px-4">
+                <i class="fas fa-file-alt me-2"></i> View Proposals
+            </a>
+        </div>
+
+        <!-- Active Projects List -->
+        <div class="projects-list" th:if="${ongoingProjects != null and !ongoingProjects.isEmpty()}">
+            <div th:each="project : ${ongoingProjects}" class="project-card">
+
+                <!-- Card Header -->
+                <div class="project-header">
+                    <a th:href="@{/job-details-apply/{id}(id=${project.job.jobPostId})}" class="project-title">
+                        <i class="fas fa-briefcase text-primary"></i>
+                        <span th:text="${project.job.jobTitle}">Job Title</span>
+                    </a>
+                    <span class="hired-badge">
+                        <i class="fas fa-circle text-success" style="font-size: 6px;"></i> In Progress
+                    </span>
+                </div>
+
+                <!-- Card Body -->
+                <div class="project-body">
+                    <!-- Freelancer Info -->
+                    <div class="freelancer-section">
+                        <img th:if="${project.userId.photosImagePath != null}"
+                            th:src="@{${project.userId.photosImagePath}}" class="freelancer-avatar" alt="Avatar">
+                        <img th:unless="${project.userId.photosImagePath != null}" th:src="@{/images/default-user.png}"
+                            class="freelancer-avatar" alt="Avatar">
+
+                        <div class="freelancer-details">
+                            <h4 class="mb-1">
+                                <a th:href="@{/job-seeker-profile/view/{id}(id=${project.userId.userAccountId})}"
+                                    th:text="${project.userId.firstName + ' ' + project.userId.lastName}">Freelancer
+                                    Name</a>
+                            </h4>
+                            <div class="freelancer-tagline" th:if="${project.userId.tagline != null}"
+                                th:text="${project.userId.tagline}">Developer</div>
+                            <div class="freelancer-tagline fst-italic text-muted"
+                                th:unless="${project.userId.tagline != null}">
+                                Freelancer
+                            </div>
+
+                            <div class="freelancer-meta mt-2">
+                                <span><i class="far fa-calendar-check me-1"></i> Hired <span
+                                        th:text="${#dates.format(project.applyDate, 'MMM dd')}">Date</span></span>
+                                <span th:if="${project.userId.country != null}"><i
+                                        class="fas fa-map-marker-alt me-1"></i> <span
+                                        th:text="${project.userId.country}">Country</span></span>
+                            </div>
+
+                            <!-- Skills Chips (Limit to 3) -->
+                            <div class="skills-container"
+                                th:if="${project.userId.skills != null and !project.userId.skills.isEmpty()}">
+                                <span class="skill-chip" th:each="skill, iterStat : ${project.userId.skills}"
+                                    th:if="${iterStat.count <= 3}" th:text="${skill.name}">Skill</span>
+                            </div>
+
+                            <!-- Scope / Relevant Skills Snippet -->
+                            <div class="project-scope-box"
+                                th:if="${project.relevantSkills != null and !project.relevantSkills.isEmpty()}">
+                                <span class="scope-label"><i class="fas fa-crosshairs me-1"></i> Project Focus</span>
+                                <span th:text="${#strings.abbreviate(project.relevantSkills, 100)}"
+                                    class="text-truncate-2">Skills...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Project Stats -->
+                    <div class="project-stats">
+                        <div class="stat-item">
+                            <div class="stat-label">Agreed Budget</div>
+                            <div class="stat-value stat-value-highlight" th:if="${project.proposedRate != null}"
+                                th:text="${'$' + #numbers.formatDecimal(project.proposedRate, 0, 'COMMA', 2, 'POINT')}">
+                                $0.00</div>
+                            <div class="stat-value text-muted" th:unless="${project.proposedRate != null}">N/A</div>
+                            <div class="small text-muted mt-1"><i class="fas fa-lock me-1"></i> Escrow Secured</div>
+                        </div>
+
+                        <div class="stat-item">
+                            <div class="stat-label">Timeline</div>
+                            <div class="timeline-badge" th:if="${project.expectedCompletionTime != null}">
+                                <i class="fas fa-stopwatch"></i> <span th:text="${project.expectedCompletionTime}">2
+                                    Weeks</span>
+                            </div>
+                            <div class="text-muted small" th:unless="${project.expectedCompletionTime != null}">Not
+                                specified</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Actions -->
+                <div class="project-footer">
+                    <div class="footer-left">
+                        <!-- Mark as Completed Workflow -->
+                        <form th:action="@{/applications/{id}/status(id=${project.id})}" method="post">
+                            <input type="hidden" name="status" value="COMPLETED">
+                            <button type="submit" class="btn btn-outline-success btn-sm rounded-pill px-4 fw-bold"
+                                onclick="return confirm('Are you sure you want to mark this project as COMPLETED? This action indicates the work is done.');">
+                                <i class="fas fa-check-circle me-1"></i> Mark Complete
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="footer-right">
+                        <!-- View Contract -->
+                        <a th:href="@{/job-details-apply/{id}(id=${project.job.jobPostId})}"
+                            class="btn btn-outline-secondary btn-sm rounded-pill px-4 fw-bold">Contract</a>
+
+                        <!-- Rate Button -->
+                        <a th:href="@{/ratings/submit/{id}(id=${project.id})}"
+                            class="btn btn-outline-warning btn-sm rounded-pill px-4 fw-bold"
+                            th:if="${projectRatedMap != null and not projectRatedMap.get(project.id)}">
+                            <i class="far fa-star me-1"></i> Rate
+                        </a>
+                        <a th:href="@{/ratings/view/{id}(id=${project.userId.userAccountId})}"
+                            class="btn btn-warning btn-sm rounded-pill px-4 fw-bold text-white"
+                            th:if="${projectRatedMap != null and projectRatedMap.get(project.id)}">
+                            <i class="fas fa-star me-1"></i> Rated
+                        </a>
+
+                        <!-- Message -->
+                        <a th:href="@{/chat/{userId}(userId=${project.userId.userAccountId}, jobId=${project.job.jobPostId})}"
+                            class="btn btn-primary btn-sm rounded-pill px-4 fw-bold shadow-sm">
+                            <i class="fas fa-comments me-2"></i> Message
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <th:block th:replace="fragments/footer :: footer"></th:block>
+
+
+</body>
+
+</html>

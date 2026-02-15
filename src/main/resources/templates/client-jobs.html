@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+    xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>My Job Posts - Jobify</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
+    <link rel="stylesheet" th:href="@{/webjars/font-awesome/css/all.min.css}" />
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            --primary: #4B6CB7;
+            --primary-light: #182848;
+            --accent: #00b4d8;
+            --success: #2ecc71;
+            --warning: #f1c40f;
+            --danger: #e74c3c;
+            --bg-body: #f5f7fa;
+            --glass-bg: rgba(255, 255, 255, 0.8);
+            --glass-border: rgba(255, 255, 255, 0.4);
+            --card-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+            --radius-xl: 18px;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            color: #2D3436;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+        }
+
+        .page-header {
+            background: white;
+            padding: 30px 0;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title h1 {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--primary-light);
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+
+        .header-title p {
+            color: #636E72;
+            margin: 5px 0 0 0;
+            font-size: 14px;
+        }
+
+        .content-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--card-shadow);
+            padding: 0;
+            overflow: hidden;
+            margin-bottom: 40px;
+        }
+
+        .table-custom {
+            margin-bottom: 0;
+        }
+
+        .table-custom th {
+            background: rgba(75, 108, 183, 0.03);
+            border-top: none;
+            padding: 20px 24px;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #636E72;
+            border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .table-custom td {
+            padding: 24px;
+            vertical-align: middle;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+            font-size: 15px;
+        }
+
+        .job-title-cell {
+            font-weight: 700;
+            color: var(--primary-light);
+        }
+
+        .job-meta {
+            font-size: 12px;
+            color: #636E72;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 4px;
+        }
+
+        .job-meta i {
+            margin-right: 5px;
+            color: var(--primary);
+            opacity: 0.7;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-action {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: none;
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-edit {
+            background: var(--primary);
+            box-shadow: 0 4px 10px rgba(75, 108, 183, 0.2);
+        }
+
+        .btn-edit:hover {
+            background: var(--primary-light);
+            transform: translateY(-3px) scale(1.1);
+            color: white;
+        }
+
+        .btn-delete {
+            background: var(--danger);
+            box-shadow: 0 4px 10px rgba(231, 76, 60, 0.2);
+        }
+
+        .btn-delete:hover {
+            background: #c0392b;
+            transform: translateY(-3px) scale(1.1);
+            color: white;
+        }
+
+        .badge-candidates {
+            background: rgba(52, 152, 219, 0.1);
+            color: #2980b9;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 12px;
+        }
+
+        .empty-state {
+            padding: 80px 40px;
+            text-align: center;
+        }
+
+        .empty-state i {
+            font-size: 64px;
+            color: #dfe6e9;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            font-weight: 800;
+            color: var(--primary-light);
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: #636E72;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+
+    <!-- Header -->
+    <th:block th:replace="fragments/client-header :: clientHeader('jobs')"></th:block>
+
+    <div class="page-header">
+        <div class="header-container">
+            <div class="header-title">
+                <h1>Manage Your Job Posts</h1>
+                <p>Monitor your active listings and find the right talent.</p>
+            </div>
+            <a th:href="@{/dashboard/add}" class="btn btn-primary px-4 fw-bold" style="border-radius: 12px;">
+                <i class="fas fa-plus me-2"></i> Post New Job
+            </a>
+        </div>
+    </div>
+
+    <div class="container py-2" style="max-width: 1200px;">
+
+        <div class="content-card">
+            <div th:if="${postedJobs.empty}" class="empty-state">
+                <i class="fas fa-briefcase"></i>
+                <h3>No jobs posted yet</h3>
+                <p>You haven't posted any jobs. Start hiring today to find your dream team.</p>
+                <a th:href="@{/dashboard/add}" class="btn btn-primary btn-lg px-5 fw-bold" style="border-radius: 15px;">
+                    Create Your First Job
+                </a>
+            </div>
+
+            <div th:unless="${postedJobs.empty}" class="table-responsive">
+                <table class="table table-custom">
+                    <thead>
+                        <tr>
+                            <th>Job Information</th>
+                            <th>Candidates</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="job : ${postedJobs}">
+                            <td>
+                                <div class="job-title-cell" th:text="${job.jobTitle}">UI/UX Designer</div>
+                                <div class="job-meta">
+                                    <span><i class="fas fa-map-marker-alt"></i> <span
+                                            th:text="${job.jobLocationId.city + ', ' + job.jobLocationId.country}">City,
+                                            Country</span></span>
+                                    <span><i class="fas fa-calendar-alt"></i> <span
+                                            th:text="${#calendars.format(job.postedDate, 'MMM dd, yyyy')}">Date</span></span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge-candidates">
+                                    <i class="fas fa-users me-1"></i>
+                                    <span th:text="${job.totalCandidates}">0</span> Candidates Applied
+                                </span>
+                            </td>
+                            <td>
+                                <div class="action-btns justify-content-center">
+                                    <a th:href="@{/dashboard/edit/{id}(id=${job.jobPostId})}"
+                                        class="btn-action btn-edit" title="Edit Job">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button class="btn-action btn-delete"
+                                        th:onclick="'confirmDelete(' + ${job.jobPostId} + ')'" title="Delete Job">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden form for deletion -->
+    <form id="deleteForm" method="post" style="display: none;">
+        <input type="hidden" name="_method" value="POST" />
+    </form>
+
+    <!-- Footer -->
+    <th:block th:replace="fragments/footer :: footer"></th:block>
+
+
+
+    <script th:inline="javascript">
+        function confirmDelete(id) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this! All applications for this job will also be removed.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#e74c3c',
+                cancelButtonColor: '#636E72',
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'Cancel',
+                borderRadius: '15px'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const form = document.getElementById('deleteForm');
+                    form.action = '/dashboard/deleteJob/' + id;
+                    form.submit();
+                }
+            })
+        }
+    </script>
+</body>
+
+</html>

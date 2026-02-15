@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+    xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Post New Job - Jobify</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
+    <link rel="stylesheet" th:href="@{/webjars/font-awesome/css/all.min.css}" />
+    <!-- Summernote -->
+    <link th:rel="stylesheet" type="text/css" media="all" th:href="@{/summernote/summernote-lite.min.css}" />
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+
+    <style>
+        :root {
+            --primary: #4b6cb7;
+            --primary-light: #eef2fb;
+            --primary-dark: #182848;
+            --dark: #1A1A2E;
+            --light: #F8F9FA;
+            --gray: #6C757D;
+            --border: #E0E0E0;
+            --radius: 10px;
+            --transition: all 0.3s ease;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+
+
+        /* Main Content */
+        .page-container {
+            width: 100%;
+            margin: 0 auto;
+            padding: 40px 24px;
+            flex: 1;
+        }
+
+        .job-form-card {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 40px 30px;
+            border: 1px solid var(--border);
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 12px;
+        }
+
+        .page-subtitle {
+            color: var(--gray);
+            font-size: 15px;
+        }
+
+        .form-section-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--dark);
+            margin: 40px 0 25px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--primary-light);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+        }
+
+        .form-section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 60px;
+            height: 2px;
+            background: var(--primary);
+        }
+
+        .form-section-title i {
+            color: var(--primary);
+            font-size: 18px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+
+        .form-control,
+        .form-select {
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius);
+            padding: 14px 16px;
+            font-size: 15px;
+            transition: var(--transition);
+            background: #fff;
+            color: var(--dark);
+        }
+
+        .form-control:hover,
+        .form-select:hover {
+            border-color: #cbd5e0;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(75, 108, 183, 0.15);
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 16px 40px;
+            font-weight: 700;
+            font-size: 16px;
+            border-radius: var(--radius);
+            border: none;
+            transition: var(--transition);
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-submit:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(75, 108, 183, 0.3);
+        }
+
+        /* Wizard Steps */
+        .step-content {
+            display: none;
+        }
+
+        .step-content.active {
+            display: block;
+            animation: slideIn 0.4s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Progress Bar */
+        .progress-wizard {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            position: relative;
+            padding: 0 40px;
+        }
+
+        .progress-wizard::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 80px;
+            right: 80px;
+            height: 2px;
+            background: #e0e0e0;
+            z-index: 1;
+        }
+
+        .progress-line {
+            position: absolute;
+            top: 20px;
+            left: 80px;
+            width: 0%;
+            height: 2px;
+            background: var(--primary);
+            z-index: 1;
+            transition: width 0.4s ease;
+        }
+
+        .step-item {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+
+        .step-circle {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: white;
+            border: 2px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            font-weight: 700;
+            color: var(--gray);
+            transition: all 0.3s ease;
+        }
+
+        .step-item.active .step-circle {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 0 0 5px rgba(75, 108, 183, 0.1);
+        }
+
+        .step-item.completed .step-circle {
+            background: #28A745;
+            border-color: #28A745;
+            color: white;
+        }
+
+        .step-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--gray);
+        }
+
+        .step-item.active .step-label {
+            color: var(--primary);
+        }
+
+        /* Layout Overhaul */
+        .wizard-container {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 40px;
+            align-items: start;
+        }
+
+        @media (max-width: 992px) {
+            .wizard-container {
+                grid-template-columns: 1fr;
+            }
+
+            .preview-column {
+                display: none;
+            }
+        }
+
+        /* Live Preview Card */
+        .preview-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid var(--border);
+            position: sticky;
+            top: 100px;
+            box-shadow: var(--shadow);
+        }
+
+        .preview-header {
+            border-bottom: 2px solid var(--primary-light);
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+
+        .preview-title-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--primary);
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .preview-job-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .preview-meta {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .meta-box {
+            background: #f8fafc;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #edf2f7;
+        }
+
+        .meta-label {
+            font-size: 10px;
+            color: var(--gray);
+            margin-bottom: 2px;
+        }
+
+        .meta-value {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        /* Navigation Buttons */
+        .wizard-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            padding-top: 25px;
+            border-top: 1px solid var(--border);
+        }
+
+        .btn-wizard {
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-prev {
+            background: white;
+            border: 1px solid var(--border);
+            color: var(--gray);
+        }
+
+        .btn-prev:hover {
+            background: #f8fafc;
+            color: var(--dark);
+        }
+
+        .btn-next {
+            background: var(--primary);
+            border: none;
+            color: white;
+        }
+
+        .btn-next:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .skill-badge {
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            border: 1px solid rgba(75, 108, 183, 0.1);
+        }
+
+        #previewDesc {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .alert {
+            border-radius: var(--radius);
+            border: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            margin-bottom: 25px;
+        }
+    </style>
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+    <!-- Header -->
+    <!-- Header -->
+    <th:block th:replace="fragments/client-header :: clientHeader(activePage='post-job')"></th:block>
+
+    <!-- Main Content -->
+    <div class="page-container" style="max-width: 98% !important;">
+        <!-- Mobile Back Button -->
+        <div class="d-lg-none mb-3">
+            <a th:href="@{/client-dashboard/}"
+                class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-2"
+                style="border-radius: 8px;">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back to Dashboard</span>
+            </a>
+        </div>
+
+        <div class="page-header">
+            <h1 class="page-title">Post a New Job</h1>
+            <p class="page-subtitle">Find the best talent for your project by providing detailed requirements.</p>
+        </div>
+
+        <div class="progress-wizard">
+            <div class="progress-line" id="progressLine"></div>
+            <div class="step-item active" data-step="1">
+                <div class="step-circle">1</div>
+                <div class="step-label">Details</div>
+            </div>
+            <div class="step-item" data-step="2">
+                <div class="step-circle">2</div>
+                <div class="step-label">Specs</div>
+            </div>
+            <div class="step-item" data-step="3">
+                <div class="step-circle">3</div>
+                <div class="step-label">Location</div>
+            </div>
+        </div>
+
+        <div class="wizard-container">
+            <!-- Form Column -->
+            <div class="job-form-card">
+                <!-- Verification Status Alerts -->
+                <div th:if="${recruiterProfile != null and !recruiterProfile.isVerified}"
+                    class="alert alert-warning fade show">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-exclamation-triangle me-3 fa-lg text-warning"></i>
+                        <div>
+                            <strong class="d-block">Account Verification Required</strong>
+                            <small class="text-muted">You must be verified before you can publish jobs.</small>
+                        </div>
+                    </div>
+                </div>
+
+                <form id="job-main-form" th:action="@{/dashboard/addNew}" th:object="${jobPostActivity}" method="post">
+                    <input hidden type="text" th:field="*{jobPostId}">
+                    <input hidden type="text" th:field="*{jobLocationId.Id}">
+                    <input hidden type="text" th:field="*{jobCompanyId.Id}">
+
+                    <!-- STEP 1: JOB DETAILS -->
+                    <div class="step-content active" id="step1">
+                        <div class="form-section-title">
+                            <i class="fas fa-edit"></i> Basic Job Information
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="title" class="form-label">Job Title</label>
+                            <input id="title" type="text" th:field="*{jobTitle}" class="form-control"
+                                placeholder="e.g. Senior Java Developer for FinTech Project" required>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="category" class="form-label">Job Category</label>
+                            <select id="category" th:field="*{jobCategory}" class="form-select" required>
+                                <option value="">Select Category</option>
+                                <option value="AI & Machine Learning">AI & Machine Learning</option>
+                                <option value="Data Science & Analytics">Data Science & Analytics</option>
+                                <option value="Web, Mobile & Software Development">Web, Mobile & Software Development
+                                </option>
+                                <option value="Sales & Marketing">Sales & Marketing</option>
+                                <option value="Design & Creative">Design & Creative</option>
+                                <option value="Writing">Writing</option>
+                                <option value="Engineering & Architecture">Engineering & Architecture</option>
+                                <option value="IT & Networking">IT & Networking</option>
+                                <option value="Customer Service">Customer Service</option>
+                                <option value="Legal">Legal</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-0">
+                            <label for="content" class="form-label">Detailed Job Description</label>
+                            <textarea id="content" th:field="*{descriptionOfJob}" class="form-control"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- STEP 2: SPECIFICATIONS -->
+                    <div class="step-content" id="step2">
+                        <div class="form-section-title">
+                            <i class="fas fa-layer-group"></i> Skills & project Specs
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="skills" class="form-label">Required Skills</label>
+                            <input id="skills" type="text" th:field="*{requiredSkills}" class="form-control"
+                                placeholder="e.g. Java, Spring Boot, MySQL (comma separated)">
+                            <div class="form-text text-muted">Separate multiple skills with commas.</div>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6 mb-3">
+                                <label for="projectType" class="form-label">Project Type</label>
+                                <select id="projectType" th:field="*{projectType}" class="form-select" required>
+                                    <option value="">Select Type</option>
+                                    <option th:value="Fixed-Price">Fixed-Price</option>
+                                    <option th:value="Hourly">Hourly</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="salary" class="form-label">Budget / Rate</label>
+                                <input id="salary" th:field="*{salary}" type="text" class="form-control"
+                                    placeholder="e.g. $500 - $1000">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="duration" class="form-label">Duration</label>
+                                <input id="duration" th:field="*{projectDuration}" type="text" class="form-control"
+                                    placeholder="e.g. 3 months">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="type" class="form-label">Employment Type</label>
+                                <select id="type" th:field="*{jobType}" class="form-select">
+                                    <option value="">Select Type</option>
+                                    <option th:value="Full-time">Full-time</option>
+                                    <option th:value="Part-time">Part-time</option>
+                                    <option th:value="Freelance">Freelance</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- STEP 3: LOCATION -->
+                    <div class="step-content" id="step3">
+                        <div class="form-section-title">
+                            <i class="fas fa-map-marker-alt"></i> Location & Company
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6 mb-3">
+                                <label for="remote" class="form-label">Work Mode</label>
+                                <select id="remote" th:field="*{remote}" class="form-select">
+                                    <option value="">Select Mode</option>
+                                    <option th:value="Remote-Only">Remote Only</option>
+                                    <option th:value="Office-Only">Office Only</option>
+                                    <option th:value="Partial-Remote">Hybrid</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="deadline" class="form-label">Application Deadline</label>
+                                <input id="deadline" th:field="*{applicationDeadline}" type="date" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-4 mb-3">
+                                <label for="city" class="form-label">City</label>
+                                <input th:field="*{jobLocationId.city}" id="city" type="text" class="form-control"
+                                    placeholder="City">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="state" class="form-label">State</label>
+                                <input id="state" th:field="*{jobLocationId.state}" type="text" class="form-control"
+                                    placeholder="State">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="country" class="form-label">Country</label>
+                                <input id="country" th:field="*{jobLocationId.country}" type="text" class="form-control"
+                                    placeholder="Country">
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="companyName" class="form-label">Company Name (Optional)</label>
+                            <input id="companyName" th:field="*{jobCompanyId.name}" type="text" class="form-control"
+                                placeholder="Your company name">
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="wizard-actions">
+                        <button type="button" class="btn btn-wizard btn-prev" id="prevBtn"
+                            style="display: none;">Back</button>
+                        <button type="button" class="btn btn-wizard btn-next" id="nextBtn">Next Setup</button>
+                        <button type="submit" class="btn btn-wizard btn-next" id="submitBtn"
+                            style="display: none;">Publish Job</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Preview Column -->
+            <div class="preview-column">
+                <div class="preview-card">
+                    <div class="preview-title-label">Live Preview</div>
+                    <div class="preview-header">
+                        <div id="previewTitle" class="preview-job-title">Job Title Appears Here</div>
+                        <div class="text-muted small mt-1">
+                            <i class="fas fa-tag me-1"></i> <span id="previewCategory">Category</span>
+                        </div>
+                    </div>
+
+                    <div class="preview-meta">
+                        <div class="meta-box">
+                            <div class="meta-label">Budget</div>
+                            <div id="previewBudget" class="meta-value">$0.00</div>
+                        </div>
+                        <div class="meta-box">
+                            <div class="meta-label">Type</div>
+                            <div id="previewType" class="meta-value">Fixed</div>
+                        </div>
+                        <div class="meta-box">
+                            <div class="meta-label">Location</div>
+                            <div id="previewLocation" class="meta-value">Remote</div>
+                        </div>
+                        <div class="meta-box">
+                            <div class="meta-label">Duration</div>
+                            <div id="previewDuration" class="meta-value">Ongoing</div>
+                        </div>
+                    </div>
+
+                    <div id="previewDesc" class="small text-muted"
+                        style="max-height: 80px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical;">
+                        Provide a description to see it here...
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <div class="meta-label mb-2">Required Skills</div>
+                    <div id="previewSkills" class="d-flex flex-wrap gap-1">
+                        <!-- Skill tags will appear here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <script th:src="@{/summernote/summernote-lite.min.js}"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Initialize Summernote
+            $('#content').summernote({
+                height: 200,
+                placeholder: 'Describe the role, responsibilities, and requirements...',
+                toolbar: [
+                    ['style', ['style']],
+                    ['font', ['bold', 'underline', 'clear']],
+                    ['color', ['color']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['insert', ['link']],
+                    ['view', ['codeview', 'help']]
+                ],
+                callbacks: {
+                    onChange: function (contents, $editable) {
+                        updatePreview();
+                    }
+                }
+            });
+
+            // Wizard Logic
+            let currentStep = 1;
+            const totalSteps = 3;
+
+            function updateWizard() {
+                // Update Step Visibility
+                $('.step-content').removeClass('active');
+                $(`#step${currentStep}`).addClass('active');
+
+                // Update Progress Indicator
+                $('.step-item').removeClass('active completed');
+                $('.step-item').each(function () {
+                    const step = $(this).data('step');
+                    if (step === currentStep) {
+                        $(this).addClass('active');
+                    } else if (step < currentStep) {
+                        $(this).addClass('completed');
+                    }
+                });
+
+                // Update Progress Line
+                const progressWidth = ((currentStep - 1) / (totalSteps - 1)) * 80; // Adjust for padding
+                $('#progressLine').css('width', `${progressWidth}%`);
+
+                // Update Buttons
+                if (currentStep === 1) {
+                    $('#prevBtn').hide();
+                    $('#nextBtn').text('Next: Specifications').show();
+                    $('#submitBtn').hide();
+                } else if (currentStep === 2) {
+                    $('#prevBtn').show();
+                    $('#nextBtn').text('Next: Finalize').show();
+                    $('#submitBtn').hide();
+                } else {
+                    $('#prevBtn').show();
+                    $('#nextBtn').hide();
+                    $('#submitBtn').show();
+                }
+
+                // Scroll to top of card on step change
+                $('.job-form-card')[0].scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+
+            $('#nextBtn').click(function () {
+                if (validateCurrentStep()) {
+                    currentStep++;
+                    updateWizard();
+                }
+            });
+
+            $('#prevBtn').click(function () {
+                currentStep--;
+                updateWizard();
+            });
+
+            function validateCurrentStep() {
+                const stepDiv = $(`#step${currentStep}`);
+                const requiredInputs = stepDiv.find('[required]');
+                let isValid = true;
+
+                requiredInputs.each(function () {
+                    if (!this.checkValidity()) {
+                        this.reportValidity();
+                        isValid = false;
+                        return false;
+                    }
+                });
+                return isValid;
+            }
+
+            // Real-time Preview Logic
+            function updatePreview() {
+                $('#previewTitle').text($('#title').val() || 'Job Title Appears Here');
+                $('#previewCategory').text($('#category').val() || 'Category');
+                $('#previewBudget').text($('#salary').val() || '$0.00');
+                $('#previewType').text($('#projectType').val() || 'Type');
+                $('#previewLocation').text($('#remote').val() || 'Remote');
+                $('#previewDuration').text($('#duration').val() || 'Ongoing');
+
+                // Preview Description
+                const rawContent = $('#content').val();
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = rawContent;
+                const textContent = tempDiv.textContent || tempDiv.innerText || "";
+                $('#previewDesc').text(textContent || 'Provide a description to see it here...');
+
+                // Preview Skills
+                const skillsField = $('#skills').val();
+                const skillsContainer = $('#previewSkills');
+                skillsContainer.empty();
+
+                if (skillsField) {
+                    const skills = skillsField.split(',').map(s => s.trim()).filter(s => s !== "");
+                    skills.forEach(skill => {
+                        skillsContainer.append(`<span class="skill-badge">${skill}</span>`);
+                    });
+                }
+            }
+
+            // Listen for input changes
+            $('input, select, textarea').on('input change', updatePreview);
+
+            // Initial call
+            updateWizard();
+            updatePreview();
+        });
+    </script>
+
+    <!-- Footer -->
+    <th:block th:replace="fragments/footer :: footer"></th:block>
+</body>
+
+</html>

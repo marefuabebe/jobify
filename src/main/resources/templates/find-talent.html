@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+    xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Find Talent - Jobify</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
+    <link rel="stylesheet" th:href="@{/webjars/font-awesome/css/all.min.css}" />
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <style>
+        :root {
+            --primary: #3B5998;
+            --primary-dark: #2d4373;
+            --secondary: #6C757D;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --card-bg: #ffffff;
+            --border-color: #e9ecef;
+            --radius-lg: 16px;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
+        }
+
+        body {
+            background-color: #f4f6f9;
+            color: #333;
+        }
+
+        /* Layout */
+        .dashboard-layout {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 24px;
+            margin-bottom: 40px;
+            align-items: stretch;
+        }
+
+        @media (max-width: 992px) {
+            .dashboard-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Cards */
+        .content-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        .card-header-custom {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-color);
+            background: white;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .card-body-custom {
+            padding: 24px;
+        }
+
+        .filter-group {
+            margin-bottom: 20px;
+        }
+
+        /* Filter Styles */
+        .sidebar-column {
+            position: relative;
+        }
+
+        .sticky-sidebar {
+            position: sticky;
+            top: 100px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .sidebar-column .content-card {
+            margin-bottom: 0;
+            height: auto;
+        }
+
+        .filter-label {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: #495057;
+            display: block;
+        }
+
+        .filter-input,
+        .filter-select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .filter-input:focus,
+        .filter-select:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 180, 216, 0.1);
+        }
+
+        .btn-filter {
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-filter:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .btn-clear {
+            color: var(--secondary);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            display: block;
+            text-align: center;
+            margin-top: 12px;
+        }
+
+        .btn-clear:hover {
+            color: var(--dark);
+        }
+
+        /* Hero Search Bar */
+        .hero-search-container {
+            flex-grow: 1;
+            max-width: 600px;
+            margin-left: 40px;
+        }
+
+        .hero-search-box {
+            background: white;
+            border-radius: 12px;
+            padding: 6px 6px 6px 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            width: 100%;
+        }
+
+        .hero-search-input {
+            border: none;
+            padding: 12px;
+            font-size: 15px;
+            flex-grow: 1;
+            outline: none;
+            width: 100%;
+        }
+
+        .hero-search-divider {
+            width: 1px;
+            height: 24px;
+            background: var(--border-color);
+        }
+
+        .btn-hero-search {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 15px;
+            transition: all 0.2s;
+            margin-left: 5px;
+        }
+
+        .btn-hero-search:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 1200px) {
+            .hero-search-container {
+                display: none;
+                /* Hide on smaller header, filters still in sidebar */
+            }
+        }
+
+        /* Talent Grid */
+        .talent-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        @media (max-width: 576px) {
+            .talent-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .talent-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .talent-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+            border-color: rgba(0, 180, 216, 0.3);
+        }
+
+        .freelancer-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .freelancer-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            text-decoration: none;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .freelancer-location {
+            font-size: 12px;
+            color: #6c757d;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .badge-verified {
+            color: #28A745;
+            background: rgba(40, 167, 69, 0.1);
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .skill-badge {
+            background: #f8f9fa;
+            color: #495057;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            display: inline-block;
+            margin: 0 6px 8px 0;
+            border: 1px solid #e9ecef;
+        }
+
+        .actions-row {
+            margin-top: auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            width: 100%;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .btn-action {
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            text-align: center;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .btn-action {
+            padding: 8px 5px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 12px;
+            text-align: center;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .btn-view {
+            background: white;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-view:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-message {
+            background: var(--primary);
+            color: white;
+            border: 1px solid var(--primary);
+        }
+
+        .btn-message:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+
+        .animate-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+
+    <!-- Header -->
+    <th:block th:replace="fragments/client-header :: clientHeader('find-talent')"></th:block>
+
+    <div class="container-fluid py-4" style="max-width: 1400px;">
+        <!-- Mobile Back Button -->
+        <div class="d-lg-none mb-3">
+            <a th:href="@{/client-dashboard/}"
+                class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-2"
+                style="border-radius: 8px;">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back to Dashboard</span>
+            </a>
+        </div>
+
+        <!-- Page Title & Hero Search -->
+        <div class="d-flex justify-content-between align-items-center mb-5 animate-on-scroll visible">
+            <div style="flex: 1;">
+                <h2 class="fw-bold text-dark mb-2" style="font-size: 2.2rem; letter-spacing: -0.5px;">
+                    <span class="text-primary">Elite</span> Talent,
+                    <span style="color: var(--primary-dark);">Limitless</span> Potential
+                </h2>
+                <p class="text-muted mb-0" style="font-size: 1.1rem; max-width: 500px;">Connect with world-class experts
+                    and scale your vision with verified professional power.</p>
+            </div>
+
+            <!-- Hero Search (Right Side) -->
+            <div class="hero-search-container">
+                <form th:action="@{/find-talent/}" method="get" class="hero-search-box">
+                    <div class="d-flex align-items-center flex-grow-1">
+                        <i class="fas fa-search text-primary ms-2"></i>
+                        <input type="text" name="search" class="hero-search-input" placeholder="Search keywords..."
+                            th:value="${search}">
+                    </div>
+                    <div class="hero-search-divider"></div>
+                    <div class="d-flex align-items-center flex-grow-1">
+                        <i class="fas fa-map-marker-alt text-primary ms-2"></i>
+                        <input type="text" name="location" class="hero-search-input" placeholder="Location..."
+                            th:value="${location}">
+                    </div>
+                    <button type="submit" class="btn-hero-search">
+                        Search
+                    </button>
+                    <!-- Hidden fields to maintain other filters -->
+                    <input type="hidden" name="skill" th:value="${skill}">
+                    <input type="hidden" name="experienceLevel" th:value="${experienceLevel}">
+                </form>
+            </div>
+
+            <div class="ms-4 text-end d-none d-xl-block">
+                <span class="badge bg-white text-primary border px-3 py-2 rounded-pill shadow-sm">
+                    <i class="fas fa-users me-2"></i>
+                    <span th:text="${totalItems + ' Professionals Found'}">0 Professionals Found</span>
+                </span>
+            </div>
+        </div>
+
+        <div class="dashboard-layout">
+
+            <!-- Sidebar Filters -->
+            <aside class="sidebar-column animate-on-scroll" style="transition-delay: 0.1s;">
+                <div class="sticky-sidebar">
+                    <div class="content-card">
+                        <div class="card-header-custom">
+                            <i class="fas fa-sliders-h me-2 text-primary"></i> Filters
+                        </div>
+                        <div class="card-body-custom">
+                            <form th:action="@{/find-talent/}" method="get">
+
+                                <!-- Search -->
+                                <div class="filter-group">
+                                    <label class="filter-label">Keywords</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white border-end-0"><i
+                                                class="fas fa-search text-muted"></i></span>
+                                        <input type="text" class="filter-input border-start-0 ps-0" name="search"
+                                            placeholder="Name, skills..." th:value="${search}">
+                                    </div>
+                                </div>
+
+                                <!-- Skill -->
+                                <div class="filter-group">
+                                    <label class="filter-label">Specific Skill</label>
+                                    <input type="text" class="filter-input" name="skill" placeholder="e.g. React, Java"
+                                        th:value="${skill}">
+                                </div>
+
+                                <!-- Experience -->
+                                <div class="filter-group">
+                                    <label class="filter-label">Experience Level</label>
+                                    <select class="filter-select" name="experienceLevel">
+                                        <option value="">Any Experience</option>
+                                        <option value="Beginner" th:selected="${experienceLevel == 'Beginner'}">Beginner
+                                        </option>
+                                        <option value="Intermediate" th:selected="${experienceLevel == 'Intermediate'}">
+                                            Intermediate</option>
+                                        <option value="Advanced" th:selected="${experienceLevel == 'Advanced'}">Advanced
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <button type="submit" class="btn-filter shadow-sm">
+                                    Apply Filters
+                                </button>
+
+                                <a th:href="@{/find-talent/}" class="btn-clear"
+                                    th:if="${search != null or skill != null or experienceLevel != null}">
+                                    <i class="fas fa-times me-1"></i> Clear All Filters
+                                </a>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Help Card -->
+                    <div class="content-card bg-primary text-white border-0"
+                        style="background: linear-gradient(135deg, #3B5998 0%, #2d4373 100%);">
+                        <div class="p-4">
+                            <h5 class="fw-bold mb-2">Need a Specialist?</h5>
+                            <p class="small mb-3" style="opacity: 0.9;">Our recruiting team can help you find the
+                                perfect
+                                match for complex projects.</p>
+                            <a href="#" class="btn btn-light btn-sm w-100 fw-bold text-primary">Contact Support</a>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="main-column">
+
+                <!-- Empty State -->
+                <div th:if="${freelancers == null or freelancers.isEmpty()}"
+                    class="content-card text-center py-5 animate-on-scroll">
+                    <div class="py-4">
+                        <i class="fas fa-search fa-3x text-muted mb-3 opacity-50"></i>
+                        <h4 class="fw-bold text-dark">No Talent Found</h4>
+                        <p class="text-muted mb-4">We couldn't find any freelancers matching your criteria.</p>
+                        <a th:href="@{/find-talent/}" class="btn btn-primary px-4">Reset Filters</a>
+                    </div>
+                </div>
+
+                <!-- Talent Grid -->
+                <div class="talent-grid" th:if="${freelancers != null and not freelancers.isEmpty()}">
+
+                    <div th:each="freelancer, iterStat : ${freelancers}" class="talent-card animate-on-scroll"
+                        th:style="'transition-delay: ' + ${iterStat.index * 0.1} + 's;'">
+
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <img th:if="${freelancer.photosImagePath}" th:src="@{${freelancer.photosImagePath}}"
+                                class="freelancer-avatar" />
+                            <img th:unless="${freelancer.photosImagePath}" th:src="@{/images/default-user.png}"
+                                class="freelancer-avatar" />
+
+                            <div class="flex-grow-1 overflow-hidden">
+                                <a th:href="@{/job-seeker-profile/view/{id}(id=${freelancer.userAccountId})}"
+                                    class="freelancer-name text-truncate"
+                                    th:text="${freelancer.firstName + ' ' + freelancer.lastName}">Name</a>
+
+                                <div class="freelancer-title text-muted small mb-1 text-truncate"
+                                    th:if="${freelancer.title != null}" th:text="${freelancer.title}">
+                                    Professional Title
+                                </div>
+
+                                <div class="freelancer-location">
+                                    <i class="fas fa-map-marker-alt me-1"></i>
+                                    <span class="text-truncate"
+                                        th:text="${freelancer.city != null ? freelancer.city : 'Remote'}">Location</span>
+                                </div>
+
+                                <div th:if="${freelancer.isVerified}" class="badge-verified">
+                                    <i class="fas fa-check-circle"></i> Verified Pro
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Availability & Languages Quick Info -->
+                        <div class="d-flex flex-wrap gap-2 mb-3">
+                            <span th:if="${freelancer.availabilityStatus != null}" class="badge rounded-pill px-2 py-1"
+                                th:classappend="${freelancer.availabilityStatus == 'Available' ? 'bg-success-subtle text-success border border-success-subtle' : 
+                                                  (freelancer.availabilityStatus == 'Busy' ? 'bg-warning-subtle text-warning border border-warning-subtle' : 'bg-light text-muted border')}"
+                                style="font-size: 10px;">
+                                <i class="fas fa-clock me-1"></i> <span
+                                    th:text="${freelancer.availabilityStatus}">Available</span>
+                            </span>
+                            <span th:if="${freelancer.languages != null and !freelancer.languages.isEmpty()}"
+                                class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2 py-1"
+                                style="font-size: 10px;">
+                                <i class="fas fa-language me-1"></i> <span
+                                    th:text="${#strings.arraySplit(freelancer.languages, ', ').length + ' Languages'}">2
+                                    Languages</span>
+                            </span>
+                        </div>
+
+                        <div class="mb-3 flex-grow-1 overflow-hidden">
+                            <span th:each="skill, iter : ${freelancer.skills}" th:if="${iter.index < 3}"
+                                class="skill-badge" th:text="${skill.name}">Skill</span>
+                            <span th:if="${freelancer.skills.size() > 3}"
+                                class="skill-badge bg-white text-primary border-primary">
+                                +<span th:text="${freelancer.skills.size() - 3}"></span>
+                            </span>
+                        </div>
+
+                        <div class="actions-row">
+                            <a th:href="@{/chat/{userId}(userId=${freelancer.userId.userId})}"
+                                class="btn-action btn-message">
+                                <i class="fas fa-comment-dots"></i> Message
+                            </a>
+                            <a th:href="@{/job-seeker-profile/view/{id}(id=${freelancer.userAccountId})}"
+                                class="btn-action btn-view">
+                                View Profile
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="mt-5 pb-5" th:if="${totalPages > 1}">
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination justify-content-center">
+
+                                <!-- Previous -->
+                                <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                                    <a class="page-link shadow-sm"
+                                        th:href="@{/find-talent/(page=${currentPage - 1}, size=${size}, search=${search}, skill=${skill}, location=${location}, experienceLevel=${experienceLevel})}"
+                                        aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+
+                                <!-- Page Numbers -->
+                                <li class="page-item mx-1" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                                    th:classappend="${currentPage == i} ? 'active'">
+                                    <a class="page-link shadow-sm"
+                                        th:href="@{/find-talent/(page=${i}, size=${size}, search=${search}, skill=${skill}, location=${location}, experienceLevel=${experienceLevel})}"
+                                        th:text="${i + 1}">1</a>
+                                </li>
+
+                                <!-- Next -->
+                                <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                                    <a class="page-link shadow-sm"
+                                        th:href="@{/find-talent/(page=${currentPage + 1}, size=${size}, search=${search}, skill=${skill}, location=${location}, experienceLevel=${experienceLevel})}"
+                                        aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+
+
+            </main>
+
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <th:block th:replace="fragments/footer :: footer"></th:block>
+
+    <!-- Scripts -->
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.1
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.animate-on-scroll').forEach(element => {
+                observer.observe(element);
+            });
+        });
+    </script>
+</body>
+
+</html>

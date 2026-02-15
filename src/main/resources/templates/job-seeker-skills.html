@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org/"
+    xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Manage Skills | Jobify</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" rel="stylesheet" />
+    <link th:href="@{/webjars/font-awesome/css/all.min.css}" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" />
+
+    <style>
+        :root {
+            --primary: #0d6efd;
+            --primary-light: #e7f1ff;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --border: #e2e8f0;
+            --radius: 12px;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: #f1f5f9;
+            color: var(--dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .page-container {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 0 24px;
+            flex: 1;
+        }
+
+        .skill-card {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            padding: 30px;
+            margin-bottom: 24px;
+            transition: var(--transition);
+        }
+
+        .skill-card:hover {
+            box-shadow: 0 10px 30px rgba(13, 110, 253, 0.08);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+
+        .section-header h1 {
+            font-size: 28px;
+            font-weight: 800;
+            margin: 0;
+            background: linear-gradient(45deg, var(--dark), var(--primary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .form-label {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--gray);
+            margin-bottom: 8px;
+        }
+
+        .form-control,
+        .form-select {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 15px;
+            transition: var(--transition);
+            background-color: var(--light);
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            background-color: white;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.1);
+        }
+
+        .skill-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: white;
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            margin-bottom: 16px;
+            transition: var(--transition);
+            border: 1px solid var(--border);
+        }
+
+        .skill-item:hover {
+            border-color: var(--primary);
+            transform: translateY(-3px) scale(1.01);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+        }
+
+        .skill-icon-box {
+            width: 48px;
+            height: 48px;
+            background: var(--primary-light);
+            color: var(--primary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-right: 20px;
+        }
+
+        .skill-info {
+            flex: 1;
+        }
+
+        .skill-name {
+            font-weight: 700;
+            font-size: 17px;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+
+        .skill-meta {
+            display: flex;
+            gap: 15px;
+            color: var(--gray);
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .skill-meta span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-delete {
+            color: #ef4444;
+            background: #fee2e2;
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            border: none;
+            text-decoration: none;
+        }
+
+        .btn-delete:hover {
+            background: #ef4444;
+            color: white;
+            transform: rotate(15deg);
+        }
+
+        .animate-up {
+            animation: fadeInUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .delay-1 {
+            animation-delay: 0.1s;
+        }
+
+        .delay-2 {
+            animation-delay: 0.2s;
+        }
+    </style>
+</head>
+
+<body class="bg-light d-flex flex-column min-vh-100">
+    <!-- Header -->
+    <th:block th:replace="fragments/freelancer-header :: freelancerHeader('profile')"></th:block>
+
+    <div class="page-container">
+        <div class="section-header animate-up">
+            <div>
+                <h1>Manage Your Skills</h1>
+                <p class="text-muted mb-0">Highlight your expertise to attract more clients.</p>
+            </div>
+            <a th:href="@{/job-seeker-profile/}" class="btn btn-white border shadow-sm rounded-pill px-4 fw-bold">
+                <i class="fas fa-arrow-left me-2"></i> Back to Profile
+            </a>
+        </div>
+
+        <div th:if="${success}"
+            class="alert alert-success border-0 shadow-sm rounded-4 d-flex align-items-center animate-up" role="alert">
+            <i class="fas fa-check-circle me-3 fs-4"></i>
+            <div th:text="${success}">Skill added successfully!</div>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div class="row g-4 mt-2">
+            <!-- Add Skill Form -->
+            <div class="col-lg-5 animate-up delay-1">
+                <div class="skill-card">
+                    <h5 class="fw-bold mb-4">Add New Skill</h5>
+                    <form th:action="@{/job-seeker-profile/skills/add}" method="post" th:object="${newSkill}">
+                        <div class="mb-4">
+                            <label class="form-label">Skill Name</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 rounded-start-lg"><i
+                                        class="fas fa-terminal text-primary"></i></span>
+                                <input type="text" class="form-control border-start-0" th:field="*{name}"
+                                    placeholder="e.g. Java, Python, UI Design" required />
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-6">
+                                <label class="form-label">Level</label>
+                                <select class="form-select" th:field="*{experienceLevel}" required>
+                                    <option value="" disabled selected>Select</option>
+                                    <option value="Beginner">Beginner</option>
+                                    <option value="Intermediate">Intermediate</option>
+                                    <option value="Advance">Advance</option>
+                                    <option value="Expert">Expert</option>
+                                </select>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">Category</label>
+                                <select class="form-select" th:field="*{category}" required>
+                                    <option value="" disabled selected>Category</option>
+                                    <option value="Development">Development</option>
+                                    <option value="Design">Design</option>
+                                    <option value="Data Science">Data Science</option>
+                                    <option value="Marketing">Marketing</option>
+                                    <option value="Writing">Writing</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label">Experience (Years)</label>
+                            <input type="text" class="form-control" th:field="*{yearsOfExperience}"
+                                placeholder="e.g. 3+ Years" required />
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 py-3 fw-bold rounded-3 shadow-sm">
+                            <i class="fas fa-plus-circle me-2"></i> Add Skill to Profile
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Skills List -->
+            <div class="col-lg-7 animate-up delay-2">
+                <div class="skill-card">
+                    <h5 class="fw-bold mb-4">Your Expert Skills</h5>
+
+                    <div th:if="${skills == null or skills.isEmpty()}" class="text-center py-5">
+                        <div class="mb-3">
+                            <i class="fas fa-lightbulb fa-3x text-warning opacity-50"></i>
+                        </div>
+                        <h6 class="fw-bold text-dark">No skills listed yet</h6>
+                        <p class="text-muted small">Showcase your talents by adding relevant skills.</p>
+                    </div>
+
+                    <div th:if="${skills != null and !skills.isEmpty()}">
+                        <div th:each="skill : ${skills}" class="skill-item">
+                            <div class="d-flex align-items-center">
+                                <div class="skill-icon-box">
+                                    <i
+                                        th:class="${skill.category == 'Development' ? 'fas fa-code' : 
+                                               (skill.category == 'Design' ? 'fas fa-paint-brush' : 
+                                               (skill.category == 'Marketing' ? 'fas fa-bullhorn' : 'fas fa-star'))}"></i>
+                                </div>
+                                <div class="skill-info">
+                                    <div class="skill-name" th:text="${skill.name}">Java</div>
+                                    <div class="skill-meta">
+                                        <span><i class="fas fa-signal"></i> [[${skill.experienceLevel}]]</span>
+                                        <span><i class="fas fa-calendar-alt"></i> [[${skill.yearsOfExperience}]]</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <a th:href="@{/job-seeker-profile/skills/delete/{id}(id=${skill.id})}" class="btn-delete"
+                                title="Remove Skill"
+                                onclick="return confirm('Are you sure you want to remove this skill?');">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <th:block th:replace="fragments/footer :: footer"></th:block>
+
+    <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
+</body>
+
+</html>

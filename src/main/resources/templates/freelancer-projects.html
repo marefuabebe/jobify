@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org/">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Ongoing Projects | Jobify</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" rel="stylesheet" />
+    <link th:href="@{/webjars/font-awesome/css/all.min.css}" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" />
+    <style>
+        .project-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08) !important;
+        }
+
+        .btn-submit-work {
+            background: linear-gradient(135deg, #198754 0%, #20c997 100%);
+            border: none;
+            color: white;
+            font-weight: 600;
+        }
+
+        .btn-submit-work:hover {
+            background: linear-gradient(135deg, #157347 0%, #1baa80 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(32, 201, 151, 0.3);
+        }
+
+        .avatar-small {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body class="bg-light d-flex flex-column min-vh-100">
+
+    <!-- Header -->
+    <th:block th:replace="fragments/freelancer-header :: freelancerHeader('projects')"></th:block>
+
+    <div class="container py-5 flex-grow-1">
+
+        <!-- Page Header -->
+        <div class="d-flex justify-content-between align-items-center mb-5 animate-up">
+            <div>
+                <h2 class="fw-bold text-dark mb-1">Ongoing Projects</h2>
+                <p class="text-muted mb-0">Manage and track your active contracts.</p>
+            </div>
+            <div class="d-flex gap-3">
+                <a th:href="@{/find-work/}"
+                    class="btn btn-outline-primary rounded-pill px-4 btn-sm fw-bold shadow-sm btn-nowrap"
+                    style="white-space: nowrap;">
+                    <i class="fas fa-search me-2"></i>Find New Work
+                </a>
+                <a th:href="@{/freelancer-dashboard/}"
+                    class="btn btn-outline-primary rounded-pill px-4 btn-sm fw-bold shadow-sm btn-nowrap"
+                    style="white-space: nowrap;">
+                    <i class="fas fa-home me-2"></i> Dashboard
+                </a>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="text-center py-5 animate-up" th:if="${ongoingProjects == null or ongoingProjects.isEmpty()}">
+            <div class="bg-white rounded-circle shadow-sm d-inline-flex align-items-center justify-content-center mb-4"
+                style="width: 100px; height: 100px;">
+                <i class="fas fa-clipboard-list fa-3x text-muted opacity-50"></i>
+            </div>
+            <h4 class="fw-bold text-dark">No Active Projects</h4>
+            <p class="text-muted mb-4">You don't have any ongoing work at the moment.</p>
+            <a th:href="@{/freelancer-dashboard/proposals}" class="btn btn-primary px-4 rounded-pill">
+                Check Proposals
+            </a>
+        </div>
+
+        <!-- Projects Grid -->
+        <div class="row g-4" th:if="${ongoingProjects != null and !ongoingProjects.isEmpty()}">
+            <div class="col-lg-6" th:each="project, iterStat : ${ongoingProjects}">
+                <div class="card border-0 shadow-sm rounded-4 h-100 project-card animate-up"
+                    th:classappend="'delay-' + ${iterStat.index * 100}">
+
+                    <div class="card-body p-4 d-flex flex-column">
+
+                        <!-- Header: Title & Status -->
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <span
+                                    class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill mb-2">
+                                    <i class="fas fa-bolt me-1"></i> Active
+                                </span>
+                                <h5 class="fw-bold text-dark mb-1 text-truncate-2" th:text="${project.job.jobTitle}">
+                                    Project Title</h5>
+                                <div class="d-flex align-items-center text-muted small">
+                                    <i class="fas fa-building me-2"></i>
+                                    <span th:text="${project.job.jobCompanyId.name}">Company Name</span>
+                                </div>
+                            </div>
+                            <!-- Rate Badge -->
+                            <div class="text-end" th:if="${project.proposedRate != null}">
+                                <div class="fs-5 fw-bold text-success"
+                                    th:text="${'$' + #numbers.formatDecimal(project.proposedRate, 0, 'COMMA', 0, 'POINT')}">
+                                    $500</div>
+                                <div class="small text-muted">Agreed Rate</div>
+                            </div>
+                        </div>
+
+                        <hr class="op-1 my-3" />
+
+                        <!-- Details & Client Info -->
+                        <div class="mb-4 flex-grow-1">
+                            <div class="d-flex align-items-center mb-3">
+                                <img th:src="${project.job.recruiterProfilePhoto != null ? project.job.recruiterProfilePhoto : 'https://ui-avatars.com/api/?name=' + (project.job.recruiterFirstName != null ? project.job.recruiterFirstName : 'Client') + '&background=random'}"
+                                    class="avatar-small me-3">
+                                <div>
+                                    <div class="fw-bold text-dark small">
+                                        <span
+                                            th:text="${project.job.recruiterFirstName != null ? project.job.recruiterFirstName + ' ' + (project.job.recruiterLastName != null ? project.job.recruiterLastName : '') : 'Client Contact'}">Client
+                                            Name</span>
+                                    </div>
+                                    <div class="text-muted small" th:text="${project.job.postedById.email}">
+                                        client@email.com</div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex gap-4 small text-muted">
+                                <div>
+                                    <i class="fas fa-calendar-check me-1 text-primary"></i>
+                                    Hired: <span class="fw-medium text-dark"
+                                        th:text="${#dates.format(project.applyDate, 'MMM dd, yyyy')}">Jan 01</span>
+                                </div>
+                                <div th:if="${project.job.jobType}">
+                                    <i class="fas fa-clock me-1 text-info"></i>
+                                    <span th:text="${project.job.jobType}">Full Time</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex gap-2 mt-auto">
+                            <!-- Message Button -->
+                            <a th:href="@{/chat/{userId}(userId=${project.job.postedById.userId}, jobId=${project.job.jobPostId})}"
+                                class="btn btn-primary flex-fill shadow-sm rounded-3">
+                                <i class="fas fa-comment-dots me-2"></i>Message
+                            </a>
+
+                            <!-- Submit/Status Button -->
+                            <form th:action="@{/dispute/submit-work}" method="post" class="flex-fill"
+                                th:if="${project.applicationStatus != 'WORK_SUBMITTED'}">
+                                <input type="hidden" name="jobId" th:value="${project.job.jobPostId}" />
+                                <button type="submit" class="btn btn-submit-work w-100 rounded-3 shadow-sm"
+                                    onclick="return confirm('Confirm work submission? This will notify the client.');">
+                                    <i class="fas fa-check-circle me-2"></i>Submit Work
+                                </button>
+                            </form>
+
+                            <button th:if="${project.applicationStatus == 'WORK_SUBMITTED'}"
+                                class="btn btn-secondary flex-fill rounded-3" disabled>
+                                <i class="fas fa-clock me-2"></i>Under Review
+                            </button>
+
+                            <!-- Dropdown for More Actions (Report) -->
+                            <div class="dropdown">
+                                <button class="btn btn-light border shadow-sm rounded-3 px-3" type="button"
+                                    data-bs-toggle="dropdown">
+                                    <i class="fas fa-ellipsis-v text-muted"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3">
+                                    <li>
+                                        <button class="dropdown-item text-danger" type="button" data-bs-toggle="modal"
+                                            th:data-bs-target="'#disputeModal' + ${project.id}">
+                                            <i class="fas fa-exclamation-triangle me-2"></i>Report Issue
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Dispute Modal (Per Project) -->
+                <div class="modal fade" th:id="'disputeModal' + ${project.id}" tabindex="-1">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content rounded-4 border-0 shadow">
+                            <form th:action="@{/dispute/create}" method="post">
+                                <div class="modal-header border-0 pb-0">
+                                    <h5 class="modal-title fw-bold text-danger"><i
+                                            class="fas fa-shield-alt me-2"></i>Report Dispute</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body p-4">
+                                    <p class="text-muted small mb-3">
+                                        Please describe the issue with <strong><span
+                                                th:text="${project.job.jobTitle}">Job</span></strong>.
+                                        Admins will review this case.
+                                    </p>
+
+                                    <input type="hidden" name="jobId" th:value="${project.job.jobPostId}" />
+                                    <input type="hidden" name="againstId" th:value="${project.job.postedById.userId}" />
+
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">Issue Type</label>
+                                        <select class="form-select bg-light border-0" name="type" required>
+                                            <option value="STATUS_ISSUE">Project Status / Delays</option>
+                                            <option value="PAYMENT_ISSUE">Payment Issue</option>
+                                            <option value="BEHAVIOR">Unprofessional Behavior</option>
+                                            <option value="OTHER">Other</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">Description</label>
+                                        <textarea class="form-control bg-light border-0" name="description" rows="4"
+                                            placeholder="Provide specific details about the problem..."
+                                            required></textarea>
+                                    </div>
+
+                                    <div
+                                        class="alert alert-warning d-flex align-items-start border-0 bg-warning-subtle text-warning small rounded-3">
+                                        <i class="fas fa-info-circle mt-1 me-2"></i>
+                                        <div>Reporting a dispute may freeze funds related to this project until
+                                            resolved.</div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer border-0 pt-0">
+                                    <button type="button" class="btn btn-light rounded-pill px-4"
+                                        data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn btn-danger rounded-pill px-4">Submit
+                                        Report</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <th:block th:replace="fragments/footer :: footer"></th:block>
+
+    <!-- Scripts -->
+
+
+</body>
+
+</html>

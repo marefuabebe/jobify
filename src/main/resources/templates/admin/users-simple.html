@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>All Users - Admin</title>
+</head>
+<body>
+    <h1>All Users Admin Page</h1>
+    <p>Total Users: <span th:text="${totalUsers}">0</span></p>
+    <p>Current Page: <span th:text="${currentPage}">0</span></p>
+    
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Type</th>
+                <th>Approved</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="user : ${users}">
+                <td th:text="${user.firstName + ' ' + user.lastName}">Name</td>
+                <td th:text="${user.email}">Email</td>
+                <td th:text="${user.userTypeId != null ? (user.userTypeId.userTypeId == 1 ? 'Client' : 'Freelancer') : 'Unknown'}">Type</td>
+                <td th:text="${user.approved ? 'Yes' : 'No'}">Approved</td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <div th:if="${totalPages > 1}">
+        <p>Page <span th:text="${currentPage + 1}">1</span> of <span th:text="${totalPages}">1</span></p>
+        <a th:if="${currentPage > 0}" th:href="@{/admin/users(page=${currentPage - 1})}">Previous</a>
+        <a th:if="${currentPage < totalPages - 1}" th:href="@{/admin/users(page=${currentPage + 1})}">Next</a>
+    </div>
+    
+    <p>
+        <a href="/admin/dashboard">Back to Dashboard</a>
+    </p>
+</body>
+</html>

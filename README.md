@@ -1,6 +1,6 @@
-# Jobify - Web-Based Freelancing Platform
+# Jobify - Modern Online Job Portal
 
-**Jobify** is a web-based freelancing platform that connects **Clients** and **Freelancers**. Built with **Java 21**, **Spring Boot 3**, **Spring MVC**, **Thymeleaf**, **Hibernate/JPA**, **Spring Security**, and **MySQL**, this platform provides a complete workflow from job posting to project completion, featuring real-time communication and comprehensive admin oversight.
+**Jobify** is a modern online job portal that connects job seekers with employers through secure profiles, searchable listings, and streamlined applications. It offers dashboards for applicants and recruiters, supports resume uploads, and provides an efficient, user-friendly hiring experience. Designed to simplify recruitment for all users everywhere.
 
 The Client UI allows clients to post job requirements, view freelancer applications, access freelancer profiles and resumes, shortlist candidates, and track application status. Only verified clients can post jobs, and all job postings require admin approval, ensuring a secure and well-managed hiring process.
 
